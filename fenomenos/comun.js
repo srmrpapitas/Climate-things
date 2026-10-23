@@ -115,6 +115,7 @@ window.COMUN = (() => {
       }
       geo.setAttribute('color', new T.BufferAttribute(col, 3)); geo.computeVertexNormals();
       const m = new T.Mesh(geo, new T.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: .9, emissive: 0x000000 }));
+      m.rotation.x = -1.05; // gira la esfera (sobre el eje del corte) para que la ciudad no caiga en el casquete polar
       // cara del corte: magma
       const cut = new T.Mesh(new T.CircleGeometry(RT * .995, 40), new T.MeshStandardMaterial({ color: 0xff6a1a, emissive: 0xff3b00, emissiveIntensity: .9, flatShading: true, side: T.DoubleSide }));
       cut.rotation.y = Math.PI / 2;
@@ -125,18 +126,48 @@ window.COMUN = (() => {
     // halo de atmósfera
     const atm = new T.Mesh(new T.SphereGeometry(RT * 1.025, 48, 32), new T.MeshBasicMaterial({ color: 0x9fd3ff, transparent: true, opacity: .18, side: T.BackSide, depthWrite: false }));
     g.add(atm);
+    // nubes: trozos sueltos de una esfera algo mayor, blancos y semitransparentes
+    const geoN = new T.SphereGeometry(RT * 1.012, 48, 30).toNonIndexed(), pN = geoN.attributes.position, keep = [];
+    for (let i = 0; i < pN.count; i += 3) { const x = pN.getX(i) / RT, y = pN.getY(i) / RT, z = pN.getZ(i) / RT;
+      if (tierra(x * 1.7 + 3, y * 1.7, z * 1.7 - 2) > .56) for (let k = 0; k < 3; k++) keep.push(pN.getX(i + k), pN.getY(i + k), pN.getZ(i + k)); }
+    const geoNub = new T.BufferGeometry(); geoNub.setAttribute('position', new T.Float32BufferAttribute(keep, 3)); geoNub.computeVertexNormals();
+    const nubes = new T.Mesh(geoNub, new T.MeshStandardMaterial({ color: 0xffffff, transparent: true, opacity: .62, flatShading: true, roughness: 1, depthWrite: false }));
+    g.add(nubes);
+    // estrellas alrededor (solo se ven cuando el planeta está en pantalla)
+    const est = new Float32Array(1800 * 3);
+    for (let k = 0; k < 1800; k++) { const u = Math.random() * 2 - 1, a = Math.random() * 6.283, r = Math.sqrt(1 - u * u), d = 4e8;
+      est[k * 3] = r * Math.cos(a) * d; est[k * 3 + 1] = u * d; est[k * 3 + 2] = r * Math.sin(a) * d; }
+    const geoE = new T.BufferGeometry(); geoE.setAttribute('position', new T.BufferAttribute(est, 3));
+    const estrellas = new T.Points(geoE, new T.PointsMaterial({ color: 0xffffff, size: 1.6, sizeAttenuation: false, fog: false }));
+    estrellas.frustumCulled = false; g.add(estrellas);
+    // trozos de roca para cuando revienta, y un fogonazo
+    const trozos = [];
+    const fogonazo = new T.Mesh(new T.SphereGeometry(RT, 32, 20), new T.MeshBasicMaterial({ color: 0xfff6dc, transparent: true, opacity: 0, depthWrite: false, blending: T.AdditiveBlending, fog: false }));
+    fogonazo.visible = false; g.add(fogonazo); let flash = -1;
     ctx.scene.add(g);
     let split = 0, splitV = 0, ocultos = null, forzado = false;
     planetaObj = {
-      g, halves, core, atm,
+      g, halves, core, atm, nubes, trozos,
       // el planeta aparece cuando la cámara se aleja lo bastante; el resto de la escena se oculta
       update(dt) {
         const lejos = forzado || ctx.camera.position.distanceTo(g.position) > RT + 6e5;
         if (lejos && !g.visible) { g.visible = true; ocultos = [];
-          for (const ch of ctx.scene.children) if (ch !== g && ch.visible && !ch.isLight && !ch.isPoints) { ch.visible = false; ocultos.push(ch); } }
+          for (const ch of ctx.scene.children) if (ch !== g && ch.visible && !ch.isLight && !ch.isPoints && !ch.userData.sobrePlaneta) { ch.visible = false; ocultos.push(ch); } }
         if (splitV) { split = Math.min(1, split + dt * splitV); const e = 1 - Math.pow(1 - split, 2);
           for (const hf of halves) { hf.h.position.x = hf.dir * e * RT * .9; hf.h.rotation.z = hf.dir * e * .5; hf.h.rotation.y = hf.dir * e * .3; }
-          atm.material.opacity = .18 * (1 - e); core.scale.setScalar(1 + e * .25); }
+          atm.material.opacity = .18 * (1 - e); core.scale.setScalar(1 + e * .25); nubes.material.opacity = .62 * (1 - e); }
+        nubes.rotation.y += dt * .01;
+        for (const t of trozos) { t.m.position.addScaledVector(t.v, dt); t.m.rotation.x += t.w * dt; t.m.rotation.y += t.w * .7 * dt; }
+        if (flash >= 0) { flash += dt; const k = flash / 1.6; fogonazo.visible = k < 1; fogonazo.scale.setScalar(1 + k * 2.2); fogonazo.material.opacity = Math.max(0, 1 - k) * .95; }
+      },
+      // revienta: fogonazo blanco y n trozos de corteza que salen girando
+      reventar(n = 70) {
+        flash = 0;
+        const cs = [0x8a6a4c, 0x6f5a48, 0xff7a22, 0xc65a1e, 0x5a8a3c];
+        for (let k = 0; k < n; k++) { const u = ctx.rr(-1, 1), a = ctx.rr(0, 6.283), r = Math.sqrt(1 - u * u), d = new T.Vector3(r * Math.cos(a), u, r * Math.sin(a));
+          const m = new T.Mesh(new T.IcosahedronGeometry(1, 0), new T.MeshStandardMaterial({ color: cs[k % cs.length], flatShading: true, emissive: k % 5 === 2 || k % 5 === 3 ? 0xff4a10 : 0x000000, emissiveIntensity: .6 }));
+          m.scale.set(ctx.rr(.03, .11), ctx.rr(.02, .07), ctx.rr(.03, .1)).multiplyScalar(RT); m.position.copy(d).multiplyScalar(RT * ctx.rr(.6, 1));
+          g.add(m); trozos.push({ m, v: d.multiplyScalar(ctx.rr(.6e6, 2.4e6)), w: ctx.rr(-1.5, 1.5) }); }
       },
       // separa la Tierra en dos (vel: fracción por segundo)
       partir(vel = .16) { splitV = vel; },
@@ -181,6 +212,28 @@ window.COMUN = (() => {
     parte(0x3b4250, .45, .75, .28, .38); parte(color, .52, .7, .32, 1.1); g.userData.cabeza = parte(0xf1c9a5, .3, .3, .3, 1.62);
     return g;
   }
+  // protagonista con más detalle (como el del clip de referencia): pelo, barba, brazos y piernas que se mueven al andar.
+  // userData: cabeza, boca y andar(fase, amplitud) para animar el paso.
+  function heroe(ctx, color = 0xd8282f) {
+    const T = ctx.THREE, g = new T.Group();
+    const caja = (padre, c, sx, sy, sz, x, y, z) => { const m = new T.Mesh(ctx.BOX, ctx.mat(c)); m.scale.set(sx, sy, sz); m.position.set(x, y, z); m.castShadow = true; padre.add(m); return m; };
+    const piv = (x, y) => { const p = new T.Group(); p.position.set(x, y, 0); g.add(p); return p; };
+    const PIEL = 0xe0b48e, PELO = 0x4a2f1f, PANT = 0x9aa0aa;
+    const piernas = [-1, 1].map(s => { const p = piv(s * .12, .92); caja(p, PANT, .19, .84, .22, 0, -.42, 0); caja(p, 0x2b2b30, .21, .1, .32, 0, -.87, .05); return p; });
+    caja(g, color, .56, .64, .32, 0, 1.22, 0); caja(g, color, .44, .2, .2, 0, 1.5, -.12); // sudadera y capucha
+    caja(g, 0xb81f25, .5, .08, .33, 0, .93, 0); // bajo de la sudadera
+    const brazos = [-1, 1].map(s => { const p = piv(s * .34, 1.48); caja(p, color, .15, .56, .17, 0, -.27, 0); caja(p, PIEL, .12, .13, .13, 0, -.6, 0); return p; });
+    caja(g, PIEL, .14, .1, .14, 0, 1.58, 0);
+    const cabeza = new T.Group(); cabeza.position.y = 1.62; g.add(cabeza);
+    caja(cabeza, PIEL, .3, .32, .3, 0, .16, 0);
+    caja(cabeza, PELO, .33, .1, .33, 0, .34, -.01); caja(cabeza, PELO, .33, .22, .07, 0, .22, -.14); // pelo
+    caja(cabeza, PELO, .3, .09, .04, 0, .02, .14); // barba
+    for (const s of [-1, 1]) caja(cabeza, 0x1d1d22, .05, .04, .02, s * .075, .2, .151);
+    const boca = caja(cabeza, 0x3a1a1a, .12, .025, .02, 0, .08, .16);
+    g.userData = { cabeza, boca, andar(ph, k) { const a = Math.sin(ph) * k;
+      piernas[0].rotation.x = a * .55; piernas[1].rotation.x = -a * .55; brazos[0].rotation.x = -a * .45; brazos[1].rotation.x = a * .45; } };
+    return g;
+  }
   // personas que pasean (dir), se caen al suelo (caer 0→1) o huyen (huir = dirección)
   function moverGente(ctx, list, dt, t) {
     for (const p of list) {
@@ -222,5 +275,5 @@ window.COMUN = (() => {
     };
   }
 
-  return { TNT_J, RT, EN, DE, num, grande, textoTNT, comparaTNT, materiales, tintar, derribar, edificios, planeta, estallarPlaneta, multitud, persona, moverGente, tono, ruido, reloj };
+  return { TNT_J, RT, EN, DE, num, grande, textoTNT, comparaTNT, materiales, tintar, derribar, edificios, planeta, estallarPlaneta, multitud, persona, heroe, moverGente, tono, ruido, reloj };
 })();

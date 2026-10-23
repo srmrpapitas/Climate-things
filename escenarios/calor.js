@@ -15,13 +15,13 @@ window.ESCENARIOS = window.ESCENARIOS || {};
     ritmo: 3.2, introDur: 2.8,
     paso: T('DUPLICACIÓN', 'DOUBLING'),
     lema: T('EL DOBLE DE CALOR CADA VEZ', 'TWICE AS HOT EVERY TIME'),
-    intro: { pos: [-20, 12, 120], mira: [0, 14, 520] },
+    intro: { pos: [2, 9, 145], mira: [0, 14, 520] },
     sonido: { camas: { dron: .3, ciudad: .5 }, paso: 'whoosh', pasoGan: .35 },
     // planeta: la cámara sale al espacio y se ve la Tierra incandescente.
     fases: [
       P(T('UNA MAÑANA DE PRIMAVERA', 'A SPRING MORNING'), T('Tiempo perfecto para pasear.', 'Perfect weather for a walk.'), C([2, 5, 160], [0, 14, 520])),
       P(T('UN DÍA AGRADABLE', 'A NICE DAY'), T('Ya se puede ir en manga corta.', 'T-shirt weather.'), C([2, 5, 160], [0, 14, 520])),
-      P(T('UNA OLA DE CALOR', 'A HEATWAVE'), T('El asfalto quema y todo el mundo busca la sombra.', 'The asphalt burns. Everyone looks for shade.'), C([-6, 9, 150], [0, 13, 510])),
+      P(T('UNA OLA DE CALOR', 'A HEATWAVE'), T('El asfalto quema y todo el mundo busca la sombra.', 'The asphalt burns. Everyone looks for shade.'), C([1, 7, 152], [0, 13, 510])),
       P(T('UNA SAUNA', 'A SAUNA'), T('Más que el récord de la Tierra: 56,7 °C. Los árboles se secan.', 'Hotter than Earth\'s record: 56.7 °C. The trees dry out.'), C([-20, 26, 120], [0, 10, 500])),
       P(T('UN HORNO DE PAN', 'A BREAD OVEN'), T('El mar hierve en la orilla.', 'The sea boils at the shore.'), C([-200, 60, -120], [0, 0, 160]), { camas: { ciudad: 0, fuego: .25 }, sfx: [['panico', .35, .4]] }),
       P(T('UN HORNO DE PIZZA', 'A PIZZA OVEN'), T('Arden la madera y los árboles. La ciudad entera en llamas.', 'Wood and trees catch fire. The whole city is in flames.'), C([-350, 220, -250], [0, 10, 600]), { camas: { fuego: .6 } }),

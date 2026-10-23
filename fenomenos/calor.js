@@ -40,7 +40,7 @@ window.FENOMENOS.calor = (() => {
     if (T >= 1200) for (const o of edif) if (o.state !== 2) reloj.luego(ctx.rr(.3, 3.5), () => {
       COMUN.derribar(ctx, o, new ctx.THREE.Vector3(ctx.rr(-2, 2), -Math.min(o.h, 300) * .1, ctx.rr(-2, 2)), { colorEscombros: 0x6a4030, polvo: 10, colorPolvo: temp.naranja });
     });
-    if (f.planeta) planeta = COMUN.planeta(ctx);
+    if (f.planeta) { planeta = COMUN.planeta(ctx); cieloObj = 0x05070c; } // en el espacio, cielo negro
     COMUN.ruido(ctx, 4, 300 + Math.min(T, 3000) * .3, Math.min(.6, .1 + n * .06));
   }
 

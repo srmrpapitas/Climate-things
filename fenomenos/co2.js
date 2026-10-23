@@ -4,12 +4,18 @@ window.FENOMENOS.co2 = (() => {
   let ctx, ppm = 420, t0 = 0, tiempo = 0, gente = [], coches = [], todos = [];
   const est = { niebla: 0, mar: 0 }, obj = { ...est };
   let cieloObj = 0x9fd3f0, gris = null, nieblaCol = null;
+  const X0 = -11.5, Z0 = 120, VEL = .8, reloj = COMUN.reloj();
+  let heroe = null, heroeLento = 1, heroeCae = 0, andado = 0;
   const extraGt = p => Math.max(0, p - 280) * 7.8;           // CO2 de más respecto a antes de la industria (Gt)
   const cochesAno = p => extraGt(p) * 1e9 / 4.6;
 
   function crear(c) {
     ctx = c; gris = new ctx.THREE.Color(0x9a9a8c); nieblaCol = new ctx.THREE.Color(0xb8b49a);
+    // protagonista: el mismo chico de la sudadera roja, paseando por la acera
+    heroe = COMUN.heroe(ctx, 0xd8282f); heroe.position.set(X0, ctx.GROUND, Z0); heroe.userData.fenPropio = true;
+    heroe.traverse(m => { if (m.isMesh) m.castShadow = true; }); ctx.scene.add(heroe);
     gente = COMUN.multitud(ctx, 90, -10, 10, 120, 420, { andar: true });
+    for (const p of gente) if (Math.abs(p.x - X0) < 1.5 && p.z > Z0 - 4 && p.z < Z0 + 60) { p.x += 3; p.g.position.x = p.x; }
     todos = gente.concat(ctx.people);
     coches = ctx.objects.filter(o => o.kind === 'car');
     for (const o of coches) o.vel = ctx.R() < .5 ? ctx.rr(4, 9) : 0;
@@ -29,6 +35,8 @@ window.FENOMENOS.co2 = (() => {
     obj.niebla = Math.min(.92, Math.max(0, Math.log2(ppm / 420) / 8));
     obj.mar = ppm >= 3000 ? Math.min(1, Math.log2(ppm / 1680) / 4) : 0;
     cieloObj = ppm >= 20000 ? 0x8d8b7a : ppm >= 5000 ? 0xa3aa9e : ppm >= 1500 ? 0xb3c4c6 : 0x9fd3f0;
+    heroeLento = ppm >= 40000 ? .15 : ppm >= 10000 ? .4 : ppm >= 5000 ? .65 : 1;
+    if (ppm >= 40000 && !heroeCae) reloj.luego(1.2, () => { heroeCae = .001; });
     const lento = ppm >= 5000 ? Math.max(.15, 1 - Math.log2(ppm / 5000) * .3) : 1;
     // fracción de gente que se desmaya
     const caen = ppm >= 100000 ? 1 : ppm >= 40000 ? .55 : ppm >= 20000 ? .08 : 0;
@@ -42,7 +50,7 @@ window.FENOMENOS.co2 = (() => {
   }
 
   function actualizar(c, dt, t) {
-    tiempo = t; const k = 1 - Math.exp(-dt * .9);
+    tiempo = t; reloj.tick(t); const k = 1 - Math.exp(-dt * .9);
     for (const key in est) est[key] += (obj[key] - est[key]) * k;
     ctx.skyT.set(cieloObj);
     // el mar sube (el hielo de los polos se derrite con el tiempo)
@@ -56,11 +64,19 @@ window.FENOMENOS.co2 = (() => {
     const r = Math.max(30, Math.min(800, ctx.camDist * .6)), n = Math.round(est.niebla * 10);
     for (let q = 0; q < n; q++) ctx.emit(ctx.camTgt.x + ctx.rr(-r, r), ctx.camTgt.y + ctx.rr(-r, r) * .5, ctx.camTgt.z + ctx.rr(-r, r), ctx.rr(-1, 1), ctx.rr(-.5, .5), ctx.rr(-1, 1), gris, 3, 0);
     ctx.setShake(0);
+    // el protagonista anda cada vez más despacio, tose con la cabeza gacha y al final se desploma
+    const vel = heroeCae ? 0 : VEL * heroeLento; heroe.position.z += vel * dt; andado += vel * dt;
+    heroe.userData.andar(t * 5 * heroeLento, vel > .05 ? 1 : 0);
+    heroe.userData.cabeza.rotation.x = ppm >= 5000 && !heroeCae ? .25 + Math.sin(t * 9) * .08 * (ppm >= 10000 ? 1 : 0) : 0;
+    if (heroeCae) { heroeCae = Math.min(1, heroeCae + dt / 1.4); heroe.rotation.x = -Math.PI / 2 * heroeCae * heroeCae; }
   }
+
+  // las cámaras de los pasos están puestas respecto a donde empieza a andar
+  function camara(c) { const d = andado, m = v => [v[0], v[1], v[2] + d]; return c.cerca ? { ...c, pos: m(c.pos), mira: m(c.mira) } : c; }
 
   return {
     sinBoom: true,
-    crear, fase, actualizar,
+    crear, fase, actualizar, camara,
     activo: () => tiempo - t0 < 4,
     mag: v => `${COMUN.num(v, 0)} ppm`,
     linea3: v => COMUN.EN ? [`≈ ${COMUN.grande(cochesAno(v))} cars for a year`, `(${COMUN.grande(extraGt(v) * 1e9)} t of extra CO2)`] : [`≈ ${COMUN.grande(cochesAno(v))} de coches un año`, `(${COMUN.grande(extraGt(v) * 1e9)} de t de CO2 de más)`],

@@ -7,7 +7,7 @@ window.FENOMENOS.decibelios = (() => {
   const X0 = -11.5, Z0 = 120, VEL = 1.25; // acera oeste de la avenida central; anda hacia el norte (z+)
   const reloj = COMUN.reloj();
   let ctxRef, stage, quien, cabeza, boca, burbuja, gente = [], ondas = [], dB = 0, t0 = 0, tiempo = 0, ventanas = 0, caidos0 = 0;
-  let planeta = null, explota = 0, astronauta = null, andar = true, zAndado = 0, fActual = {}, cupula = null, brillo = [0, 0], brilloObj = [0, 0];
+  let efectos = [], grietas = null, planeta = null, explota = 0, astronauta = null, andar = true, zAndado = 0, fActual = {}, cupula = null, brillo = [0, 0], brilloObj = [0, 0];
   const vatios = L => 4 * Math.PI * 1e-12 * Math.pow(10, L / 10);
   const presion = L => 20e-6 * Math.pow(10, L / 20); // Pa a 1 m
   const pos = () => quien.position;
@@ -15,9 +15,7 @@ window.FENOMENOS.decibelios = (() => {
   function crear(ctx) {
     const T = ctx.THREE; ctxRef = ctx; stage = document.getElementById('stage');
     quien = new T.Group(); quien.position.set(X0, ctx.GROUND, Z0);
-    const fig = COMUN.persona(ctx, 0xd8282f); quien.add(fig); cabeza = fig.userData.cabeza;
-    boca = new T.Mesh(ctx.BOX, ctx.mat(0x3a1a1a)); boca.scale.set(.14, .03, .02); boca.position.set(0, 1.56, .155); quien.add(boca);
-    quien.traverse(m => { if (m.isMesh) m.castShadow = true; });
+    const fig = COMUN.heroe(ctx, 0xd8282f); quien.add(fig); cabeza = fig.userData.cabeza; boca = fig.userData.boca;
     ctx.cityGroup.add(quien);
     // gente paseando por las dos aceras y la calzada (en este tramo no hay coches)
     gente = COMUN.multitud(ctx, 46, -15, -3, 100, 260, { andar: true }).concat(COMUN.multitud(ctx, 24, 3, 15, 100, 260, { andar: true }));
@@ -35,6 +33,18 @@ window.FENOMENOS.decibelios = (() => {
     ondas.push({ m, radio, dur, t: 0, op });
   }
 
+  // cúpula de polvo marrón que crece y se disipa, y un cráter oscuro con borde claro donde estaba
+  function polvo(ctx, r) {
+    const T = ctx.THREE, P = pos();
+    const domo = new T.Mesh(new T.SphereGeometry(1, 36, 14, 0, Math.PI * 2, 0, Math.PI / 2), new T.MeshStandardMaterial({ color: 0x9a7a58, transparent: true, opacity: .7, flatShading: true, roughness: 1, depthWrite: false }));
+    domo.position.set(P.x, P.y - .2, P.z); domo.userData.fenPropio = true; ctx.scene.add(domo);
+    const crater = new T.Mesh(new T.CircleGeometry(1, 40), new T.MeshStandardMaterial({ color: 0x3a2e26, roughness: 1, transparent: true, opacity: .92, polygonOffset: true, polygonOffsetFactor: -2 }));
+    crater.rotation.x = -Math.PI / 2; crater.position.set(P.x, P.y + .15, P.z); crater.scale.setScalar(.01); crater.userData.fenPropio = true; ctx.scene.add(crater);
+    const borde = new T.Mesh(new T.RingGeometry(.92, 1.08, 48), new T.MeshBasicMaterial({ color: 0xe8d8b8, transparent: true, opacity: .8, side: T.DoubleSide, depthWrite: false }));
+    borde.rotation.x = -Math.PI / 2; borde.position.set(P.x, P.y + .3, P.z); borde.scale.setScalar(.01); borde.userData.fenPropio = true; ctx.scene.add(borde);
+    efectos.push({ domo, crater, borde, r, t: 0 });
+  }
+
   function gritar(ctx, L) {
     const g = Math.min(1, .25 + Math.max(0, L - 60) * .006);
     ctx.sfx('grito', g, 0, L > 250 ? .82 : L > 180 ? .92 : 1); // grito grabado (audio/sfx/grito.mp3)
@@ -50,11 +60,11 @@ window.FENOMENOS.decibelios = (() => {
     if (dB >= 150 || f.espacio || f.final) andar = false;
     burbuja.textContent = COMUN.EN ? 'BOMBOCLAT!' : '¡BOMBOCLAT!';
     if (f.final) { // en el espacio no hay sonido: el protagonista flota entre los restos
-      const T = ctx.THREE; astronauta = COMUN.persona(ctx, 0xd8282f); astronauta.scale.setScalar(900); astronauta.userData.fenPropio = true; ctx.scene.add(astronauta);
+      const T = ctx.THREE; astronauta = COMUN.heroe(ctx, 0xd8282f); astronauta.userData.andar(1.2, .9); astronauta.scale.setScalar(1300); astronauta.userData.fenPropio = true; ctx.scene.add(astronauta);
       return;
     }
     if (f.brillo) brilloObj = f.brillo;
-    if (f.espacio || f.planeta) { planeta = COMUN.planeta(ctx); planeta.mostrar(); }
+    if (f.espacio || f.planeta) { planeta = COMUN.planeta(ctx); if (f.planeta) planeta.mostrar(); } // en espacio aparece sola al alejarse
     if (f.sinAire && planeta) planeta.atm.visible = false;
     if (f.planeta) explota = tiempo + .6;
     reloj.luego(.25, () => {
@@ -65,6 +75,7 @@ window.FENOMENOS.decibelios = (() => {
       else if (!f.espacio && !f.planeta) {
         const rCae = Math.min(3e5, presion(dB) / 35e3), rCri = Math.min(3e6, presion(dB) / 1e3);
         onda(ctx, rCae * 1.1, 2.4, 0xffffff, .55); onda(ctx, Math.max(rCae * 3, Math.min(rCri, rCae * 30)), 3, 0xfff2c0, .25);
+        if (dB >= 220) polvo(ctx, Math.max(40, rCae));
       }
       if (!f.espacio && !f.planeta) reaccionar(ctx, f);
     });
@@ -105,7 +116,7 @@ window.FENOMENOS.decibelios = (() => {
     if (dB >= 200) { // anillo de polvo a ras de suelo
       const v0 = Math.min(3000, 60 * Math.pow(10, (dB - 200) / 20));
       for (let k = 0; k < 900; k++) { const a = ctx.rr(0, 6.283), v = v0 * ctx.rr(.5, 1.4);
-        ctx.emit(P.x + Math.sin(a) * 5, P.y + ctx.rr(0, 8), P.z + Math.cos(a) * 5, Math.sin(a) * v, ctx.rr(0, v * .08), Math.cos(a) * v, DUST(ctx), ctx.rr(2.5, 4.5), 2); }
+        ctx.emit(P.x + Math.sin(a) * 5, P.y + ctx.rr(0, 8), P.z + Math.cos(a) * 5, Math.sin(a) * v, ctx.rr(0, v * .08), Math.cos(a) * v, DUST(ctx), dB >= 270 ? ctx.rr(1, 1.8) : ctx.rr(2.5, 4.5), 2); }
     }
   }
   let _cr, _du;
@@ -114,9 +125,10 @@ window.FENOMENOS.decibelios = (() => {
   function actualizar(ctx, dt, t) {
     tiempo = t; reloj.tick(t); const e = t - t0;
     // anda por la acera y la cámara le sigue
-    if (andar) { const dz = VEL * dt; quien.position.z += dz; zAndado += dz; ctx.pushCamera(0, 0, dz); quien.children[0].position.y = Math.abs(Math.sin(t * 7)) * .06; }
+    if (andar) { const dz = VEL * dt; quien.position.z += dz; zAndado += dz; ctx.pushCamera(0, 0, dz); }
+    const fig = quien.children[0]; fig.position.y = andar ? Math.abs(Math.sin(t * 5)) * .05 : 0; fig.userData.andar(t * 5, andar ? 1 : 0);
     quien.rotation.y = 0;
-    ctx.skyT.set(dB >= 230 && !fActual.espacio ? 0xc9b89a : dB >= 200 && e > .4 ? 0xb9c4c8 : 0x9fd3f0);
+    ctx.skyT.set(fActual.espacio || fActual.planeta || fActual.final ? 0x05070c : dB >= 230 ? 0xc9b89a : dB >= 200 && e > .4 ? 0xb9c4c8 : 0x9fd3f0);
     // boca abierta y burbuja mientras grita
     const grita = e > .25 && e < 1.1 && !fActual.final;
     boca.scale.y = grita ? .06 + Math.abs(Math.sin(e * 22)) * .1 : .03;
@@ -129,6 +141,11 @@ window.FENOMENOS.decibelios = (() => {
     for (let i = ondas.length - 1; i >= 0; i--) { const o = ondas[i]; o.t += dt; const k = Math.min(1, o.t / o.dur);
       o.m.scale.setScalar(.01 + o.radio * (1 - Math.pow(1 - k, 2))); o.m.material.opacity = o.op * (1 - k);
       if (k >= 1) { ctx.scene.remove(o.m); o.m.geometry.dispose(); o.m.material.dispose(); ondas.splice(i, 1); } }
+    for (const ef of efectos) { ef.t += dt; const k = Math.min(1, ef.t / 1.8), ease = 1 - Math.pow(1 - k, 3);
+      ef.domo.scale.set(ef.r * 1.3 * ease + .01, ef.r * .55 * ease + .01, ef.r * 1.3 * ease + .01);
+      ef.domo.material.opacity = .7 * Math.max(0, 1 - Math.max(0, ef.t - 1.5) / 3);
+      ef.crater.scale.setScalar(ef.r * .8 * ease + .01); ef.borde.scale.setScalar(ef.r * .8 * ease + .01);
+      ef.borde.material.opacity = .8 * Math.max(.35, 1 - ef.t / 4); }
     COMUN.moverGente(ctx, gente.concat(ctx.people), dt, t);
     const choque = dB >= 200 && !fActual.espacio && e > .3 && e < 2 ? (1 - (e - .3) / 1.7) : 0;
     ctx.setShake(choque * Math.min(ctx.camDist * .01, 40));
@@ -139,15 +156,27 @@ window.FENOMENOS.decibelios = (() => {
       // cúpula de choque que crece sobre la superficie desde donde gritas
       if (fActual.espacio && !explota) {
         if (!cupula) { const T = ctx.THREE; cupula = new T.Mesh(new T.SphereGeometry(1, 40, 20), new T.MeshBasicMaterial({ color: 0xffb060, transparent: true, opacity: .45, depthWrite: false, blending: T.AdditiveBlending }));
-          cupula.userData.fenPropio = true; ctx.scene.add(cupula); }
+          cupula.userData.fenPropio = cupula.userData.sobrePlaneta = true; ctx.scene.add(cupula); }
         const meta = Math.min(COMUN.RT * 1.2, presion(dB) / 35e3);
         const s = cupula.scale.x + (meta - cupula.scale.x) * (1 - Math.exp(-dt * 2)); cupula.scale.setScalar(Math.max(1, s));
+        cupula.material.opacity = .45 + Math.sin(t * 6) * .08;
+        // grietas brillantes que salen de la zona del impacto sobre la superficie
+        if (!grietas) { const T = ctx.THREE, RT = COMUN.RT, pts = [];
+          for (let k = 0; k < 14; k++) { let a = k / 14 * 6.283 + ctx.rr(-.2, .2), th = 0;
+            for (let j = 0; j < 9; j++) { const p0 = [RT * Math.sin(th) * Math.cos(a), RT * Math.cos(th) - RT + 2e3, RT * Math.sin(th) * Math.sin(a)];
+              th += ctx.rr(.03, .07); a += ctx.rr(-.12, .12);
+              pts.push(...p0, RT * Math.sin(th) * Math.cos(a), RT * Math.cos(th) - RT + 2e3, RT * Math.sin(th) * Math.sin(a)); } }
+          const geo = new T.BufferGeometry(); geo.setAttribute('position', new T.Float32BufferAttribute(pts, 3));
+          grietas = new T.LineSegments(geo, new T.LineBasicMaterial({ color: 0xffb040, transparent: true, opacity: 0, fog: false, blending: T.AdditiveBlending }));
+          grietas.userData.fenPropio = grietas.userData.sobrePlaneta = true; grietas.scale.setScalar(.01); ctx.scene.add(grietas); }
+        const gk = Math.min(1, s / (COMUN.RT * .6)); grietas.material.opacity = Math.min(1, brillo[0] * 1.5 + gk * .6);
+        grietas.scale.setScalar(1); grietas.geometry.setDrawRange(0, Math.floor(grietas.geometry.attributes.position.count * Math.max(.15, Math.min(1, brillo[0] + gk * .5))));
       }
-      if (explota && tiempo > explota && !planeta.rota) { planeta.rota = true; planeta.partir(.35); COMUN.estallarPlaneta(ctx, 2600, 0xfff3c4); if (cupula) cupula.visible = false; }
+      if (explota && tiempo > explota && !planeta.rota) { planeta.rota = true; planeta.partir(.35); planeta.reventar(80); COMUN.estallarPlaneta(ctx, 2600, 0xfff3c4); if (cupula) cupula.visible = false; if (grietas) grietas.visible = false; }
     }
     if (astronauta) { // flota delante de la cámara, girando despacio
       const fw = new ctx.THREE.Vector3(); ctx.camera.getWorldDirection(fw);
-      astronauta.position.copy(ctx.camera.position).addScaledVector(fw, 7000); astronauta.position.y -= 1400;
+      astronauta.position.copy(ctx.camera.position).addScaledVector(fw, 7000); astronauta.position.y -= 2300;
       astronauta.rotation.set(.4 + Math.sin(t * .4) * .2, t * .25, Math.sin(t * .3) * .5);
     }
   }
@@ -164,8 +193,9 @@ window.FENOMENOS.decibelios = (() => {
       return [`${EN ? 'Energy' : 'Energía'} ≈ ${COMUN.textoTNT(t)} ${EN ? 'per second' : 'por segundo'}`];
     },
     danos: () => {
-      if (!ventanas && !ctxRef.caidos) return '';
-      return COMUN.EN ? `${COMUN.num(ventanas, 0)} windows broken · ${COMUN.num(ctxRef.caidos, 0)} buildings down` : `${COMUN.num(ventanas, 0)} ventanas rotas · ${COMUN.num(ctxRef.caidos, 0)} edificios caídos`;
+      const v = ventanas, c = ctxRef.caidos, n = COMUN.num, EN = COMUN.EN; if (!v && !c) return '';
+      return EN ? `${n(v, 0)} window${v === 1 ? '' : 's'} broken · ${n(c, 0)} building${c === 1 ? '' : 's'} down`
+        : `${n(v, 0)} ventana${v === 1 ? '' : 's'} rota${v === 1 ? '' : 's'} · ${n(c, 0)} edificio${c === 1 ? '' : 's'} caído${c === 1 ? '' : 's'}`;
     },
   };
 })();
