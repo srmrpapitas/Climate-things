@@ -231,7 +231,7 @@ const skyMat = new THREE.ShaderMaterial({ uniforms: skyU, side: THREE.BackSide, 
   vertexShader: 'varying vec3 vW; void main() { vec4 w = modelMatrix * vec4(position, 1.0); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }',
   fragmentShader: `uniform vec3 cHor, cTop, cSol, dirSol; uniform float sol; varying vec3 vW;
     void main() { vec3 d = normalize(vW - cameraPosition); float h = max(d.y, 0.0);
-      vec3 c = mix(cHor, cTop, pow(h, .55)); c = mix(c, cHor * .8, smoothstep(0.0, -.25, d.y));
+      vec3 c = mix(cHor, cTop, pow(h, .55)); c = mix(c, cHor * .8, (1.0 - smoothstep(-.25, 0.0, d.y)));
       float s = max(dot(d, dirSol), 0.0);
       c += cSol * sol * (pow(s, 8.0) * .35 + pow(s, 90.0) * .9 + smoothstep(.9994, .9998, s) * 9.0);
       gl_FragColor = vec4(c, 1.0);

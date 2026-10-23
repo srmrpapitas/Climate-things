@@ -28,6 +28,8 @@ window.FENOMENOS.decibelios = (() => {
     burbuja.textContent = COMUN.EN ? 'BOMBOCLAT!' : '¡BOMBOCLAT!'; stage.appendChild(burbuja);
   }
 
+  // Ojo en los shaders: en el iPhone un pow() de negativo o un smoothstep con los bordes al revés dan NaN, y el bloom
+  // los convierte en cuadrados negros. Por eso todo va con clamp y smoothstep(a < b).
   // onda de sonido: burbuja de aire que se expande desde la boca. Sin malla: solo se ve el borde (fresnel),
   // como el aire que se deforma, y un anillo suave en el suelo
   let matOnda = null, matSuelo = null;
@@ -36,10 +38,10 @@ window.FENOMENOS.decibelios = (() => {
     matOnda ||= new T.ShaderMaterial({ transparent: true, depthWrite: false, side: T.DoubleSide, blending: T.AdditiveBlending,
       uniforms: { col: { value: new T.Color() }, op: { value: 1 } },
       vertexShader: 'varying vec3 vN; varying vec3 vV; void main() { vec4 p = modelViewMatrix * vec4(position, 1.0); vN = normalize(normalMatrix * normal); vV = normalize(-p.xyz); gl_Position = projectionMatrix * p; }',
-      fragmentShader: 'uniform vec3 col; uniform float op; varying vec3 vN; varying vec3 vV; void main() { float f = 1.0 - abs(dot(vN, vV)); float a = pow(f, 3.5) * op; gl_FragColor = vec4(col * a, a); }' });
+      fragmentShader: 'uniform vec3 col; uniform float op; varying vec3 vN; varying vec3 vV; void main() { float f = clamp(1.0 - abs(dot(normalize(vN), normalize(vV))), 0.0, 1.0); float a = clamp(pow(f, 3.5) * op, 0.0, 1.0); gl_FragColor = vec4(col * a, a); }' });
     matSuelo ||= new T.ShaderMaterial({ transparent: true, depthWrite: false, blending: T.AdditiveBlending, uniforms: { col: { value: new T.Color() }, op: { value: 1 } },
       vertexShader: 'varying vec2 vU; void main() { vU = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
-      fragmentShader: 'uniform vec3 col; uniform float op; varying vec2 vU; void main() { float r = length(vU - .5) * 2.0; float a = smoothstep(.78, .96, r) * smoothstep(1.0, .96, r) * op; gl_FragColor = vec4(col * a, a); }' });
+      fragmentShader: 'uniform vec3 col; uniform float op; varying vec2 vU; void main() { float r = length(vU - .5) * 2.0; float a = clamp(smoothstep(.78, .96, r) * (1.0 - smoothstep(.96, 1.0, r)) * op, 0.0, 1.0); gl_FragColor = vec4(col * a, a); }' });
     const m = new T.Mesh(new T.SphereGeometry(1, 48, 32), matOnda.clone()); m.material.uniforms.col.value.set(color);
     m.position.copy(pos()); m.position.y += 1.6; m.userData.fenPropio = true; m.scale.setScalar(.01); ctx.scene.add(m);
     const s = new T.Mesh(new T.PlaneGeometry(2, 2), matSuelo.clone()); s.material.uniforms.col.value.set(color); s.rotation.x = -Math.PI / 2;
