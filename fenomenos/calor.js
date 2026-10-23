@@ -2,7 +2,7 @@
 // TNT: energía para calentar 1 km³ de aire desde 15 °C (1,2·10⁹ kg · 1.005 J/kg·K ≈ 0,29 kt por grado).
 window.FENOMENOS.calor = (() => {
   const reloj = COMUN.reloj();
-  let ctx, T = 15, t0 = 0, tiempo = 0, edif = [], arboles = [], coches = [], planeta = null;
+  let ctx, T = 15, t0 = 0, tiempo = 0, edif = [], arboles = [], coches = [], planeta = null, yo = null;
   // estado visual que se interpola hacia el objetivo de cada fase
   const est = { tinte: 0, brillo: 0, mar: 0, derretir: 0 }, obj = { ...est };
   let cieloObj = 0x9fd3f0, colTinte = 0xff9a55, colBrillo = 0xff3a00;
@@ -10,6 +10,7 @@ window.FENOMENOS.calor = (() => {
 
   function crear(c) {
     ctx = c; const C = ctx.THREE.Color;
+    yo = COMUN.protagonista(ctx); // el chico de la sudadera: se agobia, se tuesta y cae
     COMUN.materiales(ctx);
     edif = COMUN.edificios(ctx);
     arboles = ctx.objects.filter(o => o.kind === 'tree' || o.kind === 'palm');
@@ -25,6 +26,9 @@ window.FENOMENOS.calor = (() => {
   function fase(c, n, valor, f) {
     T = valor; t0 = tiempo;
     obj.tinte = Math.min(.85, Math.max(0, (T - 40) / 900));
+    Object.assign(yo.est, { lento: T >= 100 ? .25 : T >= 56 ? .5 : T >= 35 ? .75 : 1, cabeza: T >= 56 ? .3 : T >= 35 ? .15 : 0, hablar: T >= 35 && T < 150 ? .35 : 0 });
+    if (T >= 150 && !yo.est.caer) reloj.luego(.8, () => { yo.est.caer = true; });
+    if (T >= 300) yo.est.tinte = { c: new ctx.THREE.Color(0x1a1410), k: Math.min(1, (T - 300) / 600) };
     obj.brillo = T >= 5000 ? 1 : Math.max(0, Math.min(.75, (T - 500) / 2600));
     obj.mar = T >= 2500 ? 1 : T >= 600 ? .5 : T >= 150 ? .12 : 0;
     obj.derretir = T >= 2500 ? 1 : 0;
@@ -46,6 +50,7 @@ window.FENOMENOS.calor = (() => {
 
   function actualizar(c, dt, t) {
     tiempo = t; reloj.tick(t); const e = t - t0, k = 1 - Math.exp(-dt * 1.2);
+    yo.actualizar(dt, t);
     for (const key in est) est[key] += (obj[key] - est[key]) * k;
     COMUN.tintar(ctx, colTinte, est.tinte, colBrillo, est.brillo);
     ctx.skyT.set(cieloObj);
@@ -69,7 +74,7 @@ window.FENOMENOS.calor = (() => {
   }
 
   return {
-    crear, fase, actualizar,
+    crear, fase, actualizar, camara: c => yo.camara(c),
     activo: () => tiempo - t0 < 4 || reloj.pendientes > 0,
     tnt: v => Math.max(0, v - 15) * 1.2e12 / COMUN.TNT_J,
     mag: v => `${COMUN.num(v, 0)} °C`,

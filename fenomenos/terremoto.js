@@ -2,7 +2,7 @@
 // Datos del escenario: escenarios/terremoto.js. Energía: E = 10^(1,5·M + 4,8) julios.
 window.FENOMENOS.terremoto = (() => {
   const reloj = COMUN.reloj();
-  let edif = [], cola = [], t0 = 0, dur = 0, M = 0, tiempo = 0, grietas = [], sima = null, planeta = null, fin = false, fase = 0;
+  let yo = null, edif = [], cola = [], t0 = 0, dur = 0, M = 0, tiempo = 0, grietas = [], sima = null, planeta = null, fin = false, fase = 0;
   const base = new Map();
 
   function energiaJ(m) { return Math.pow(10, 1.5 * m + 4.8); }
@@ -16,6 +16,7 @@ window.FENOMENOS.terremoto = (() => {
 
   function crear(ctx) {
     edif = COMUN.edificios(ctx);
+    yo = COMUN.protagonista(ctx, { z: 560, ry: Math.PI, vel: .8 }); // el chico de la sudadera, por la acera hacia el centro
     for (const o of edif) o.mth = umbral(ctx, o);
     for (const o of ctx.objects) base.set(o, { x: o.g.position.x, y: o.g.position.y, z: o.g.position.z, ry: o.g.rotation.y });
   }
@@ -34,6 +35,8 @@ window.FENOMENOS.terremoto = (() => {
 
   function fase_(ctx, n, valor, f) {
     fase = n; M = valor; t0 = tiempo; dur = f.duracion ?? clampD(2.5 + (M - 2) * .55); cola = [];
+    Object.assign(yo.est, { lento: M >= 5 ? .3 : 1, cabeza: M >= 4 ? -.2 : 0, hablar: M >= 5 && M < 6 ? .6 : 0 });
+    if (M >= 6 && !yo.est.caer) reloj.luego(.6, () => { yo.est.caer = true; });
     // qué cae en esta fase
     for (const o of edif) {
       if (o.state === 2) continue;
@@ -58,9 +61,10 @@ window.FENOMENOS.terremoto = (() => {
   }
 
   function actualizar(ctx, dt, t) {
-    tiempo = t; reloj.tick(t);
+    tiempo = t; reloj.tick(t); yo.actualizar(dt, t);
     ctx.skyT.set(0x9fd3f0).lerp(POLVO(ctx), Math.max(0, Math.min(.8, (M - 5.5) / 5)));
     const e = tiempo - t0, k = e < dur ? Math.sin(Math.PI * Math.min(1, e / dur)) ** .6 : 0; // envolvente del temblor
+    yo.est.tiembla = k * Math.min(4, M / 1.5);
     const I = Math.max(0, Math.min(1, (M - 2.4) / 6.6)) ** 1.4 * k;
     ctx.setShake(fin ? 0 : ctx.camDist * .006 * I + .02 * k);
     // vaivén de todo lo que está en pie
@@ -105,7 +109,7 @@ window.FENOMENOS.terremoto = (() => {
   const CRISTAL = ctx => _cr ||= new ctx.THREE.Color(0xd8f4ff), LAVA = ctx => _lv ||= new ctx.THREE.Color(0xff7a22);
 
   return {
-    crear, fase: fase_, actualizar,
+    crear, fase: fase_, actualizar, camara: c => yo.camara(c),
     activo: () => tiempo - t0 < dur + 1.2 || cola.length > 0 || (planeta && planeta.split < .9),
     tnt: m => energiaJ(m) / COMUN.TNT_J,
     mag: m => `${COMUN.EN ? 'Magnitude' : 'Magnitud'} ${COMUN.num(m, m % 1 ? 1 : 0)}`,

@@ -2,7 +2,8 @@
 // TNT: energía para calentar 1 km³ de aire desde 15 °C. Cifras aproximadas: compruébalas antes de publicar.
 window.ESCENARIOS = window.ESCENARIOS || {};
 (() => {
-  const C = (pos, mira) => ({ pos, mira }), P = (sub, texto, camara, extra) => ({ sub, texto, camara, ...extra });
+  const C = (pos, mira) => ({ pos, mira }), H = (pos, mira) => ({ pos, mira, cerca: true }), // H: sigue al protagonista (suelo a 3 m)
+    P = (sub, texto, camara, extra) => ({ sub, texto, camara, ...extra });
   const ESP = [0, -6.371e6, 0];
   window.ESCENARIOS.calor = {
     id: 'calor',
@@ -15,13 +16,13 @@ window.ESCENARIOS = window.ESCENARIOS || {};
     ritmo: 3.2, introDur: 2.8,
     paso: T('DUPLICACIÓN', 'DOUBLING'),
     lema: T('EL DOBLE DE CALOR CADA VEZ', 'TWICE AS HOT EVERY TIME'),
-    intro: { pos: [2, 9, 145], mira: [0, 14, 520] },
+    intro: { pos: [-10.6, 8.2, 127.5], mira: [-11.5, 7.4, 120] },
     sonido: { camas: { dron: .3, ciudad: .5 }, paso: 'whoosh', pasoGan: .35 },
     // planeta: la cámara sale al espacio y se ve la Tierra incandescente.
     fases: [
-      P(T('UNA MAÑANA DE PRIMAVERA', 'A SPRING MORNING'), T('Tiempo perfecto para pasear.', 'Perfect weather for a walk.'), C([2, 5, 160], [0, 14, 520])),
-      P(T('UN DÍA AGRADABLE', 'A NICE DAY'), T('Ya se puede ir en manga corta.', 'T-shirt weather.'), C([2, 5, 160], [0, 14, 520])),
-      P(T('UNA OLA DE CALOR', 'A HEATWAVE'), T('El asfalto quema y todo el mundo busca la sombra.', 'The asphalt burns. Everyone looks for shade.'), C([1, 7, 152], [0, 13, 510])),
+      P(T('UNA MAÑANA DE PRIMAVERA', 'A SPRING MORNING'), T('Tiempo perfecto para pasear.', 'Perfect weather for a walk.'), H([-10.9, 4.9, 125.2], [-11.5, 4.25, 120])),
+      P(T('UN DÍA AGRADABLE', 'A NICE DAY'), T('Ya se puede ir en manga corta.', 'T-shirt weather.'), H([-9.8, 5.6, 127.5], [-11.5, 4.3, 120])),
+      P(T('UNA OLA DE CALOR', 'A HEATWAVE'), T('El asfalto quema y todo el mundo busca la sombra.', 'The asphalt burns. Everyone looks for shade.'), H([-8, 7, 131], [-11.5, 4.2, 120])),
       P(T('UNA SAUNA', 'A SAUNA'), T('Más que el récord de la Tierra: 56,7 °C. Los árboles se secan.', 'Hotter than Earth\'s record: 56.7 °C. The trees dry out.'), C([-20, 26, 120], [0, 10, 500])),
       P(T('UN HORNO DE PAN', 'A BREAD OVEN'), T('El mar hierve en la orilla.', 'The sea boils at the shore.'), C([-200, 60, -120], [0, 0, 160]), { camas: { ciudad: 0, fuego: .25 }, sfx: [['panico', .35, .4]] }),
       P(T('UN HORNO DE PIZZA', 'A PIZZA OVEN'), T('Arden la madera y los árboles. La ciudad entera en llamas.', 'Wood and trees catch fire. The whole city is in flames.'), C([-350, 220, -250], [0, 10, 600]), { camas: { fuego: .6 } }),
