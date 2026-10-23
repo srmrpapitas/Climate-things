@@ -845,7 +845,9 @@ function rumble(v) { if (AC) rumbleG.gain.setTargetAtTime(v, AC.currentTime, .4)
 const VOZ = params.get('voz') !== '0', SON = ESC.sonido, VOZ_RETRASO = ESC.vozRetraso ?? 0;
 const crudo = {}, bufs = {}, camas = {}, vozDur = {};
 const traer = url => crudo[url] ||= fetch(url).then(r => r.ok ? r.arrayBuffer() : null).catch(() => null);
-const cargar = url => bufs[url] ||= traer(url).then(a => a && AC.decodeAudioData(a.slice(0))).catch(() => null);
+// decodificar con callbacks además de promesa: algunos Safari (contextos webkit) no devuelven promesa
+const decodificar = (ctx, a) => new Promise((ok, ko) => { const p = ctx.decodeAudioData(a.slice(0), ok, ko); if (p && p.then) p.then(ok, ko); });
+const cargar = url => bufs[url] ||= traer(url).then(a => a && decodificar(AC, a)).catch(() => null);
 const sfxUrl = n => `audio/sfx/${n}.mp3`, vozUrl = n => `audio/voz/${window.LANG}/${ESC.id}/${String(n).padStart(2, '0')}.mp3`;
 let busCama, busSfx, busVoz;
 function audioBuses() {
@@ -874,7 +876,7 @@ function voz(n) {
 }
 // duraciones de la narración (para que cada paso dure al menos lo que tarda en leerse)
 nVoz.then(k => { for (let n = 0; n < k; n++) traer(vozUrl(n)).then(a => { if (!a) return;
-  try { const OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext; new OAC(1, 1, 44100).decodeAudioData(a.slice(0)).then(b => { vozDur[n] = b.duration; }, () => {}); } catch (e) {} }); });
+  try { const OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext; decodificar(new OAC(1, 1, 44100), a).then(b => { vozDur[n] = b.duration; }, () => {}); } catch (e) {} }); });
 if (SON) for (const n of new Set([...Object.keys(SON.camas || {}), ...ESC.fases.flatMap(f => [...(f.sfx || []).map(s => s[0]), ...Object.keys(f.camas || {})]), ...(SON.extra || []), ...(SON.paso ? [SON.paso] : [])])) traer(sfxUrl(n));
 
 // ---------- contexto para los fenómenos ----------
@@ -1046,7 +1048,8 @@ async function exportar() {
   // todo cargado antes de empezar: fuentes, narración (y su duración) y efectos
   await document.fonts.ready; const k = await nVoz;
   for (let i = 0; i < 100 && Object.keys(vozDur).length < k; i++) await new Promise(r => setTimeout(r, 100));
-  paused = true; $('auto').checked = true; start(); await Promise.all([...[...Array(k)].map((_, i) => cargar(vozUrl(i))), ...Object.keys(crudo).filter(u => u.includes('/sfx/')).map(u => cargar(u))]);
+  paused = true; $('auto').checked = true; start(); const vozOk = (await Promise.all([...Array(k)].map((_, i) => cargar(vozUrl(i))))).filter(Boolean).length;
+  await Promise.all(Object.keys(crudo).filter(u => u.includes('/sfx/')).map(u => cargar(u)));
   // a 1080×1920 sin tocar la maqueta: solo cambia la resolución interna
   const w0 = stage.getBoundingClientRect().width; renderer.setPixelRatio(W / w0); resize();
   const c2 = Object.assign(document.createElement('canvas'), { width: W, height: H }).getContext('2d');
@@ -1075,7 +1078,10 @@ async function exportar() {
   if (fallo) { txt.textContent = 'Error: ' + fallo.message; return; }
   mux.finalize(); const blob = new Blob([mux.target.buffer], { type: 'video/mp4' }), nombre = `siseduplica-${ESC.id}-${window.LANG}.mp4`, url = URL.createObjectURL(blob);
   window.__mp4 = blob; barra.style.width = '100%';
-  txt.textContent = `${EN ? 'Done' : 'Listo'}: ${dur.toFixed(1)} s · ${(blob.size / 1e6).toFixed(1)} MB${acod === 'opus' ? (EN ? ' (Opus audio)' : ' (audio Opus)') : ''}`;
+  // qué audio lleva el vídeo, para ver de un vistazo si falta algo
+  const audioTxt = !acod ? (EN ? 'NO AUDIO: this browser cannot encode audio' : 'SIN AUDIO: este navegador no puede codificar audio')
+    : `${acod === 'opus' ? 'Opus' : 'AAC'} · ${EN ? 'narrator' : 'narrador'} ${vozOk}/${k}`;
+  txt.textContent = `${EN ? 'Done' : 'Listo'}: ${dur.toFixed(1)} s · ${(blob.size / 1e6).toFixed(1)} MB · ${audioTxt}`;
   const b1 = Object.assign(document.createElement('button'), { textContent: EN ? 'Download' : 'Descargar' }); b1.onclick = () => Object.assign(document.createElement('a'), { href: url, download: nombre }).click();
   bot.append(b1);
   const file = new File([blob], nombre, { type: 'video/mp4' });
