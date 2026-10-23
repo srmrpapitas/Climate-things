@@ -1037,14 +1037,52 @@ function pintarTextos(c2, k) {
   }
   c2.globalAlpha = 1; c2.shadowColor = 'transparent';
 }
+// Sin AudioEncoder con AAC (iPhone): se reproduce la mezcla en tiempo real hacia un MediaRecorder que graba AAC en MP4,
+// y mp4box.js saca de ahí los paquetes AAC para meterlos en nuestro MP4. El iPhone exige tocar la pantalla para que suene un AudioContext.
+async function audioGrabado(ab, dur, mux, tipo, { txt, barra, bot, EN }) {
+  if (!window.MP4Box) await new Promise((ok, ko) => document.head.append(Object.assign(document.createElement('script'), { src: 'vendor/mp4box.all.min.js', onload: ok, onerror: ko })));
+  const rc = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 48000 });
+  if (rc.state !== 'running') { txt.textContent = EN ? 'Tap to add the sound (takes as long as the video)' : 'Toca para añadir el sonido (tarda lo que dura el vídeo)';
+    const b = Object.assign(document.createElement('button'), { textContent: EN ? '🔊 Add sound' : '🔊 Añadir sonido' }); bot.append(b);
+    await new Promise(ok => b.onclick = () => { rc.resume().then(ok); }); b.remove(); }
+  const dest = rc.createMediaStreamDestination(), src = rc.createBufferSource(); src.buffer = ab; src.connect(dest);
+  const rec = new MediaRecorder(dest.stream, { mimeType: tipo, audioBitsPerSecond: 192000 }), partes = [];
+  rec.ondataavailable = e => e.data.size && partes.push(e.data);
+  const parado = new Promise(ok => rec.onstop = ok);
+  rec.start(1000); src.start(rc.currentTime + .05);
+  const t0 = performance.now(), iv = setInterval(() => { const p = Math.min(1, (performance.now() - t0) / 1000 / (dur + .3));
+    barra.style.width = (90 + p * 9) + '%'; txt.textContent = `${EN ? 'Recording sound' : 'Grabando el sonido'} ${Math.round(p * 100)}%`; }, 250);
+  await new Promise(ok => setTimeout(ok, (dur + .3) * 1000)); rec.stop(); await parado; clearInterval(iv); rc.close();
+  // sacar los paquetes de audio
+  const buf = await new Blob(partes, { type: tipo }).arrayBuffer(); buf.fileStart = 0;
+  const f = MP4Box.createFile(), muestras = []; let pista = null;
+  f.onReady = info => { pista = info.audioTracks[0]; if (!pista) return; f.setExtractionOptions(pista.id, null, { nbSamples: 1e9 }); f.start(); };
+  f.onSamples = (id, u, ss) => muestras.push(...ss);
+  f.appendBuffer(buf); f.flush();
+  if (!pista || !muestras.length) throw new Error(EN ? 'could not record the sound' : 'no se pudo grabar el sonido');
+  const sr = pista.audio.sample_rate, ch = pista.audio.channel_count, aac = /mp4a/i.test(pista.codec);
+  let desc = null;
+  try { desc = f.getTrackById(pista.id).mdia.minf.stbl.stsd.entries[0].esds.esd.descs[0].descs[0].data; } catch (e) {}
+  if (aac && !desc) { const fi = [96000, 88200, 64000, 48000, 44100, 32000, 24000, 22050, 16000, 12000, 11025, 8000].indexOf(sr); desc = new Uint8Array([0x10 | (fi >> 1), ((fi & 1) << 7) | (ch << 3)]); }
+  const cts0 = muestras[0].cts, fin = dur * 1e6;
+  muestras.forEach((m, i) => { const t = Math.round((m.cts - cts0) / m.timescale * 1e6); if (t >= fin) return;
+    mux.addAudioChunkRaw(m.data, 'key', t, Math.round(m.duration / m.timescale * 1e6),
+      i === 0 ? { decoderConfig: { codec: aac ? 'mp4a.40.2' : 'opus', sampleRate: sr, numberOfChannels: ch, ...(desc && aac ? { description: desc } : {}) } } : undefined); });
+}
 async function exportar() {
   const box = $('exporta'), txt = box.querySelector('.txt'), barra = box.querySelector('.barra i'), bot = box.querySelector('.bot'); box.classList.add('on');
   const EN = window.LANG === 'en', W = 1080, H = 1920, FPS = 30;
   if (!window.VideoEncoder || !window.Mp4Muxer) { txt.textContent = EN ? 'This browser cannot export video (try Chrome or Safari 17+).' : 'Este navegador no puede exportar vídeo (prueba con Chrome o Safari 17+).'; return; }
   txt.textContent = EN ? 'Loading sounds…' : 'Cargando sonidos…';
   const vcod = (await VideoEncoder.isConfigSupported({ codec: 'avc1.640028', width: W, height: H, bitrate: 12e6, framerate: FPS })).supported ? 'avc1.640028' : 'avc1.42E028';
-  const acod = window.AudioEncoder && (await AudioEncoder.isConfigSupported({ codec: 'mp4a.40.2', sampleRate: 48000, numberOfChannels: 2, bitrate: 192000 })).supported ? 'mp4a.40.2'
-    : window.AudioEncoder && (await AudioEncoder.isConfigSupported({ codec: 'opus', sampleRate: 48000, numberOfChannels: 2, bitrate: 192000 })).supported ? 'opus' : null;
+  // audio: AAC con AudioEncoder; si no hay (iPhone), AAC grabado con MediaRecorder en tiempo real; Opus solo como último recurso
+  // (Opus dentro de MP4 no suena en el iPhone ni en WhatsApp)
+  const aEnc = async c => !!window.AudioEncoder && (await AudioEncoder.isConfigSupported({ codec: c, sampleRate: 48000, numberOfChannels: 2, bitrate: 192000 }).catch(() => ({}))).supported;
+  const mrTipo = window.MediaRecorder && ['audio/mp4;codecs=mp4a.40.2', 'audio/mp4'].find(t => MediaRecorder.isTypeSupported(t));
+  const via = params.get('audio'); // ?audio=mr fuerza MediaRecorder (pruebas)
+  const acod = via !== 'mr' && await aEnc('mp4a.40.2') ? 'mp4a.40.2' : mrTipo ? 'mr' : await aEnc('opus') ? 'opus' : null;
+  const mrAac = acod === 'mr' && (mrTipo.includes('mp4a') || !MediaRecorder.isTypeSupported('audio/mp4;codecs=opus'));
+  const aCodec = acod === 'opus' || (acod === 'mr' && !mrAac) ? 'opus' : 'aac';
   // todo cargado antes de empezar: fuentes, narración (y su duración) y efectos
   await document.fonts.ready; const k = await nVoz;
   for (let i = 0; i < 100 && Object.keys(vozDur).length < k; i++) await new Promise(r => setTimeout(r, 100));
@@ -1054,7 +1092,7 @@ async function exportar() {
   const w0 = stage.getBoundingClientRect().width; renderer.setPixelRatio(W / w0); resize();
   const c2 = Object.assign(document.createElement('canvas'), { width: W, height: H }).getContext('2d');
   const mux = new Mp4Muxer.Muxer({ target: new Mp4Muxer.ArrayBufferTarget(), fastStart: 'in-memory', firstTimestampBehavior: 'offset',
-    video: { codec: 'avc', width: W, height: H, frameRate: FPS }, ...(acod ? { audio: { codec: acod === 'opus' ? 'opus' : 'aac', sampleRate: 48000, numberOfChannels: 2 } } : {}) });
+    video: { codec: 'avc', width: W, height: H, frameRate: FPS }, ...(acod ? { audio: { codec: aCodec, sampleRate: 48000, numberOfChannels: 2 } } : {}) });
   let fallo = null; const venc = new VideoEncoder({ output: (c, m) => mux.addVideoChunk(c, m), error: e => fallo = e });
   venc.configure({ codec: vcod, width: W, height: H, bitrate: 12e6, framerate: FPS, latencyMode: 'quality' });
   let n = 0, fin = null; const total = () => fin !== null ? fin + FPS * 3.5 : Math.max(n + FPS * 10, FPS * 60), t0 = performance.now();
@@ -1069,18 +1107,23 @@ async function exportar() {
   await venc.flush(); const dur = n / FPS;
   if (acod) { txt.textContent = EN ? 'Mixing audio…' : 'Mezclando el audio…';
     const ab = await AC.startRendering(), len = Math.min(ab.length, Math.round(dur * 48000)), fade = 1.5 * 48000;
-    const aenc = new AudioEncoder({ output: (c, m) => mux.addAudioChunk(c, m), error: e => fallo = e });
-    aenc.configure({ codec: acod, sampleRate: 48000, numberOfChannels: 2, bitrate: 192000 });
-    for (let i = 0; i < len; i += 4800) { const m = Math.min(4800, len - i), d = new Float32Array(m * 2);
-      for (let c = 0; c < 2; c++) { const src = ab.getChannelData(c); for (let j = 0; j < m; j++) d[c * m + j] = src[i + j] * Math.min(1, (len - i - j) / fade); }
-      const ad = new AudioData({ format: 'f32-planar', sampleRate: 48000, numberOfFrames: m, numberOfChannels: 2, timestamp: Math.round(i / 48 * 1000), data: d }); aenc.encode(ad); ad.close(); }
-    await aenc.flush(); }
+    for (let c = 0; c < 2; c++) { const d = ab.getChannelData(c); for (let j = Math.max(0, len - fade); j < d.length; j++) d[j] *= Math.max(0, (len - j) / fade); } // fundido final
+    if (acod === 'mr') await audioGrabado(ab, dur, mux, mrTipo, { txt, barra, bot, EN });
+    else { const aenc = new AudioEncoder({ output: (c, m) => {
+        // AAC necesita su AudioSpecificConfig; si el navegador no la da, la escribimos (AAC-LC, 48 kHz, estéreo)
+        if (m && m.decoderConfig && !m.decoderConfig.description && acod !== 'opus') m.decoderConfig.description = new Uint8Array([0x11, 0x90]);
+        mux.addAudioChunk(c, m); }, error: e => fallo = e });
+      aenc.configure({ codec: acod, sampleRate: 48000, numberOfChannels: 2, bitrate: 192000 });
+      for (let i = 0; i < len; i += 4800) { const m = Math.min(4800, len - i), d = new Float32Array(m * 2);
+        for (let c = 0; c < 2; c++) d.set(ab.getChannelData(c).subarray(i, i + m), c * m);
+        const ad = new AudioData({ format: 'f32-planar', sampleRate: 48000, numberOfFrames: m, numberOfChannels: 2, timestamp: Math.round(i / 48 * 1000), data: d }); aenc.encode(ad); ad.close(); }
+      await aenc.flush(); } }
   if (fallo) { txt.textContent = 'Error: ' + fallo.message; return; }
   mux.finalize(); const blob = new Blob([mux.target.buffer], { type: 'video/mp4' }), nombre = `siseduplica-${ESC.id}-${window.LANG}.mp4`, url = URL.createObjectURL(blob);
   window.__mp4 = blob; barra.style.width = '100%';
   // qué audio lleva el vídeo, para ver de un vistazo si falta algo
   const audioTxt = !acod ? (EN ? 'NO AUDIO: this browser cannot encode audio' : 'SIN AUDIO: este navegador no puede codificar audio')
-    : `${acod === 'opus' ? 'Opus' : 'AAC'} · ${EN ? 'narrator' : 'narrador'} ${vozOk}/${k}`;
+    : `${aCodec === 'opus' ? 'Opus' : 'AAC'}${acod === 'mr' ? ' (MediaRecorder)' : ''} · ${EN ? 'narrator' : 'narrador'} ${vozOk}/${k}`;
   txt.textContent = `${EN ? 'Done' : 'Listo'}: ${dur.toFixed(1)} s · ${(blob.size / 1e6).toFixed(1)} MB · ${audioTxt}`;
   const b1 = Object.assign(document.createElement('button'), { textContent: EN ? 'Download' : 'Descargar' }); b1.onclick = () => Object.assign(document.createElement('a'), { href: url, download: nombre }).click();
   bot.append(b1);
