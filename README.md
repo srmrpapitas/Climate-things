@@ -11,7 +11,25 @@ Simulador cinemático low poly para vídeos verticales de Instagram (@siseduplic
 
 ## Crear un vídeo nuevo
 
-Todo el contenido de un vídeo está en `escenarios.js`: pregunta, valor inicial, multiplicador, texto de cada fase, cámara, alcance de la ola y etiquetas de escala. Las cifras son aproximadas y hay que comprobarlas antes de publicar.
+Cada vídeo es un archivo en `escenarios/` (pregunta, valor inicial, multiplicador, texto de cada fase, cámara y etiquetas de escala) y cada fenómeno es un archivo en `fenomenos/` que anima el mundo. Los dos se dan de alta en `lista.js`. Las cifras son aproximadas y hay que comprobarlas antes de publicar.
+
+Un fenómeno se registra así (ver `fenomenos/ola.js`):
+
+```js
+window.FENOMENOS.tipo = {
+  crear(ctx) {},                 // una vez, al cargar
+  fase(ctx, n, valor, f) {},     // al empezar la fase n con su valor y su entrada de escenario
+  actualizar(ctx, dt, t) {},     // cada fotograma
+  activo() { return true },      // true mientras dura la animación de la fase (modo auto y cierre)
+  tnt(valor) { return null },    // toneladas de TNT para el marcador, o null
+  linea3(valor) {},              // opcional: sustituye la línea de TNT (p. ej. CO2)
+  mag(valor) {},                 // opcional: texto grande ("Magnitud 6", "120 dB")
+  danos() {},                    // opcional: línea de daños
+  corriente(x, z) {},            // opcional: { y, vz } si el agua arrastra restos en ese punto
+};
+```
+
+`ctx` da acceso a la escena, la ciudad (`objects`, `inst`, `people`), `derribar(o, vel)`, partículas (`emit`), restos (`addDebris`), cámara (`camTo`, `pushCamera`, `setShake`), cielo (`skyT`), sonido (`boom`, `rumble`, `audio`) y utilidades (`R`, `rr`, `lerp`, `clamp`, `smooth`, `fmt`).
 
 ## Técnica
 

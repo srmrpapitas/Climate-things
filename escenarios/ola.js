@@ -1,8 +1,8 @@
-// Escenarios del juego. Para crear un vídeo nuevo, copia un escenario y cambia los datos.
-// Las cifras son aproximadas: compruébalas antes de publicar.
-window.ESCENARIOS = {
-  ola: {
+// Escenario: la ola que se duplica. Para crear un vídeo nuevo, copia un archivo de escenario,
+// cambia los datos y añádelo a lista.js. Las cifras son aproximadas: compruébalas antes de publicar.
+window.ESCENARIOS.ola = {
     id: 'ola',
+    tipo: 'ola', // fenómeno que lo anima (fenomenos/ola.js)
     titulo: 'La ola que se duplica',
     pregunta: '¿Qué pasaría si una ola fuera cada vez el doble de grande?',
     unidad: 'm',
@@ -19,15 +19,15 @@ window.ESCENARIOS = {
         alcance: 430, duracion: 5, camara: { pos: [-4, 4.8, 150], mira: [0, 13, -150] } },
       { texto: 'Las casas bajas desaparecen. Es casi la altura máxima del tsunami de Japón en 2011.',
         alcance: 1150, duracion: 5, camara: { pos: [-70, 62, 930], mira: [0, 16, 250] } },
-      { texto: 'Los cristales estallan y el hormigón se inclina: la presión en la base llega a 8 atmósferas.',
+      { texto: 'Se traga la Torre de Pisa (56 m). Los cristales estallan: en la base hay 8 atmósferas de presión.',
         alcance: 2300, duracion: 5, camara: { pos: [750, 330, 3000], mira: [0, 30, 800] } },
-      { texto: 'Más alta que casi cualquier edificio de una ciudad europea. Entra kilómetros tierra adentro.',
+      { texto: 'Más alta que el Big Ben (96 m), la noria (135 m) y la Gran Pirámide (139 m). Entra kilómetros tierra adentro.',
         alcance: 4200, duracion: 4.5, camara: { pos: [-1700, 900, 6200], mira: [0, 60, 1800] } },
-      { texto: 'Supera la Torre Eiffel (330 m). Ya no hay edificio donde refugiarse.',
+      { texto: 'Llega casi a la punta de la Torre Eiffel (330 m). Ya no hay edificio donde refugiarse.',
         alcance: 7500, duracion: 4.5, camara: { pos: [-3600, 3000, 9800], mira: [0, 100, 2600] } },
-      { texto: 'Solo asoman los rascacielos más altos del mundo. El Burj Khalifa mide 828 m.',
+      { texto: 'Cubre el Empire State (443 m) y la CN Tower (553 m). Solo asoma el Burj Khalifa (828 m).',
         alcance: 12500, duracion: 4, camara: { pos: [-6500, 6500, 17000], mira: [0, 200, 5000] } },
-      { texto: 'Cubre colinas y valles enteros. Ya es más alta que muchas montañas de la costa.',
+      { texto: 'Se traga el Burj Khalifa y cubre colinas y valles enteros.',
         alcance: 20000, duracion: 4, camara: { pos: [-9000, 13000, 30000], mira: [0, 0, 10000] } },
       { texto: 'La ciudad entera ha desaparecido. No queda ningún relieve urbano.',
         alcance: 32000, duracion: 3.5, camara: { pos: [-4000, 30000, 36000], mira: [0, 0, 14000] } },
@@ -38,10 +38,16 @@ window.ESCENARIOS = {
     ],
     // Etiquetas que aparecen en el mundo para entender la escala (fase = número de fase, desde 1)
     marcas: [
-      { texto: 'Torre de 330 m', pos: [0, 345, 1680], fases: [4, 5] },
-      { texto: 'Rascacielos de 828 m', pos: [-420, 850, 2300], fases: [5, 6] },
-      { texto: 'Montaña de 8.849 m', pos: [7000, 9300, 56000], fases: [8, 9, 10] },
+      { texto: 'Torre de Pisa · 56 m', pos: [-420, 66, 260], fases: [2, 3] },
+      { texto: 'Estatua de la Libertad · 93 m', pos: [750, 105, -330], fases: [3] },
+      { texto: 'Big Ben · 96 m', pos: [540, 108, 620], fases: [4] },
+      { texto: 'Noria · 135 m', pos: [520, 148, 92], fases: [4] },
+      { texto: 'Gran Pirámide · 139 m', pos: [1800, 152, 1000], fases: [4] },
+      { texto: 'Torre Eiffel · 330 m', pos: [-120, 345, 1280], fases: [5] },
+      { texto: 'Empire State · 443 m', pos: [660, 458, 1340], fases: [6] },
+      { texto: 'CN Tower · 553 m', pos: [-780, 568, 1460], fases: [6] },
+      { texto: 'Burj Khalifa · 828 m', pos: [360, 845, 1640], fases: [6, 7] },
+      { texto: 'Montaña · 8.849 m', pos: [7000, 9300, 56000], fases: [8, 9, 10] },
     ],
     cierre: { titulo: 'No queda nada.', pregunta: '¿Qué duplicamos ahora? 👇' },
-  },
-};
+  };
