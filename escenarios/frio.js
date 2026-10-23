@@ -13,7 +13,7 @@ window.ESCENARIOS = window.ESCENARIOS || {};
     ritmo: 3.2, introDur: 2.8,
     paso: T('MITAD', 'HALVING'),
     lema: T('LA MITAD DE CALOR CADA VEZ', 'HALF THE HEAT EVERY TIME'),
-    intro: { pos: [-20, 12, 120], mira: [0, 14, 520] },
+    intro: { pos: [2, 9, 145], mira: [0, 14, 520] },
     sonido: { camas: { dron: .3, ciudad: .4, helado: .2 }, paso: 'whoosh', pasoGan: .35 },
     fases: [
       P(0, T('UNA MAÑANA DE INVIERNO', 'A WINTER MORNING'), T('Hielo en las aceras y escarcha en los coches.', 'Ice on the pavement. Frost on the cars.'), C([2, 5, 160], [0, 14, 520])),

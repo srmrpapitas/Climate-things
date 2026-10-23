@@ -4,7 +4,7 @@
 window.ESCENARIOS = window.ESCENARIOS || {};
 (() => {
   const RT = 6.371e6, C = (pos, mira) => ({ pos, mira }), ESP = [0, -RT, 0];
-  const cerca = C([-6.5, 3, 129], [-11.5, 2.3, 120]), medio = C([-4.5, 4.8, 133], [-11.5, 2.2, 120]);
+  const cerca = C([-10.9, 1.9, 125.2], [-11.5, 1.25, 120]), medio = C([-9.8, 2.6, 127.5], [-11.5, 1.3, 120]);
   const P = (valor, sub, texto, camara, extra) => ({ valor, sub, texto, camara, ...extra });
   window.ESCENARIOS.decibelios = {
     id: 'decibelios',
@@ -12,10 +12,10 @@ window.ESCENARIOS = window.ESCENARIOS || {};
     titulo: T('Gritar BOMBOCLAT cada vez más fuerte', 'Shouting BOMBOCLAT louder and louder'),
     pregunta: T('¿Y si cada BOMBOCLAT sonara el doble de fuerte que el anterior?', 'What if every BOMBOCLAT was twice as loud as the last?'),
     unidad: 'dB',
-    ritmo: 2.6, introDur: 2.8,
+    ritmo: 2.6, introDur: 2.8, vozRetraso: .7,
     paso: T('GRITO', 'SHOUT'),
     lema: T('EL DOBLE DE FUERTE CADA VEZ', 'TWICE AS LOUD EVERY TIME'),
-    intro: { pos: [-5, 7.5, 133], mira: [-11.5, 5.2, 120] }, // absoluta (el suelo está a 3 m)
+    intro: { pos: [-10.6, 5.2, 127.5], mira: [-11.5, 4.4, 120] }, // absoluta (el suelo está a 3 m)
     sonido: { camas: { dron: .3, ciudad: .55 }, extra: ['grito', 'impacto'] },
     fases: [
       P(60, T('UNA CONVERSACIÓN NORMAL', 'A NORMAL CONVERSATION'), T('Un tipo cualquiera paseando por la calle.', 'Just a guy walking down the street.'), cerca),
@@ -24,16 +24,16 @@ window.ESCENARIOS = window.ESCENARIOS || {};
       P(90, T('UN CORTACÉSPED', 'A LAWNMOWER'), T('Ahora le mira todo el mundo.', 'Now everyone is staring.'), medio),
       P(100, T('UN MARTILLO NEUMÁTICO', 'A JACKHAMMER'), T('La gente empieza a apartarse.', 'People start backing away.'), medio),
       P(110, T('UN CONCIERTO DE ROCK', 'A ROCK CONCERT'), T('Alguien llama a la policía.', 'Someone calls the police.'), medio),
-      P(120, T('UN TRUENO', 'A THUNDERCLAP'), T('Empiezan a doler los oídos.', 'Ears start to hurt.'), C([-3, 8, 137], [-11.5, 2.5, 120])),
-      P(130, T('EL UMBRAL DEL DOLOR', 'THE THRESHOLD OF PAIN'), T('Todos huyen tapándose los oídos.', 'Everyone runs, covering their ears.'), C([-3, 8, 137], [-11.5, 2.5, 120]), { sfx: [['panico', .5, .3]] }),
-      P(140, T('UN AVIÓN DESPEGANDO', 'A JET TAKING OFF'), T('Daño auditivo instantáneo.', 'Instant hearing damage.'), C([0, 11, 142], [-11.5, 2.8, 119])),
-      P(150, T('UN MOTOR A REACCIÓN A 1 METRO', 'A JET ENGINE, 1 METRE AWAY'), T('Pueden reventar los tímpanos.', 'Eardrums can burst.'), C([4, 14, 148], [-11.5, 3, 118])),
-      P(160, T('UN DISPARO DE ESCOPETA', 'A SHOTGUN BLAST'), T('Tiemblan los cristales de al lado.', 'The windows next to him rattle.'), C([6, 17, 152], [-11.5, 3, 118])),
-      P(170, T('UNA GRANADA ATURDIDORA', 'A STUN GRENADE'), T('Saltan todas las alarmas de coche.', 'Every car alarm goes off.'), C([9, 21, 157], [-11.5, 4, 117]), { alarmas: true, sfx: [['alarmas', .45, .35]] }),
-      P(180, T('EL DESPEGUE DE UN COHETE', 'A ROCKET LAUNCH'), T('Revientan las primeras ventanas.', 'The first windows shatter.'), C([15, 28, 165], [-11.5, 5, 115]), { sfx: [['cristales', .55, .3]] }),
-      P(190, T('EL COHETE SATURNO V', 'THE SATURN V ROCKET'), T('Toda la manzana se queda sin cristales.', 'The whole block loses its windows.'), C([22, 38, 178], [-11.5, 5, 113]), { sfx: [['cristales', .7, .3]] }),
-      P(194, T('EL LÍMITE DEL SONIDO EN EL AIRE', 'THE LIMIT OF SOUND IN AIR'), T('El sonido ya no puede ser más fuerte. Se convierte en onda de choque.', 'Sound can\'t get any louder. It becomes a shockwave.'), C([28, 48, 190], [-11.5, 5, 112]), { sfx: [['riser', .5, 0]] }),
-      P(200, T('UNA ONDA EXPANSIVA', 'A SHOCKWAVE'), T('Los coches de al lado salen volando.', 'The cars next to him go flying.'), C([40, 70, 210], [-11, 5, 110]), { sfx: [['impacto', .8, .25]], camas: { ciudad: .25 } }),
+      P(120, T('UN TRUENO', 'A THUNDERCLAP'), T('Empiezan a doler los oídos.', 'Ears start to hurt.'), C([-9.6, 2.8, 128.5], [-11.5, 1.3, 120])),
+      P(130, T('EL UMBRAL DEL DOLOR', 'THE THRESHOLD OF PAIN'), T('Todos huyen tapándose los oídos.', 'Everyone runs, covering their ears.'), C([-9.3, 3.2, 129.5], [-11.5, 1.4, 120]), { sfx: [['panico', .5, .3]] }),
+      P(140, T('UN AVIÓN DESPEGANDO', 'A JET TAKING OFF'), T('Daño auditivo instantáneo.', 'Instant hearing damage.'), C([-9, 3.6, 130.5], [-11.5, 1.5, 120])),
+      P(150, T('UN MOTOR A REACCIÓN A 1 METRO', 'A JET ENGINE, 1 METRE AWAY'), T('Pueden reventar los tímpanos.', 'Eardrums can burst.'), C([-8.5, 4.2, 131.5], [-11.5, 1.5, 120])),
+      P(160, T('UN DISPARO DE ESCOPETA', 'A SHOTGUN BLAST'), T('Tiemblan los cristales de al lado.', 'The windows next to him rattle.'), C([-8, 5, 132.5], [-11.5, 1.5, 120])),
+      P(170, T('UNA GRANADA ATURDIDORA', 'A STUN GRENADE'), T('Saltan todas las alarmas de coche.', 'Every car alarm goes off.'), C([-6, 16, 132], [-11.5, 0, 118]), { alarmas: true, sfx: [['alarmas', .45, .35]] }),
+      P(180, T('EL DESPEGUE DE UN COHETE', 'A ROCKET LAUNCH'), T('Revientan las primeras ventanas.', 'The first windows shatter.'), C([-5, 22, 134], [-11.5, 0, 116]), { sfx: [['cristales', .55, .3]] }),
+      P(190, T('EL COHETE SATURNO V', 'THE SATURN V ROCKET'), T('Toda la manzana se queda sin cristales.', 'The whole block loses its windows.'), C([-4, 30, 137], [-11.5, 0, 114]), { sfx: [['cristales', .7, .3]] }),
+      P(194, T('EL LÍMITE DEL SONIDO EN EL AIRE', 'THE LIMIT OF SOUND IN AIR'), T('El sonido ya no puede ser más fuerte. Se convierte en onda de choque.', 'Sound can\'t get any louder. It becomes a shockwave.'), C([-3, 38, 140], [-11.5, 0, 112]), { sfx: [['riser', .5, 0]] }),
+      P(200, T('UNA ONDA EXPANSIVA', 'A SHOCKWAVE'), T('Los coches de al lado salen volando.', 'The cars next to him go flying.'), C([0, 55, 150], [-11, 0, 110]), { sfx: [['impacto', .8, .25]], camas: { ciudad: .25 } }),
       P(210, T('UNA DEMOLICIÓN', 'A BUILDING DEMOLITION'), T('Se cae el edificio de enfrente.', 'The building across the street collapses.'), C([70, 120, 260], [-11, 3, 105]), { sfx: [['derrumbe', .7, .35]] }),
       P(220, T('UN MISIL DE CRUCERO', 'A CRUISE MISSILE'), T('Se viene abajo toda la manzana.', 'The whole block comes down.'), C([110, 190, 340], [-11, 0, 100]), { sfx: [['derrumbe', .8, .35]], camas: { ciudad: 0 } }),
       P(230, T('UNA PEQUEÑA BOMBA NUCLEAR', 'A SMALL NUKE'), T('Los vecinos ponen una queja por ruido.', 'The neighbours file a noise complaint.'), C([250, 450, 650], [0, 0, 100]), { sfx: [['derrumbe', .8, .4]] }),
@@ -43,7 +43,7 @@ window.ESCENARIOS = window.ESCENARIOS || {};
       P(270, T('UNA GUERRA NUCLEAR', 'A NUCLEAR WAR'), T('Te llama tu madre. No la oyes.', 'Your mom calls. You can\'t hear her.'), C([1e4, 2.2e4, 2.4e4], [0, 0, 0])),
       P(280, T('UN SUPERVOLCÁN', 'A SUPERVOLCANO'), T('Se oye en la otra punta del país.', 'They hear it on the other side of the country.'), C([3e4, 7e4, 7e4], [0, 0, 0])),
       P(290, T('EL KRAKATOA', 'KRAKATOA'), T('El Krakatoa llama: quiere su récord.', 'Krakatoa called. It wants its record back.'), C([1e5, 2.4e5, 2.2e5], [0, 0, 0])),
-      P(300, T('UNA ONDA DEL TAMAÑO DE UN PAÍS', 'A COUNTRY-SIZED SHOCKWAVE'), T('La onda se ve desde el espacio.', 'You can see the shockwave from space.'), C([0, 3e6, 4e6], ESP), { espacio: true, camas: { dron: .35, espacio: .3 } }),
+      P(300, T('UNA ONDA DEL TAMAÑO DE UN PAÍS', 'A COUNTRY-SIZED SHOCKWAVE'), T('La onda se ve desde el espacio.', 'You can see the shockwave from space.'), C([0, 7e6, 1.3e7], ESP), { espacio: true, camas: { dron: .35, espacio: .3 } }),
       P(320, T('EL ASTEROIDE DE LOS DINOSAURIOS', 'THE DINOSAUR ASTEROID'), T('La Tierra suena como una campana.', 'Earth rings like a bell.'), C([0, 4e6, 1.2e7], ESP), { espacio: true }),
       P(345, T('2 MILLONES DE VECES LA LUZ DEL SOL EN LA TIERRA', '2 MILLION TIMES THE SUNLIGHT ON EARTH'), T('Hierven los océanos.', 'The oceans start to boil.'), C([0, 3e6, 2e7], ESP), { espacio: true, brillo: [.35, .25], sfx: [['fuego', .4, .2]] }),
       P(374, T('TANTA POTENCIA COMO EL SOL', 'AS POWERFUL AS THE SUN'), T('La atmósfera sale volando al espacio.', 'The atmosphere is blown into space.'), C([0, 3e6, 2e7], ESP), { espacio: true, sinAire: true, brillo: [.6, .5] }),

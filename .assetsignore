@@ -1,5 +1,4 @@
-.git
-.git/*
+.git/
+/.git/**
 wrangler.jsonc
 README.md
-.assetsignore

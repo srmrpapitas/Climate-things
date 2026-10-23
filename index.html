@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Si se duplica</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@600;800&family=Lora:ital,wght@1,500;1,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@600;800&family=Lora:ital,wght@0,400;0,500;1,500;1,600&display=swap" rel="stylesheet">
 <style>
   :root { --bg: #000; --fg: #fff; --accent: #ffd23f; --shadow: rgba(0,0,0,.55); }
   @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #000; --fg: #fff; } }
@@ -28,6 +28,15 @@
     font-weight: 800; font-size: .4em; letter-spacing: .08em; text-transform: uppercase; text-shadow: none; }
   #hud .lema:empty, #hud .sub:empty { display: none; }
   #hud .dmg { font-weight: 600; font-size: .5em; margin-top: .5em; opacity: .85; }
+  /* formato del clip de referencia (escenarios con ritmo): cifra en serif fina y el resto en versalitas pequeñas */
+  body.ritmo #hud { left: 1.1em; top: 2.2em; line-height: 1.25; }
+  body.ritmo #hud .fase { font-weight: 600; font-size: .4em; letter-spacing: .16em; }
+  body.ritmo #hud .mag { font-family: Lora, Georgia, serif; font-weight: 400; font-size: 1.55em; letter-spacing: 0; line-height: 1.05; margin: .08em 0 .1em; }
+  body.ritmo #hud .sub { font-weight: 600; font-size: .36em; letter-spacing: .1em; margin: .15em 0 0; }
+  body.ritmo #hud .tnt, body.ritmo #hud .cmp { color: #fff; font-weight: 600; font-size: .34em; letter-spacing: .1em; text-transform: uppercase; opacity: .9; }
+  body.ritmo #hud .dmg { font-size: .34em; letter-spacing: .06em; margin-top: .2em; opacity: .75; }
+  body.ritmo #hud .lema { font-size: .32em; padding: .25em .6em; margin-top: .7em; letter-spacing: .12em; }
+  body.ritmo #caption { top: 27%; font-weight: 500; font-size: .78em; }
   #big { position: absolute; left: 0; right: 0; top: 34%; text-align: center; font-family: 'Archivo Black', Inter, sans-serif;
     font-size: 3.6em; opacity: 0; transform: scale(.6); pointer-events: none; }
   #big.pop { animation: pop 1.7s ease-out forwards; }
@@ -743,7 +752,8 @@ function updateCamera(dt, time) {
   if (shake > 0) { camera.position.x += rr(-1, 1) * shake; camera.position.y += rr(-1, 1) * shake; }
   camera.lookAt(camTgt);
   camera.near = clamp(camDist * .0015, .3, 200); camera.far = Math.max(60000, camDist * 30); camera.updateProjectionMatrix();
-  scene.fog.near = camDist * 1.2; scene.fog.far = camDist * (camPos.y > 20000 ? 14 : 9);
+  const fd = Math.max(camDist, camPos.y * 1.5); // con la cámara muy alta el suelo está lejos aunque mire a un punto cercano
+  scene.fog.near = fd * 1.2; scene.fog.far = fd * (camPos.y > 20000 ? 14 : 9);
   for (const P of pools) P.mat.size = clamp(camDist * .0085, .7, 4000);
   updateShadow();
 }
@@ -799,7 +809,8 @@ function rumble(v) { if (AC) rumbleG.gain.setTargetAtTime(v, AC.currentTime, .4)
 // ---------- sonidos grabados (audio/sfx) y narración (audio/voz/<idioma>/<escenario>/<n>.mp3, 0 = pregunta) ----------
 // ESC.sonido.camas: bucles de fondo con su volumen; cada fase puede cambiarlos (f.camas) y lanzar efectos (f.sfx: [[nombre, volumen, retraso]]).
 // ?voz=0 quita la narración.
-const VOZ = params.get('voz') !== '0', SON = ESC.sonido;
+// ESC.vozRetraso: segundos que espera la narración de cada paso (p. ej. para no pisar el grito)
+const VOZ = params.get('voz') !== '0', SON = ESC.sonido, VOZ_RETRASO = ESC.vozRetraso ?? 0;
 const crudo = {}, bufs = {}, camas = {}, vozDur = {};
 const traer = url => crudo[url] ||= fetch(url).then(r => r.ok ? r.arrayBuffer() : null).catch(() => null);
 const cargar = url => bufs[url] ||= traer(url).then(a => a && AC.decodeAudioData(a.slice(0))).catch(() => null);
@@ -825,8 +836,9 @@ const nVoz = VOZ ? fetch('audio/voz/lista.json').then(r => r.ok ? r.json() : {})
 // la narración baja los fondos mientras habla
 function voz(n) {
   if (!AC) return; nVoz.then(k => n < k ? cargar(vozUrl(n)) : null).then(b => { if (!b) return;
-    const s = AC.createBufferSource(); s.buffer = b; s.connect(busVoz); const t = AC.currentTime + .05; s.start(t);
-    busCama.gain.setTargetAtTime(.45, t, .15); busCama.gain.setTargetAtTime(1, t + b.duration, .4); });
+    const s = AC.createBufferSource(); s.buffer = b; s.connect(busVoz); const t = AC.currentTime + .05 + (n ? VOZ_RETRASO : 0); s.start(t);
+    busCama.gain.setTargetAtTime(.45, t, .15); busCama.gain.setTargetAtTime(1, t + b.duration, .4);
+    busSfx.gain.setTargetAtTime(.65, t, .15); busSfx.gain.setTargetAtTime(1, t + b.duration, .4); });
 }
 // duraciones de la narración (para que cada paso dure al menos lo que tarda en leerse)
 nVoz.then(k => { for (let n = 0; n < k; n++) traer(vozUrl(n)).then(a => { if (!a) return;
@@ -879,7 +891,8 @@ let toastT; function toast(t) { const e = $('toast'); e.textContent = t; e.class
 // ESC.ritmo: segundos por paso; el vídeo avanza solo a ese ritmo sin esperar a que acabe cada efecto
 const RITMO = +(params.get('ritmo') || ESC.ritmo || 0);
 let phase = 0, state = 'menu', phaseTime = 0, idleT = 0, wasActive = false, ended = false, auto = params.has('auto') ? params.get('auto') === '1' : !!RITMO, introT = 0;
-const durPaso = () => Math.max(ESC.fases[phase - 1]?.dur ?? RITMO, (vozDur[phase] ?? 0) + .45);
+if (RITMO) document.body.classList.add('ritmo');
+const durPaso = () => Math.max(ESC.fases[phase - 1]?.dur ?? RITMO, (vozDur[phase] ? vozDur[phase] + VOZ_RETRASO + .45 : 0));
 const AUTO_EXTRA = +(params.get('intervalo') || 1);
 $('auto').checked = auto; $('mtitle').textContent = ESC.pregunta;
 $('autoTxt').textContent = T('Modo auto (avanza solo)', 'Auto mode (advances by itself)');
@@ -904,7 +917,9 @@ function nextPhase() {
   if (cam) { if (RITMO && !cam.dur) camSigue(cam.pos, cam.mira); else camTo(cam.pos, cam.mira, cam.dur ?? (phase === 1 ? 1.6 : 2.6)); }
   $('question').classList.remove('on'); hud.classList.add('on'); setHUD(phase, v, f);
   if (!RITMO) { big.textContent = magText(v); big.style.fontSize = big.textContent.length > 11 ? '2em' : big.textContent.length > 6 ? '2.7em' : ''; big.classList.remove('pop'); void big.offsetWidth; big.classList.add('pop'); }
-  cap.classList.remove('on'); setTimeout(() => { cap.textContent = f.texto || ''; if (f.texto) cap.classList.add('on'); }, RITMO ? 220 : 700);
+  cap.classList.remove('on'); setTimeout(() => { cap.textContent = f.texto || '';
+    if (RITMO) cap.style.top = (hud.getBoundingClientRect().bottom - cap.offsetParent.getBoundingClientRect().top + 10) + 'px'; // justo debajo del marcador, mida lo que mida
+    if (f.texto) cap.classList.add('on'); }, RITMO ? 220 : 700);
   skyT.set(f.cielo ?? SKY[Math.min(SKY.length - 1, phase - 1)]); if (!FEN.sinBoom) boom(phase); rumble(Math.min(.5, .12 + phase * .035));
   if (ambG && phase > 2) ambG.gain.setTargetAtTime(.02, AC.currentTime, 1);
   for (const [n, g = .7, t0 = 0] of f.sfx || []) sfx(n, g, t0);
