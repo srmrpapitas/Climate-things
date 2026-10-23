@@ -1,34 +1,37 @@
-// El CO2 que se duplica: desde las 420 ppm de hoy hasta más del 10 % del aire.
+// El CO2 que se duplica: desde las 420 ppm de hoy hasta que hay más CO2 que aire.
 // En vez de TNT, el marcador muestra cuántos coches tendrían que funcionar un año para echar el CO2 que hay de más
-// respecto a antes de la industria
-// (1 ppm ≈ 7,8 mil millones de t de CO2; un coche ≈ 4,6 t al año). Cifras aproximadas: compruébalas antes de publicar.
-window.ESCENARIOS.co2 = {
-  id: 'co2',
-  tipo: 'co2',
-  titulo: T('El CO2 que se duplica', 'The doubling CO2'),
-  pregunta: T('¿Qué pasaría si el CO2 del aire se duplicara cada vez?', 'What if the CO2 in the air doubled every time?'),
-  unidad: 'ppm',
-  inicial: 420,
-  multiplicador: 2,
-  fases: [
-    { texto: T('El aire de hoy. Antes de la industria había 280 ppm.', 'Today\'s air. Before industry there were 280 ppm.'),
-      camara: { pos: [3, 5, 90], mira: [0, 4, 300] } },
-    { texto: T('El clima se dispara: la Tierra se calienta varios grados. En una oficina cerrada ya cuesta concentrarse.', 'The climate runs wild: the Earth warms by several degrees. In a closed office it is already hard to focus.'),
-      camara: { pos: [0, 7, 90], mira: [0, 3, 320] } },
-    { texto: T('Dolor de cabeza y sueño (a partir de unas 1.000 ppm). El mar se vuelve más ácido.', 'Headaches and drowsiness (from about 1,000 ppm). The sea becomes more acidic.'),
-      camara: { pos: [-30, 30, 60], mira: [0, 2, 300] } },
-    { texto: T('Como hace 50 millones de años: sin hielo en los polos. Con el tiempo el mar subiría decenas de metros.', 'Like 50 million years ago: no ice at the poles. Over time the sea would rise by tens of metres.'),
-      camara: { pos: [-220, 70, -140], mira: [0, 0, 150] } },
-    { texto: T('Por encima del límite para trabajar (5.000 ppm). Respirar cansa y todo va más lento.', 'Above the workplace limit (5,000 ppm). Breathing is tiring and everything slows down.'),
-      camara: { pos: [3, 4, 80], mira: [0, 2, 320] } },
-    { texto: T('Respiración acelerada y mareos. La calima ya no deja ver los rascacielos.', 'Rapid breathing and dizziness. The haze now hides the skyscrapers.'),
-      camara: { pos: [-300, 160, -120], mira: [0, 20, 700] } },
-    { texto: T('Confusión y pánico. Los coches se quedan parados en mitad de la calle.', 'Confusion and panic. Cars stop in the middle of the street.'),
-      camara: { pos: [-40, 35, 120], mira: [0, 2, 360] } },
-    { texto: T('Más de 40.000 ppm: peligro inmediato para la vida. La gente empieza a desmayarse.', 'Over 40,000 ppm: immediately dangerous to life. People start fainting.'),
-      camara: { pos: [6, 6, 100], mira: [0, 1, 260] } },
-    { texto: T('Más del 10 % del aire. En pocos minutos se pierde la consciencia: la ciudad entera se queda dormida.', 'More than 10% of the air. Within minutes people pass out: the whole city falls asleep.'),
-      camara: { pos: [8, 12, 140], mira: [0, 1, 260] } },
-  ],
-  cierre: { titulo: T('Todos dormidos.', 'Everyone is asleep.'), pregunta: T('¿Qué duplicamos ahora? 👇', 'What should we double next? 👇') },
-};
+// respecto a antes de la industria (1 ppm ≈ 7,8 mil millones de t de CO2; un coche ≈ 4,6 t al año).
+// Cifras aproximadas: compruébalas antes de publicar.
+window.ESCENARIOS = window.ESCENARIOS || {};
+(() => {
+  const C = (pos, mira) => ({ pos, mira }), P = (sub, texto, camara, extra) => ({ sub, texto, camara, ...extra });
+  window.ESCENARIOS.co2 = {
+    id: 'co2',
+    tipo: 'co2',
+    titulo: T('El CO2 que se duplica', 'The doubling CO2'),
+    pregunta: T('¿Y si el CO2 del aire se duplicara cada vez?', 'What if the CO2 in the air doubled every time?'),
+    unidad: 'ppm',
+    inicial: 420,
+    multiplicador: 2,
+    ritmo: 3.2, introDur: 2.8,
+    paso: T('DUPLICACIÓN', 'DOUBLING'),
+    lema: T('EL DOBLE DE CO2 CADA VEZ', 'TWICE THE CO2 EVERY TIME'),
+    intro: { pos: [-10, 14, 60], mira: [0, 4, 300] },
+    sonido: { camas: { dron: .3, ciudad: .5 }, paso: 'whoosh', pasoGan: .3 },
+    fases: [
+      P(T('EL AIRE DE HOY', 'TODAY\'S AIR'), T('Antes de la industria había 280 ppm.', 'Before industry there were 280 ppm.'), C([3, 5, 90], [0, 4, 300])),
+      P(T('UN AULA SIN VENTILAR', 'A STUFFY CLASSROOM'), T('El planeta se calienta varios grados.', 'The planet warms by several degrees.'), C([0, 7, 90], [0, 3, 320])),
+      P(T('UNA REUNIÓN DE TRES HORAS', 'A THREE-HOUR MEETING'), T('Dolor de cabeza y sueño.', 'Headaches and drowsiness.'), C([-30, 30, 60], [0, 2, 300])),
+      P(T('HACE 50 MILLONES DE AÑOS', '50 MILLION YEARS AGO'), T('Ya no queda hielo en los polos.', 'No ice left at the poles.'), C([-220, 70, -140], [0, 0, 150])),
+      P(T('UN SUBMARINO', 'A SUBMARINE'), T('Por encima del límite para trabajar. Respirar cansa.', 'Above the workplace limit. Breathing is tiring.'), C([-60, 30, 40], [0, 2, 320])),
+      P(T('UN MAL DÍA EN LA ESTACIÓN ESPACIAL', 'A BAD DAY ON THE SPACE STATION'), T('Mareos. La calima ya no deja ver los rascacielos.', 'Dizziness. The haze hides the skyscrapers.'), C([-300, 160, -120], [0, 20, 700])),
+      P(T('UNA BODEGA FERMENTANDO VINO', 'A WINE CELLAR DURING FERMENTATION'), T('Confusión y pánico. Los coches se paran en mitad de la calle.', 'Confusion and panic. Cars stop in the middle of the street.'), C([-40, 35, 120], [0, 2, 360]), { camas: { ciudad: .15, asfixia: .3 }, sfx: [['panico', .35, .3]] }),
+      P(T('AIRE MORTAL', 'DEADLY AIR'), T('La gente empieza a desmayarse.', 'People start fainting.'), C([6, 6, 100], [0, 1, 260]), { camas: { ciudad: 0, asfixia: .5 } }),
+      P(T('EL 10 % DEL AIRE', '10% OF THE AIR'), T('La ciudad entera se queda dormida.', 'The whole city falls asleep.'), C([8, 12, 140], [0, 1, 260])),
+      P(T('EL LAGO NYOS, 1986', 'LAKE NYOS, 1986'), T('Una sola bocanada y te desmayas.', 'One breath and you pass out.'), C([10, 25, 170], [0, 1, 280])),
+      P(T('CASI LA MITAD ES CO2', 'ALMOST HALF IS CO2'), T('Hasta las plantas están preocupadas.', 'Even the plants are worried.'), C([-60, 60, 200], [0, 5, 400])),
+      P(T('MÁS CO2 QUE AIRE', 'MORE CO2 THAN AIR'), T('El aire de la Tierra ya se parece al de Venus.', 'Earth\'s air now looks like Venus.'), C([-300, 200, -100], [0, 10, 600]), { dur: 4.5, camas: { asfixia: .3 } }),
+    ],
+    cierre: { titulo: T('Todos dormidos.', 'Everyone is asleep.'), pregunta: T('¿Qué duplicamos ahora? 👇', 'What should we double next? 👇') },
+  };
+})();

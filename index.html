@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Si se duplica</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@600;800&family=Lora:ital,wght@1,500;1,600&display=swap" rel="stylesheet">
 <style>
   :root { --bg: #000; --fg: #fff; --accent: #ffd23f; --shadow: rgba(0,0,0,.55); }
   @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #000; --fg: #fff; } }
@@ -21,17 +21,22 @@
   #hud.on { opacity: 1; }
   #hud .fase { font-weight: 800; font-size: .62em; letter-spacing: .12em; opacity: .92; }
   #hud .mag { font-family: 'Archivo Black', Inter, sans-serif; font-size: 1.9em; letter-spacing: -.01em; }
+  #hud .sub { font-weight: 800; font-size: .48em; letter-spacing: .06em; text-transform: uppercase; margin: .1em 0 .25em; }
   #hud .tnt { font-weight: 800; font-size: .72em; color: var(--accent); }
   #hud .cmp { font-weight: 600; font-size: .6em; opacity: .95; }
+  #hud .lema { display: inline-block; margin-top: .45em; padding: .22em .55em; border-radius: .2em; background: #e3262f; color: #fff;
+    font-weight: 800; font-size: .4em; letter-spacing: .08em; text-transform: uppercase; text-shadow: none; }
+  #hud .lema:empty, #hud .sub:empty { display: none; }
   #hud .dmg { font-weight: 600; font-size: .5em; margin-top: .5em; opacity: .85; }
   #big { position: absolute; left: 0; right: 0; top: 34%; text-align: center; font-family: 'Archivo Black', Inter, sans-serif;
     font-size: 3.6em; opacity: 0; transform: scale(.6); pointer-events: none; }
   #big.pop { animation: pop 1.7s ease-out forwards; }
   @keyframes pop { 0% { opacity: 0; transform: scale(.5); } 15% { opacity: 1; transform: scale(1.08); }
     25% { transform: scale(1); } 75% { opacity: 1; } 100% { opacity: 0; transform: scale(1.05); } }
-  #caption { position: absolute; left: 6%; right: 6%; bottom: 10%; text-align: center; font-weight: 800; font-size: .78em;
-    line-height: 1.3; padding: .6em .8em; border-radius: .5em; background: rgba(0,0,0,.42); opacity: 0;
-    transform: translateY(.6em); transition: opacity .5s, transform .5s; pointer-events: none; }
+  /* frase de cada paso: cursiva serif, a la izquierda, bajo el HUD */
+  #caption { position: absolute; left: 6%; right: 18%; top: 34%; text-align: left; font-family: Lora, Georgia, serif; font-style: italic;
+    font-weight: 600; font-size: .9em; line-height: 1.25; opacity: 0; transform: translateY(.4em); transition: opacity .35s, transform .35s;
+    pointer-events: none; text-shadow: 0 .05em .25em rgba(0,0,0,.75), 0 0 .8em rgba(0,0,0,.35); }
   #caption.on { opacity: 1; transform: none; }
   #question { position: absolute; left: 7%; right: 7%; top: 30%; text-align: center; font-family: 'Archivo Black', Inter, sans-serif;
     font-size: 1.45em; line-height: 1.15; opacity: 0; transition: opacity .7s; pointer-events: none; }
@@ -75,7 +80,7 @@
 <body>
 <div id="stage">
   <div id="labels"></div>
-  <div id="hud" class="t"><div class="fase"></div><div class="mag"></div><div class="tnt"></div><div class="cmp"></div><div class="dmg"></div></div>
+  <div id="hud" class="t"><div class="fase"></div><div class="mag"></div><div class="sub"></div><div class="tnt"></div><div class="cmp"></div><div class="dmg"></div><div class="lema"></div></div>
   <div id="big" class="t"></div>
   <div id="question" class="t"></div>
   <div id="caption" class="t"></div>
@@ -720,9 +725,14 @@ function derribar(o, vel = new THREE.Vector3(), opts = {}) {
 // ---------- cámara ----------
 const camPos = new THREE.Vector3(-900, 260, -900), camTgt = new THREE.Vector3(0, 40, 800);
 let tween = null, camDist = 1000, shake = 0;
-function camTo(pos, tgt, dur) { tween = { p0: camPos.clone(), t0: camTgt.clone(), p1: new THREE.Vector3(...pos), t1: new THREE.Vector3(...tgt), t: 0, dur }; }
-function pushCamera(dx, dy, dz) { for (const v of [camPos, camTgt, ...(tween ? [tween.p0, tween.p1, tween.t0, tween.t1] : [])]) { v.x += dx; v.y += dy; v.z += dz; } }
+function camTo(pos, tgt, dur) { sigue = null; tween = { p0: camPos.clone(), t0: camTgt.clone(), p1: new THREE.Vector3(...pos), t1: new THREE.Vector3(...tgt), t: 0, dur }; }
+// plano continuo (escenarios con ritmo): la cámara va hacia su objetivo con un muelle amortiguado, sin paradas entre pasos
+let sigue = null; const camVP = new THREE.Vector3(), camVT = new THREE.Vector3();
+function camSigue(pos, tgt) { if (tween) tween = null; if (!sigue) { camVP.set(0, 0, 0); camVT.set(0, 0, 0); } sigue = { p: new THREE.Vector3(...pos), t: new THREE.Vector3(...tgt) }; }
+function muelle(x, v, meta, w, dt) { const a = meta.clone().sub(x).multiplyScalar(w * w).addScaledVector(v, -2 * w); v.addScaledVector(a, dt); x.addScaledVector(v, dt); }
+function pushCamera(dx, dy, dz) { for (const v of [camPos, camTgt, ...(tween ? [tween.p0, tween.p1, tween.t0, tween.t1] : []), ...(sigue ? [sigue.p, sigue.t] : [])]) { v.x += dx; v.y += dy; v.z += dz; } }
 function updateCamera(dt, time) {
+  if (sigue) { const w = ESC.suave ?? 1.3; for (let s = 0; s < 4; s++) { muelle(camPos, camVP, sigue.p, w, dt / 4); muelle(camTgt, camVT, sigue.t, w, dt / 4); } }
   if (tween) { tween.t += dt; const k = easeInOut(clamp(tween.t / tween.dur, 0, 1));
     camPos.lerpVectors(tween.p0, tween.p1, k); camTgt.lerpVectors(tween.t0, tween.t1, k);
     const ky = 1 - Math.pow(1 - clamp(tween.t / tween.dur, 0, 1), 3); // sube antes de avanzar para no atravesar edificios
@@ -772,8 +782,9 @@ function audioInit() {
   for (let i = 0; i < d.length; i++) { last = (last + .02 * (Math.random() * 2 - 1)) / 1.02; d[i] = last * 3.5; }
   const loop = (freq, gain) => { const s = AC.createBufferSource(); s.buffer = buf; s.loop = true; const f = AC.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = freq;
     const g = AC.createGain(); g.gain.value = gain; s.connect(f).connect(g).connect(master); s.start(); return g; };
-  ambG = loop(700, .07); rumbleG = loop(140, 0);
-  AC.noiseBuf = buf;
+  ambG = loop(700, SON ? 0 : .07); rumbleG = loop(140, 0);
+  AC.noiseBuf = buf; audioBuses();
+  if (SON) for (const n in SON.camas || {}) cama(n, SON.camas[n], 2);
 }
 function boom(phase) {
   if (!AC) return; const t = AC.currentTime, o = AC.createOscillator(), g = AC.createGain();
@@ -785,13 +796,50 @@ function boom(phase) {
 }
 function rumble(v) { if (AC) rumbleG.gain.setTargetAtTime(v, AC.currentTime, .4); }
 
+// ---------- sonidos grabados (audio/sfx) y narración (audio/voz/<idioma>/<escenario>/<n>.mp3, 0 = pregunta) ----------
+// ESC.sonido.camas: bucles de fondo con su volumen; cada fase puede cambiarlos (f.camas) y lanzar efectos (f.sfx: [[nombre, volumen, retraso]]).
+// ?voz=0 quita la narración.
+const VOZ = params.get('voz') !== '0', SON = ESC.sonido;
+const crudo = {}, bufs = {}, camas = {}, vozDur = {};
+const traer = url => crudo[url] ||= fetch(url).then(r => r.ok ? r.arrayBuffer() : null).catch(() => null);
+const cargar = url => bufs[url] ||= traer(url).then(a => a && AC.decodeAudioData(a.slice(0))).catch(() => null);
+const sfxUrl = n => `audio/sfx/${n}.mp3`, vozUrl = n => `audio/voz/${window.LANG}/${ESC.id}/${String(n).padStart(2, '0')}.mp3`;
+let busCama, busSfx, busVoz;
+function audioBuses() {
+  busCama = AC.createGain(); busSfx = AC.createGain(); busVoz = AC.createGain(); busVoz.gain.value = 1.15;
+  for (const b of [busCama, busSfx, busVoz]) b.connect(master);
+}
+function sfx(n, gan = .7, t0 = 0, rate = 1) {
+  if (!AC) return; cargar(sfxUrl(n)).then(b => { if (!b) return;
+    const s = AC.createBufferSource(), g = AC.createGain(); s.buffer = b; s.playbackRate.value = rate; g.gain.value = gan;
+    s.connect(g).connect(busSfx); s.start(AC.currentTime + t0); });
+}
+function cama(n, gan, tc = 1.2) {
+  if (!AC) return; let c = camas[n];
+  if (!c) { const g = AC.createGain(); g.gain.value = 0; g.connect(busCama); c = camas[n] = { g };
+    cargar(sfxUrl(n)).then(b => { if (!b) return; const s = AC.createBufferSource(); s.buffer = b; s.loop = true; s.connect(g); s.start(); }); }
+  c.g.gain.setTargetAtTime(gan, AC.currentTime, tc);
+}
+// audio/voz/lista.json: cuántos trozos de narración hay por idioma y escenario (así no se piden archivos que no existen)
+const nVoz = VOZ ? fetch('audio/voz/lista.json').then(r => r.ok ? r.json() : {}).then(l => l[`${window.LANG}/${ESC.id}`] || 0).catch(() => 0) : Promise.resolve(0);
+// la narración baja los fondos mientras habla
+function voz(n) {
+  if (!AC) return; nVoz.then(k => n < k ? cargar(vozUrl(n)) : null).then(b => { if (!b) return;
+    const s = AC.createBufferSource(); s.buffer = b; s.connect(busVoz); const t = AC.currentTime + .05; s.start(t);
+    busCama.gain.setTargetAtTime(.45, t, .15); busCama.gain.setTargetAtTime(1, t + b.duration, .4); });
+}
+// duraciones de la narración (para que cada paso dure al menos lo que tarda en leerse)
+nVoz.then(k => { for (let n = 0; n < k; n++) traer(vozUrl(n)).then(a => { if (!a) return;
+  try { const OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext; new OAC(1, 1, 44100).decodeAudioData(a.slice(0)).then(b => { vozDur[n] = b.duration; }, () => {}); } catch (e) {} }); });
+if (SON) for (const n of new Set([...Object.keys(SON.camas || {}), ...ESC.fases.flatMap(f => [...(f.sfx || []).map(s => s[0]), ...Object.keys(f.camas || {})]), ...(SON.extra || []), ...(SON.paso ? [SON.paso] : [])])) traer(sfxUrl(n));
+
 // ---------- contexto para los fenómenos ----------
 const ctx = {
   THREE, scene, camera, renderer, cityGroup, objects, inst, people, GROUND, groundAt, terrainY, emit, addDebris, derribar,
   mat, BOX, VMAT, R, rr, lerp, clamp, smooth, hash, fmt, sun, hemi, skyT, seaNear, camTo, pushCamera, camPos, camTgt, boom, rumble,
   C: { glass: C_GLASS, foam: C_FOAM, spray: C_SPRAY, dust: C_DUST }, escenario: ESC,
   setShake(v) { shake = v; }, get camDist() { return camDist; }, get caidos() { return fallen; }, get total() { return cityTotal; },
-  get audio() { return { AC, master }; },
+  get audio() { return { AC, master }; }, sfx, cama, camSigue,
 };
 FEN.crear(ctx);
 
@@ -800,8 +848,9 @@ const $ = id => document.getElementById(id);
 const hud = $('hud'), big = $('big'), cap = $('caption');
 let tntShown = 0, tntFrom = 0, tntTo = 0, tntT = 1;
 const magText = v => FEN.mag ? FEN.mag(v) : `${fmt(v, 0)} ${ESC.unidad}`;
-function setHUD(phase, v) {
-  hud.querySelector('.fase').textContent = `${T('FASE', 'PHASE')} ${phase} / ${NF}`;
+function setHUD(phase, v, f) {
+  hud.querySelector('.fase').textContent = ESC.paso ? `${ESC.paso} #${phase}` : `${T('FASE', 'PHASE')} ${phase} / ${NF}`;
+  hud.querySelector('.sub').textContent = f.sub || ''; hud.querySelector('.lema').textContent = ESC.lema || '';
   hud.querySelector('.mag').textContent = magText(v);
   hud.querySelector('.mag').style.fontSize = magText(v).length > 10 ? '1.35em' : '';
   if (FEN.linea3) { tntT = 1; const l = [].concat(FEN.linea3(v)); hud.querySelector('.tnt').textContent = l[0]; hud.querySelector('.cmp').textContent = l[1] || ''; return; }
@@ -827,7 +876,10 @@ function updateLabels() { const r = stage.getBoundingClientRect(), placed = [];
 let toastT; function toast(t) { const e = $('toast'); e.textContent = t; e.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => e.classList.remove('on'), 1400); }
 
 // ---------- flujo del vídeo ----------
-let phase = 0, state = 'menu', phaseTime = 0, idleT = 0, wasActive = false, ended = false, auto = params.get('auto') === '1', introT = 0;
+// ESC.ritmo: segundos por paso; el vídeo avanza solo a ese ritmo sin esperar a que acabe cada efecto
+const RITMO = +(params.get('ritmo') || ESC.ritmo || 0);
+let phase = 0, state = 'menu', phaseTime = 0, idleT = 0, wasActive = false, ended = false, auto = params.has('auto') ? params.get('auto') === '1' : !!RITMO, introT = 0;
+const durPaso = () => Math.max(ESC.fases[phase - 1]?.dur ?? RITMO, (vozDur[phase] ?? 0) + .45);
 const AUTO_EXTRA = +(params.get('intervalo') || 1);
 $('auto').checked = auto; $('mtitle').textContent = ESC.pregunta;
 $('autoTxt').textContent = T('Modo auto (avanza solo)', 'Auto mode (advances by itself)');
@@ -840,7 +892,7 @@ $('esc').value = ESC.id; $('esc').onchange = e => { params.set('e', e.target.val
 $('question').textContent = ESC.pregunta; $('end').querySelector('.a').textContent = ESC.cierre.titulo; $('end').querySelector('.b').textContent = ESC.cierre.pregunta;
 function start() {
   auto = $('auto').checked; $('menu').classList.add('off'); document.body.classList.add('playing'); audioInit();
-  state = 'intro'; introT = 0; $('question').classList.add('on'); const ic = ESC.intro || { pos: [-650, 120, -560], mira: [0, 60, 800] }; camTo(ic.pos, ic.mira, 3);
+  state = 'intro'; introT = 0; $('question').classList.add('on'); const ic = ESC.intro || { pos: [-650, 120, -560], mira: [0, 60, 800] }; camTo(ic.pos, ic.mira, 3); voz(0);
   $('hint').classList.add('on'); setTimeout(() => $('hint').classList.remove('on'), 4000);
 }
 function nextPhase() {
@@ -848,12 +900,17 @@ function nextPhase() {
   phase++; phaseTime = 0; idleT = 0; state = 'phase';
   const f = ESC.fases[phase - 1], v = f.valor ?? ESC.inicial * Math.pow(ESC.multiplicador, phase - 1);
   FEN.fase(ctx, phase, v, f); wasActive = true;
-  if (f.camara) camTo(f.camara.pos, f.camara.mira, phase === 1 ? 1.6 : 2.6);
-  $('question').classList.remove('on'); hud.classList.add('on'); setHUD(phase, v);
-  big.textContent = magText(v); big.style.fontSize = big.textContent.length > 11 ? '2em' : big.textContent.length > 6 ? '2.7em' : ''; big.classList.remove('pop'); void big.offsetWidth; big.classList.add('pop');
-  cap.classList.remove('on'); setTimeout(() => { cap.textContent = f.texto; cap.classList.add('on'); }, 700);
-  skyT.set(f.cielo ?? SKY[Math.min(SKY.length - 1, phase - 1)]); if (!FEN.sinBoom) boom(phase); rumble(.12 + phase * .035);
+  const cam = f.camara && (FEN.camara ? FEN.camara(f.camara, phase) : f.camara);
+  if (cam) { if (RITMO && !cam.dur) camSigue(cam.pos, cam.mira); else camTo(cam.pos, cam.mira, cam.dur ?? (phase === 1 ? 1.6 : 2.6)); }
+  $('question').classList.remove('on'); hud.classList.add('on'); setHUD(phase, v, f);
+  if (!RITMO) { big.textContent = magText(v); big.style.fontSize = big.textContent.length > 11 ? '2em' : big.textContent.length > 6 ? '2.7em' : ''; big.classList.remove('pop'); void big.offsetWidth; big.classList.add('pop'); }
+  cap.classList.remove('on'); setTimeout(() => { cap.textContent = f.texto || ''; if (f.texto) cap.classList.add('on'); }, RITMO ? 220 : 700);
+  skyT.set(f.cielo ?? SKY[Math.min(SKY.length - 1, phase - 1)]); if (!FEN.sinBoom) boom(phase); rumble(Math.min(.5, .12 + phase * .035));
   if (ambG && phase > 2) ambG.gain.setTargetAtTime(.02, AC.currentTime, 1);
+  for (const [n, g = .7, t0 = 0] of f.sfx || []) sfx(n, g, t0);
+  for (const n in f.camas || {}) cama(n, f.camas[n]);
+  if (RITMO && SON?.paso) sfx(SON.paso, SON.pasoGan ?? .5);
+  voz(phase);
 }
 function advance() { if (state === 'intro' && introT > .6) nextPhase(); else if (state === 'phase' && phaseTime > .8) nextPhase(); }
 $('play').onclick = e => { e.stopPropagation(); start(); };
@@ -877,11 +934,11 @@ function frame() {
 }
 function tick(dt) {
   time += dt;
-  if (state === 'intro') { introT += dt; if (introT > 2.6 && auto) nextPhase(); }
+  if (state === 'intro') { introT += dt; if (introT > Math.max(ESC.introDur ?? 2.6, (vozDur[0] ?? 0) + .4) && auto) nextPhase(); }
   if (state === 'phase') { phaseTime += dt;
     const act = FEN.activo(); if (wasActive && !act) rumble(0); wasActive = act; idleT = act ? 0 : idleT + dt;
-    if (auto && idleT > AUTO_EXTRA && phase < NF) nextPhase();
-    if (phase === NF && idleT > .3 && !ended) { ended = true; $('end').classList.add('on'); cap.classList.remove('on'); }
+    if (auto && phase < NF && (RITMO ? phaseTime > durPaso() : idleT > AUTO_EXTRA)) nextPhase();
+    if (phase === NF && !ended && (RITMO ? phaseTime > durPaso() : idleT > .3)) { ended = true; $('end').classList.add('on'); cap.classList.remove('on'); }
   }
   if (phase > 0) FEN.actualizar(ctx, dt, time);
   if (window.__wheel && window.__wheel.parent === cityGroup) window.__wheel.rotation.z += dt * .06;
