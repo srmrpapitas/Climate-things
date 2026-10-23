@@ -20,7 +20,7 @@ window.FENOMENOS.decibelios = (() => {
     burbuja = document.createElement('div');
     Object.assign(burbuja.style, { position: 'absolute', transform: 'translate(-50%,-100%) scale(.2)', fontFamily: "'Archivo Black', Inter, sans-serif", color: '#ffd23f',
       fontSize: '1.1em', whiteSpace: 'nowrap', pointerEvents: 'none', opacity: 0, transition: 'opacity .25s', textShadow: '0 .06em .2em rgba(0,0,0,.6)' });
-    burbuja.textContent = '¡BOMBOCLAT!'; stage.appendChild(burbuja);
+    burbuja.textContent = COMUN.EN ? 'BOMBOCLAT!' : '¡BOMBOCLAT!'; stage.appendChild(burbuja);
   }
 
   // anillo de sonido: esfera transparente que se expande desde la boca
@@ -118,14 +118,15 @@ window.FENOMENOS.decibelios = (() => {
     linea3(v) {
       const W = vatios(v), t = W / COMUN.TNT_J;
       let cmp;
-      if (W < 1e-6) cmp = `${COMUN.num(W * 1e9)} nanovatios`;
-      else if (W < 1e-3) cmp = `${COMUN.num(W * 1e6)} microvatios`;
-      else if (W < 1) cmp = `${COMUN.num(W * 1e3)} milivatios`;
-      else if (W < 1e3) cmp = `${COMUN.num(W)} vatios: como una bombilla LED`;
-      else if (W < 1e18) cmp = `una bomba de Hiroshima cada ${COMUN.num(15000 / t)} segundos`;
-      else cmp = `${COMUN.grande(W / 3.8e26)} de veces la potencia del Sol`;
-      return [`≈ ${COMUN.textoTNT(t)} por segundo`, `(${cmp})`];
+      const EN = COMUN.EN;
+      if (W < 1e-6) cmp = `${COMUN.num(W * 1e9)} ${EN ? 'nanowatts' : 'nanovatios'}`;
+      else if (W < 1e-3) cmp = `${COMUN.num(W * 1e6)} ${EN ? 'microwatts' : 'microvatios'}`;
+      else if (W < 1) cmp = `${COMUN.num(W * 1e3)} ${EN ? 'milliwatts' : 'milivatios'}`;
+      else if (W < 1e3) cmp = `${COMUN.num(W)} ${EN ? 'watts: like an LED bulb' : 'vatios: como una bombilla LED'}`;
+      else if (W < 1e18) cmp = EN ? `a Hiroshima bomb every ${COMUN.num(15000 / t)} seconds` : `una bomba de Hiroshima cada ${COMUN.num(15000 / t)} segundos`;
+      else cmp = EN ? `${COMUN.grande(W / 3.8e26)} times the power of the Sun` : `${COMUN.grande(W / 3.8e26)} de veces la potencia del Sol`;
+      return [`≈ ${COMUN.textoTNT(t)} ${EN ? 'per second' : 'por segundo'}`, `(${cmp})`];
     },
-    danos: () => `${COMUN.num(ventanas, 0)} ventanas rotas · ${COMUN.num(ctxRef.caidos, 0)} edificios caídos`,
+    danos: () => COMUN.EN ? `${COMUN.num(ventanas, 0)} windows broken · ${COMUN.num(ctxRef.caidos, 0)} buildings down` : `${COMUN.num(ventanas, 0)} ventanas rotas · ${COMUN.num(ctxRef.caidos, 0)} edificios caídos`,
   };
 })();

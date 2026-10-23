@@ -80,15 +80,16 @@
   <div id="question" class="t"></div>
   <div id="caption" class="t"></div>
   <div id="end" class="t"><div class="a"></div><div class="b"></div></div>
-  <div id="hint" class="t">Clic: siguiente fase · H: ocultar ayuda · A: modo auto · R: reiniciar</div>
+  <div id="hint" class="t"></div>
   <div id="toast"></div>
   <div id="menu" class="t">
     <div class="sub">@siseduplica</div>
     <h1 id="mtitle"></h1>
     <select class="esc" id="esc"></select>
+    <select class="esc" id="lang"><option value="en">English</option><option value="es">Español</option></select>
     <button id="play">▶ PLAY</button>
-    <label><input type="checkbox" id="auto"> Modo auto (avanza solo)</label>
-    <div class="keys">Clic o espacio: siguiente fase<br>H: oculta ayuda y cursor · A: modo auto · R: reiniciar<br>Añade ?full a la dirección para pantalla completa sin 9:16</div>
+    <label><input type="checkbox" id="auto"> <span id="autoTxt"></span></label>
+    <div class="keys" id="keys"></div>
   </div>
 </div>
 
@@ -125,11 +126,12 @@ function vnoise(x, y) { const xi = Math.floor(x), yi = Math.floor(y), xf = x - x
   const a = hash(xi, yi), b = hash(xi + 1, yi), c = hash(xi, yi + 1), d = hash(xi + 1, yi + 1);
   return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v; }
 function fbm(x, y) { let s = 0, a = .5, f = 1; for (let i = 0; i < 4; i++) { s += a * vnoise(x * f, y * f); f *= 2.1; a *= .5; } return s / .9375; }
-function fmt(n, dec) { // formato español: 1.280 · 0,3
+const EN = window.LANG === 'en';
+function fmt(n, dec) { // español: 1.280 · 0,3 / inglés: 1,280 · 0.3
   if (dec === undefined) dec = n < 10 ? 1 : 0;
   let s = n.toFixed(dec); let [i, d] = s.split('.');
-  i = i.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-  return d && +d !== 0 ? i + ',' + d : i; }
+  i = i.replace(/\B(?=(\d{3})+(?!\d))/g, EN ? ',' : '.');
+  return d && +d !== 0 ? i + (EN ? '.' : ',') + d : i; }
 
 // ---------- textos de energía (toneladas de TNT) ----------
 function textoTNT(t) {
@@ -799,7 +801,7 @@ const hud = $('hud'), big = $('big'), cap = $('caption');
 let tntShown = 0, tntFrom = 0, tntTo = 0, tntT = 1;
 const magText = v => FEN.mag ? FEN.mag(v) : `${fmt(v, 0)} ${ESC.unidad}`;
 function setHUD(phase, v) {
-  hud.querySelector('.fase').textContent = `FASE ${phase} / ${NF}`;
+  hud.querySelector('.fase').textContent = `${T('FASE', 'PHASE')} ${phase} / ${NF}`;
   hud.querySelector('.mag').textContent = magText(v);
   hud.querySelector('.mag').style.fontSize = magText(v).length > 10 ? '1.35em' : '';
   if (FEN.linea3) { tntT = 1; const l = [].concat(FEN.linea3(v)); hud.querySelector('.tnt').textContent = l[0]; hud.querySelector('.cmp').textContent = l[1] || ''; return; }
@@ -811,7 +813,7 @@ function updateHUD(dt) {
   if (tntT < 1) { tntT = Math.min(1, tntT + dt / 1.6); const k = 1 - Math.pow(1 - tntT, 3);
     tntShown = Math.exp(lerp(Math.log(tntFrom), Math.log(tntTo), k));
     hud.querySelector('.tnt').textContent = textoTNT(tntShown); const cmp = textoCmp(tntShown); hud.querySelector('.cmp').textContent = cmp ? `(${cmp})` : ''; }
-  if (phase > 0) hud.querySelector('.dmg').textContent = FEN.danos ? FEN.danos() : `${fmt(fallen, 0)} edificios caídos · ${fmt(Math.round(100 * fallen / cityTotal), 0)} % de la ciudad`;
+  if (phase > 0) hud.querySelector('.dmg').textContent = FEN.danos ? FEN.danos() : T(`${fmt(fallen, 0)} edificios caídos · ${fmt(Math.round(100 * fallen / cityTotal), 0)} % de la ciudad`, `${fmt(fallen, 0)} buildings down · ${fmt(Math.round(100 * fallen / cityTotal), 0)}% of the city`);
 }
 const labelsEl = $('labels'), labels = (ESC.marcas || []).map(mk => { const e = document.createElement('div'); e.className = 'lbl t'; e.textContent = mk.texto; labelsEl.appendChild(e); return { ...mk, e, v: new THREE.Vector3(...mk.pos) }; });
 function updateLabels() { const r = stage.getBoundingClientRect(), placed = [];
@@ -828,6 +830,11 @@ let toastT; function toast(t) { const e = $('toast'); e.textContent = t; e.class
 let phase = 0, state = 'menu', phaseTime = 0, idleT = 0, wasActive = false, ended = false, auto = params.get('auto') === '1', introT = 0;
 const AUTO_EXTRA = +(params.get('intervalo') || 1);
 $('auto').checked = auto; $('mtitle').textContent = ESC.pregunta;
+$('autoTxt').textContent = T('Modo auto (avanza solo)', 'Auto mode (advances by itself)');
+$('hint').textContent = T('Clic: siguiente fase · H: ocultar ayuda · A: modo auto · R: reiniciar', 'Click: next phase · H: hide help · A: auto mode · R: restart');
+$('keys').innerHTML = T('Clic o espacio: siguiente fase<br>H: oculta ayuda y cursor · A: modo auto · R: reiniciar<br>Añade ?full a la dirección para pantalla completa sin 9:16',
+  'Click or space: next phase<br>H: hide help and cursor · A: auto mode · R: restart<br>Add ?full to the address for full screen without 9:16');
+$('lang').value = window.LANG; $('lang').onchange = e => { params.set('lang', e.target.value); location.search = params.toString(); };
 for (const k in window.ESCENARIOS) { const o = document.createElement('option'); o.value = k; o.textContent = window.ESCENARIOS[k].titulo; $('esc').appendChild(o); }
 $('esc').value = ESC.id; $('esc').onchange = e => { params.set('e', e.target.value); location.search = params.toString(); };
 $('question').textContent = ESC.pregunta; $('end').querySelector('.a').textContent = ESC.cierre.titulo; $('end').querySelector('.b').textContent = ESC.cierre.pregunta;
@@ -855,7 +862,7 @@ addEventListener('keydown', e => {
   const k = e.key.toLowerCase();
   if (k === ' ' || k === 'enter') { e.preventDefault(); if (state === 'menu') start(); else advance(); }
   if (k === 'h') document.body.classList.toggle('clean');
-  if (k === 'a') { auto = !auto; toast(auto ? 'Modo auto: activado' : 'Modo auto: desactivado'); }
+  if (k === 'a') { auto = !auto; toast(auto ? T('Modo auto: activado', 'Auto mode: on') : T('Modo auto: desactivado', 'Auto mode: off')); }
   if (k === 'r') { const p = new URLSearchParams(location.search); if (auto) p.set('auto', '1'); else p.delete('auto'); location.search = p.toString(); }
 });
 
