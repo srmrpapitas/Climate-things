@@ -108,6 +108,6 @@ window.FENOMENOS.terremoto = (() => {
     crear, fase: fase_, actualizar,
     activo: () => tiempo - t0 < dur + 1.2 || cola.length > 0 || (planeta && planeta.split < .9),
     tnt: m => energiaJ(m) / COMUN.TNT_J,
-    mag: m => `Magnitud ${COMUN.num(m, m % 1 ? 1 : 0)}`,
+    mag: m => `${COMUN.EN ? 'Magnitude' : 'Magnitud'} ${COMUN.num(m, m % 1 ? 1 : 0)}`,
   };
 })();

@@ -63,7 +63,7 @@ window.FENOMENOS.co2 = (() => {
     crear, fase, actualizar,
     activo: () => tiempo - t0 < 4,
     mag: v => `${COMUN.num(v, 0)} ppm`,
-    linea3: v => [`≈ ${COMUN.grande(cochesAno(v))} de coches un año`, `(${COMUN.grande(extraGt(v) * 1e9)} de t de CO2 de más)`],
-    danos: () => { const n = todos.filter(p => p.caer && tiempo > p.retraso).length; return `${COMUN.num(Math.round(100 * n / todos.length), 0)} % de la gente inconsciente`; },
+    linea3: v => COMUN.EN ? [`≈ ${COMUN.grande(cochesAno(v))} cars for a year`, `(${COMUN.grande(extraGt(v) * 1e9)} t of extra CO2)`] : [`≈ ${COMUN.grande(cochesAno(v))} de coches un año`, `(${COMUN.grande(extraGt(v) * 1e9)} de t de CO2 de más)`],
+    danos: () => { const n = todos.filter(p => p.caer && tiempo > p.retraso).length; const pc = COMUN.num(Math.round(100 * n / todos.length), 0); return COMUN.EN ? `${pc}% of people unconscious` : `${pc} % de la gente inconsciente`; },
   };
 })();

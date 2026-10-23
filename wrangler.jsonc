@@ -1,0 +1,6 @@
+// Despliegue en Cloudflare Workers: el juego es una web estática, sin código de servidor.
+{
+  "name": "climate-things",
+  "compatibility_date": "2026-10-01",
+  "assets": { "directory": "." }
+}

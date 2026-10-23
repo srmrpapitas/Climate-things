@@ -1,5 +1,12 @@
 // Archivos que carga el juego al arrancar. Cada escenario va en escenarios/<clave>.js
 // (window.ESCENARIOS.<clave> = {...}) y cada fenómeno en fenomenos/<tipo>.js (window.FENOMENOS.<tipo> = {...}).
+// Idioma: ?lang=en o ?lang=es (inglés por defecto). Se recuerda en el navegador.
+window.LANG = (() => { const q = new URLSearchParams(location.search).get('lang'); let l = q;
+  try { if (q) localStorage.setItem('lang', q); else l = localStorage.getItem('lang'); } catch (e) {}
+  return l === 'es' ? 'es' : 'en'; })();
+document.documentElement.lang = window.LANG;
+// T('texto en español', 'text in English'): devuelve el del idioma elegido
+window.T = (es, en) => window.LANG === 'en' ? en : es;
 window.ESCENARIOS = {};
 window.FENOMENOS = {};
 window.LISTA = {

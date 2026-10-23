@@ -6,38 +6,43 @@ window.COMUN = (() => {
   const TNT_J = 4.184e9; // 1 t de TNT en julios
   const RT = 6.371e6;    // radio de la Tierra (m)
 
-  // ---------- números en español ----------
+  // ---------- números y textos en el idioma elegido (window.LANG, ver lista.js) ----------
+  const EN = window.LANG === 'en';
   function num(n, dec) {
     if (dec === undefined) dec = n < 10 ? 1 : 0;
     let s = n.toFixed(dec); let [i, d] = s.split('.');
-    i = i.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-    return d && +d !== 0 ? i + ',' + d.replace(/0+$/, '') : i;
+    i = i.replace(/\B(?=(\d{3})+(?!\d))/g, EN ? ',' : '.');
+    return d && +d !== 0 ? i + (EN ? '.' : ',') + d.replace(/0+$/, '') : i;
   }
-  // 1,2 millones · 3,4 billones (escala larga española)
+  // 1,2 millones · 3,4 billones (escala larga española) · 1.2 million · 3.4 trillion (escala corta inglesa)
   function grande(n) {
-    const u = [[1e18, 'trillones'], [1e12, 'billones'], [1e9, 'mil millones'], [1e6, 'millones'], [1e3, 'mil']];
-    for (const [v, t] of u) if (n >= v) { const x = n / v; return `${num(x, x < 10 ? 1 : 0)} ${x < 1.05 && v >= 1e6 && t !== 'mil millones' ? t.replace(/ones$/, 'ón') : t}`; }
+    const u = EN ? [[1e18, 'quintillion'], [1e15, 'quadrillion'], [1e12, 'trillion'], [1e9, 'billion'], [1e6, 'million'], [1e3, 'thousand']]
+      : [[1e18, 'trillones'], [1e12, 'billones'], [1e9, 'mil millones'], [1e6, 'millones'], [1e3, 'mil']];
+    for (const [v, t] of u) if (n >= v) { const x = n / v; return `${num(x, x < 10 ? 1 : 0)} ${!EN && x < 1.05 && v >= 1e6 && t !== 'mil millones' ? t.replace(/ones$/, 'ón') : t}`; }
     return num(n, 0);
   }
+  const DE = EN ? ' ' : ' de '; // «2 millones de coches» / «2 million cars»
+  const uno = n => n < 1.05 && n > .95;
   // toneladas de TNT → texto con la unidad más cómoda (de microgramos a gigatones)
   function textoTNT(t) {
-    if (t <= 0) return '0 g de TNT';
+    const de = EN ? ' of TNT' : ' de TNT';
+    if (t <= 0) return '0 g' + de;
     const g = t * 1e6;
-    if (g < 1e-6) return 'casi 0 g de TNT';
-    if (g < 1e-3) return `${num(g * 1e6)} µg de TNT`;
-    if (g < 1) return `${num(g * 1e3)} mg de TNT`;
-    if (g < 1000) return `${num(g)} g de TNT`;
-    if (t < 1) return `${num(g / 1000)} kg de TNT`;
-    if (t < 1000) return `${num(t)} ${t < 1.05 && t > .95 ? 'tonelada' : 'toneladas'} de TNT`;
-    if (t < 1e6) return `${num(t / 1e3)} kilotones de TNT`;
-    if (t < 1e9) return `${num(t / 1e6)} megatones de TNT`;
-    if (t < 1e12) return `${num(t / 1e9)} gigatones de TNT`;
-    return t / 1e9 < 1e6 ? `${num(t / 1e9, 0)} gigatones de TNT` : `${grande(t / 1e9)} de gigatones de TNT`;
+    if (g < 1e-6) return (EN ? 'almost 0 g' : 'casi 0 g') + de;
+    if (g < 1e-3) return `${num(g * 1e6)} µg${de}`;
+    if (g < 1) return `${num(g * 1e3)} mg${de}`;
+    if (g < 1000) return `${num(g)} g${de}`;
+    if (t < 1) return `${num(g / 1000)} kg${de}`;
+    if (t < 1000) return `${num(t)} ${EN ? (uno(t) ? 'tonne' : 'tonnes') : (uno(t) ? 'tonelada' : 'toneladas')}${de}`;
+    if (t < 1e6) return `${num(t / 1e3)} ${EN ? 'kilotons' : 'kilotones'}${de}`;
+    if (t < 1e9) return `${num(t / 1e6)} ${EN ? 'megatons' : 'megatones'}${de}`;
+    if (t < 1e12) return `${num(t / 1e9)} ${EN ? 'gigatons' : 'gigatones'}${de}`;
+    return t / 1e9 < 1e6 ? `${num(t / 1e9, 0)} ${EN ? 'gigatons' : 'gigatones'}${de}` : `${grande(t / 1e9)}${DE}${EN ? 'gigatons' : 'gigatones'}${de}`;
   }
   function comparaTNT(t) {
-    if (t >= 50e6) { const n = t / 50e6; return n >= 1e4 ? `${grande(n)} de Tsar Bombas` : `${num(n)} ${n < 1.05 && n > .95 ? 'Tsar Bomba' : 'Tsar Bombas'}`; }
-    if (t >= 1500) { const n = t / 15000; return `${num(n)} ${n < 1.05 && n > .95 ? 'bomba' : 'bombas'} de Hiroshima`; }
-    if (t >= 1) { const n = t / .0042; return `${n >= 1e4 ? grande(n) : num(n, 0)} granadas de mano`; } // ≈ 4,2 kg de explosivo por granada
+    if (t >= 50e6) { const n = t / 50e6, nom = EN ? (uno(n) ? 'Tsar Bomba' : 'Tsar Bombas') : (uno(n) ? 'Tsar Bomba' : 'Tsar Bombas'); return n >= 1e4 ? `${grande(n)}${DE}Tsar Bombas` : `${num(n)} ${nom}`; }
+    if (t >= 1500) { const n = t / 15000; return EN ? `${num(n)} Hiroshima ${uno(n) ? 'bomb' : 'bombs'}` : `${num(n)} ${uno(n) ? 'bomba' : 'bombas'} de Hiroshima`; }
+    if (t >= 1) { const n = t / .0042; return `${n >= 1e4 ? grande(n) : num(n, 0)} ${EN ? 'hand grenades' : 'granadas de mano'}`; } // ≈ 4,2 kg de explosivo por granada
     return '';
   }
 
@@ -217,5 +222,5 @@ window.COMUN = (() => {
     };
   }
 
-  return { TNT_J, RT, num, grande, textoTNT, comparaTNT, materiales, tintar, derribar, edificios, planeta, estallarPlaneta, multitud, persona, moverGente, tono, ruido, reloj };
+  return { TNT_J, RT, EN, DE, num, grande, textoTNT, comparaTNT, materiales, tintar, derribar, edificios, planeta, estallarPlaneta, multitud, persona, moverGente, tono, ruido, reloj };
 })();
