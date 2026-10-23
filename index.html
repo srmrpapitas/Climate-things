@@ -128,11 +128,13 @@ function fmt(n, dec) { // formato español: 1.280 · 0,3
 
 // ---------- textos de energía (toneladas de TNT) ----------
 function textoTNT(t) {
+  if (window.COMUN) return '≈ ' + COMUN.textoTNT(t); // fenomenos/comun.js: de mg a billones de gigatones
   if (t < 1000) return `≈ ${fmt(t)} toneladas de TNT`;
   if (t < 1e6) return `≈ ${fmt(t / 1e3)} kilotones de TNT`;
   if (t < 1e9) return `≈ ${fmt(t / 1e6)} megatones de TNT`;
   return `≈ ${fmt(t / 1e9)} gigatones de TNT`; }
 function textoCmp(t) {
+  if (window.COMUN) return COMUN.comparaTNT(t);
   if (t >= 50e6) { const n = t / 50e6; return `${fmt(n)} ${n < 1.05 && n > .95 ? 'Tsar Bomba' : 'Tsar Bombas'}`; }
   const n = t / 15000; return `${fmt(n)} ${n < 1.05 && n > .95 ? 'bomba' : 'bombas'} de Hiroshima`; }
 
@@ -204,7 +206,7 @@ function groundAt(x, z) { return (Math.abs(x) < 2600 && z > 60 && z < 2700) ? GR
 })();
 
 // mar
-const seaFar = new THREE.Mesh(new THREE.PlaneGeometry(1.6e6, 1.6e6).rotateX(-Math.PI / 2), mat(0x2f86b8, { roughness: .35 }));
+const seaFar = new THREE.Mesh(new THREE.PlaneGeometry(1.6e6, 1.6e6, 160, 160).rotateX(-Math.PI / 2), mat(0x2f86b8, { roughness: .35 }));
 seaFar.position.y = -0.4; scene.add(seaFar);
 const seaNearG = new THREE.PlaneGeometry(9000, 5000, 70, 40).rotateX(-Math.PI / 2).translate(0, 0, -2450).toNonIndexed();
 const seaNear = new THREE.Mesh(seaNearG, mat(0x3593c4, { roughness: .3 })); scene.add(seaNear);
@@ -708,7 +710,8 @@ const magText = v => FEN.mag ? FEN.mag(v) : `${fmt(v, 0)} ${ESC.unidad}`;
 function setHUD(phase, v) {
   hud.querySelector('.fase').textContent = `FASE ${phase} / ${NF}`;
   hud.querySelector('.mag').textContent = magText(v);
-  if (FEN.linea3) { tntT = 1; hud.querySelector('.tnt').textContent = FEN.linea3(v); hud.querySelector('.cmp').textContent = ''; return; }
+  hud.querySelector('.mag').style.fontSize = magText(v).length > 10 ? '1.35em' : '';
+  if (FEN.linea3) { tntT = 1; const l = [].concat(FEN.linea3(v)); hud.querySelector('.tnt').textContent = l[0]; hud.querySelector('.cmp').textContent = l[1] || ''; return; }
   const t = FEN.tnt ? FEN.tnt(v) : null;
   if (t == null || !(t > 0)) { tntT = 1; hud.querySelector('.tnt').textContent = ''; hud.querySelector('.cmp').textContent = ''; return; }
   tntFrom = tntShown || t / 4; tntTo = t; tntT = 0;
@@ -716,7 +719,7 @@ function setHUD(phase, v) {
 function updateHUD(dt) {
   if (tntT < 1) { tntT = Math.min(1, tntT + dt / 1.6); const k = 1 - Math.pow(1 - tntT, 3);
     tntShown = Math.exp(lerp(Math.log(tntFrom), Math.log(tntTo), k));
-    hud.querySelector('.tnt').textContent = textoTNT(tntShown); hud.querySelector('.cmp').textContent = `(${textoCmp(tntShown)})`; }
+    hud.querySelector('.tnt').textContent = textoTNT(tntShown); const cmp = textoCmp(tntShown); hud.querySelector('.cmp').textContent = cmp ? `(${cmp})` : ''; }
   if (phase > 0) hud.querySelector('.dmg').textContent = FEN.danos ? FEN.danos() : `${fmt(fallen, 0)} edificios caídos · ${fmt(Math.round(100 * fallen / cityTotal), 0)} % de la ciudad`;
 }
 const labelsEl = $('labels'), labels = (ESC.marcas || []).map(mk => { const e = document.createElement('div'); e.className = 'lbl t'; e.textContent = mk.texto; labelsEl.appendChild(e); return { ...mk, e, v: new THREE.Vector3(...mk.pos) }; });
@@ -749,9 +752,9 @@ function nextPhase() {
   FEN.fase(ctx, phase, v, f); wasActive = true;
   if (f.camara) camTo(f.camara.pos, f.camara.mira, phase === 1 ? 1.6 : 2.6);
   $('question').classList.remove('on'); hud.classList.add('on'); setHUD(phase, v);
-  big.textContent = magText(v); big.style.fontSize = big.textContent.length > 6 ? '2.7em' : ''; big.classList.remove('pop'); void big.offsetWidth; big.classList.add('pop');
+  big.textContent = magText(v); big.style.fontSize = big.textContent.length > 11 ? '2em' : big.textContent.length > 6 ? '2.7em' : ''; big.classList.remove('pop'); void big.offsetWidth; big.classList.add('pop');
   cap.classList.remove('on'); setTimeout(() => { cap.textContent = f.texto; cap.classList.add('on'); }, 700);
-  skyT.set(f.cielo ?? SKY[Math.min(SKY.length - 1, phase - 1)]); boom(phase); rumble(.12 + phase * .035);
+  skyT.set(f.cielo ?? SKY[Math.min(SKY.length - 1, phase - 1)]); if (!FEN.sinBoom) boom(phase); rumble(.12 + phase * .035);
   if (ambG && phase > 2) ambG.gain.setTargetAtTime(.02, AC.currentTime, 1);
 }
 function advance() { if (state === 'intro' && introT > .6) nextPhase(); else if (state === 'phase' && phaseTime > .8) nextPhase(); }
