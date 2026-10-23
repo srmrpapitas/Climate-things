@@ -293,8 +293,15 @@ window.COMUN = (() => {
     // cabeza: las mismas piezas que la gente, con más segmentos y barba
     const cabeza = piv(g, 0, 1.55), cara = piezasHumano(T, { n, piel: PIELH, pelo: PELO, barba: true }).slice(-13);
     for (const p of cara) { p[3] -= 1.55; pon(cabeza, p, p[1] === PIELH ? .6 : .8); }
-    const boca = cabeza.children.find(m => m.material.color.getHex() === 0x8a3b32);
-    g.userData = { cabeza, boca, andar(ph, k) { const a = Math.sin(ph) * k;
+    // boca: labios + hueco oscuro que se abre; la barba (mandíbula) baja con ella
+    const labios = cabeza.children.find(m => m.material.color.getHex() === 0x8a3b32), barba = cabeza.children[cabeza.children.length - 1];
+    const boca = pon(cabeza, [G.esf(n), 0x2a0f0f, 0, .036, .1, .02, .003, .012], .9), lengua = pon(cabeza, [G.esf(10), 0xb5525a, 0, .03, .097, .013, .002, .008], .7);
+    const y0b = barba.position.y, y0l = labios.position.y;
+    const hablar = v => { v = Math.max(0, Math.min(1, v));
+      boca.scale.set(.02 + v * .008, .003 + v * .038, .013); boca.position.y = .036 - v * .016; lengua.position.y = .03 - v * .02; lengua.scale.y = .002 + v * .004;
+      labios.position.y = y0l + v * .004; labios.scale.x = .022 - v * .004; barba.position.y = y0b - v * .028; };
+    hablar(0);
+    g.userData = { cabeza, boca, hablar, andar(ph, k) { const a = Math.sin(ph) * k;
       piernas[0].cad.rotation.x = a * .5; piernas[1].cad.rotation.x = -a * .5;
       piernas[0].rod.rotation.x = Math.max(0, -Math.sin(ph)) * .7 * k; piernas[1].rod.rotation.x = Math.max(0, Math.sin(ph)) * .7 * k;
       brazos[0].hom.rotation.x = -a * .4; brazos[1].hom.rotation.x = a * .4; for (const b of brazos) b.codo.rotation.x = -.25 - .2 * k;

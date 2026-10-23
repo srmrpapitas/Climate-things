@@ -12,11 +12,11 @@ window.ESCENARIOS = window.ESCENARIOS || {};
     titulo: T('Gritar BOMBOCLAT cada vez más fuerte', 'Shouting BOMBOCLAT louder and louder'),
     pregunta: T('¿Y si cada BOMBOCLAT sonara el doble de fuerte que el anterior?', 'What if every BOMBOCLAT was twice as loud as the last?'),
     unidad: 'dB',
-    ritmo: 2.6, introDur: 2.8, vozRetraso: .7,
+    ritmo: 2.6, introDur: 2.8, vozRetraso: 1.1,
     paso: T('GRITO', 'SHOUT'),
     lema: T('EL DOBLE DE FUERTE CADA VEZ', 'TWICE AS LOUD EVERY TIME'),
     intro: { pos: [-10.6, 5.2, 127.5], mira: [-11.5, 4.4, 120] }, // absoluta (el suelo está a 3 m)
-    sonido: { camas: { dron: .3, ciudad: .55 }, extra: ['grito', 'impacto'] },
+    sonido: { camas: { dron: .3, ciudad: .55 }, extra: [...Array(10)].map((_, i) => 'bomboclat/' + String(i).padStart(2, '0')).concat('impacto') },
     fases: [
       P(60, T('UNA CONVERSACIÓN NORMAL', 'A NORMAL CONVERSATION'), T('Un tipo cualquiera paseando por la calle.', 'Just a guy walking down the street.'), cerca),
       P(70, T('UNA ASPIRADORA', 'A VACUUM CLEANER'), T('Nadie se da cuenta.', 'Nobody notices.'), cerca),
