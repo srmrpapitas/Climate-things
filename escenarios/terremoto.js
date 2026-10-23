@@ -4,9 +4,9 @@
 // camara: posición y punto al que mira [x, y, z]. El mar está en z negativo y la ciudad en z positivo.
 window.ESCENARIOS = window.ESCENARIOS || {};
 (() => {
-  const C = (pos, mira) => ({ pos, mira }), D = 3.4;
+  const C = (pos, mira) => ({ pos, mira }), D = 3.4, H = (pos, mira) => ({ pos, mira, cerca: true }); // H: sigue al protagonista
   const P = (valor, sub, texto, camara, extra) => ({ valor, duracion: D, sub, texto, camara, ...extra });
-  const calle = C([-2, 3.5, 570], [0, 24, 300]), calle2 = C([-6, 9, 600], [0, 22, 320]);
+  const calle = H([-10.9, 4.9, 554.8], [-11.5, 4.25, 560]), calle2 = H([-8, 7.5, 550], [-11.5, 4.2, 560]);
   window.ESCENARIOS.terremoto = {
     id: 'terremoto',
     tipo: 'terremoto',
@@ -15,7 +15,7 @@ window.ESCENARIOS = window.ESCENARIOS || {};
     ritmo: 3.2, introDur: 2.8,
     paso: T('TERREMOTO', 'QUAKE'),
     lema: T('CADA PUNTO, 32 VECES MÁS ENERGÍA', 'EVERY POINT = 32× MORE ENERGY'),
-    intro: { pos: [-40, 30, 700], mira: [0, 20, 300] },
+    intro: { pos: [-10.6, 8.2, 552.5], mira: [-11.5, 7.4, 560] },
     sonido: { camas: { dron: .3, ciudad: .5 }, paso: 'terremoto', pasoGan: .55 },
     fases: [
       P(3, T('UN CAMIÓN QUE PASA', 'A TRUCK DRIVING PAST'), T('Las lámparas se balancean un poco.', 'The lamps sway a little.'), calle),

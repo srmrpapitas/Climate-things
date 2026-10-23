@@ -16,12 +16,12 @@ window.ESCENARIOS = window.ESCENARIOS || {};
     ritmo: 2.8, introDur: 3,
     paso: T('OLA', 'WAVE'),
     lema: T('EL DOBLE DE ALTA CADA VEZ', 'TWICE AS TALL EVERY TIME'),
-    intro: { pos: [-650, 120, -560], mira: [0, 60, 800] },
+    intro: { pos: [-650, 120, -560], mira: [0, 60, 800] }, // el protagonista espera en el paseo (x .8, z 104)
     sonido: { camas: { ciudad: .5, dron: .2 }, paso: 'whoosh', pasoGan: .3 },
     fases: [
-      P(.5, 18, T('UNA OLA DE PLAYA', 'A BEACH WAVE'), T('Un día perfecto de playa.', 'A perfect day at the beach.'), C([0, 11, 118], [0, 0, -70])),
-      P(1, 30, T('UN BUEN DÍA DE SURF', 'A GOOD DAY FOR SURFING'), T('Los surfistas están encantados.', 'The surfers are thrilled.'), C([0, 11.5, 118], [0, 0, -65])),
-      P(2, 55, T('UNA OLA DE TEMPORAL', 'A STORM WAVE'), T('Bandera roja. Todo el mundo fuera del agua.', 'Red flag. Everyone out of the water.'), C([0, 12.5, 122], [0, .5, -55]), { sfx: [['panico', .3, .6]] }),
+      P(.5, 18, T('UNA OLA DE PLAYA', 'A BEACH WAVE'), T('Un día perfecto de playa.', 'A perfect day at the beach.'), { pos: [2.1, 4.9, 110], mira: [.2, 4.1, 99], dur: 2.4 }),
+      P(1, 30, T('UN BUEN DÍA DE SURF', 'A GOOD DAY FOR SURFING'), T('Los surfistas están encantados.', 'The surfers are thrilled.'), { pos: [2.8, 5.4, 112], mira: [-.2, 3.9, 96], dur: 1.5 }),
+      P(2, 55, T('UNA OLA DE TEMPORAL', 'A STORM WAVE'), T('Bandera roja. Todo el mundo fuera del agua.', 'Red flag. Everyone out of the water.'), { pos: [-1.8, 5.2, 128], mira: [.6, 3.6, 100], dur: 1.6 }, { sfx: [['panico', .3, .6]] }),
       P(4, 120, T('UN AUTOBÚS DE DOS PISOS', 'A DOUBLE-DECKER BUS'), T('Llega al paseo. Con medio metro de agua un coche ya flota.', 'It reaches the promenade. Half a metre of water can float a car.'), C([0, 17, 205], [0, 2, -20]), { sfx: [['ola', .45, .1]] }),
       P(8, 260, T('UNA CASA DE TRES PLANTAS', 'A THREE-STOREY HOUSE'), T('Los coches bajan flotando por la calle.', 'Cars go floating down the street.'), C([-2, 24, 370], [0, 4, 70]), { sfx: [['alarmas', .35, .4]] }),
       P(16, 520, T('UN EDIFICIO DE CINCO PLANTAS', 'A FIVE-STOREY BUILDING'), T('Revientan todos los escaparates del paseo.', 'Every shop window on the seafront bursts.'), C([0, 30, 720], [0, 8, 250]), { sfx: [['cristales', .55, .3], ['ola', .5, 0]] }),

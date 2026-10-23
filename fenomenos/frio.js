@@ -2,13 +2,14 @@
 // TNT: energía que hay que quitarle a 1 km³ de aire desde 15 °C (≈ 0,29 kt por grado, sin contar los cambios de estado).
 window.FENOMENOS.frio = (() => {
   const reloj = COMUN.reloj();
-  let ctx, T = 15, t0 = 0, tiempo = 0, edif = [], capa = null, planeta = null;
+  let ctx, T = 15, t0 = 0, tiempo = 0, edif = [], capa = null, planeta = null, yo = null;
   const est = { tinte: 0, escarcha: 0, mar: 0, capa: 0, solido: 0 }, obj = { ...est };
   let cieloObj = 0xc9dbe8;
   const col = {};
 
   function crear(c) {
     ctx = c; const THREE = ctx.THREE;
+    yo = COMUN.protagonista(ctx); // el chico de la sudadera: tirita, se escarcha y se queda congelado
     COMUN.materiales(ctx);
     edif = COMUN.edificios(ctx);
     for (const [k, v] of Object.entries({ nieve: 0xffffff, gota: 0x7fb8ff, hielo: 0xdff0ff })) col[k] = new THREE.Color(v);
@@ -22,6 +23,8 @@ window.FENOMENOS.frio = (() => {
   function fase(c, n, valor, f) {
     T = valor; t0 = tiempo;
     obj.tinte = Math.min(.55, Math.max(0, -T / 380));
+    Object.assign(yo.est, { lento: T <= -190 ? 0 : T <= -100 ? .35 : T <= -20 ? .7 : 1, tiembla: T <= -190 ? 0 : T <= -20 ? 1 : T <= 0 ? .5 : 0, cabeza: T <= -100 && T > -190 ? .3 : 0,
+      tinte: T <= -100 ? { c: new ctx.THREE.Color(0xd8f0ff), k: T <= -190 ? .85 : .45 } : null });
     obj.escarcha = T <= -100 ? Math.min(.5, .2 - T / 900) : T <= 0 ? .1 : 0;
     obj.mar = T <= -100 ? 1 : 0;
     obj.capa = T <= -190 ? 1 : 0;
@@ -40,6 +43,7 @@ window.FENOMENOS.frio = (() => {
   }
 
   function actualizar(c, dt, t) {
+    yo.actualizar(dt, t);
     tiempo = t; reloj.tick(t); const e = t - t0, k = 1 - Math.exp(-dt * 1.1);
     for (const key in est) est[key] += (obj[key] - est[key]) * k;
     COMUN.tintar(ctx, 0xe4f0ff, est.tinte, 0xcfe4ff, est.escarcha);
@@ -60,7 +64,7 @@ window.FENOMENOS.frio = (() => {
   }
 
   return {
-    crear, fase, actualizar,
+    crear, fase, actualizar, camara: c => yo.camara(c),
     activo: () => tiempo - t0 < 4 || reloj.pendientes > 0,
     tnt: v => Math.max(0, 15 - v) * 1.2e12 / COMUN.TNT_J,
     mag: v => `${v < 0 ? '−' : ''}${COMUN.num(Math.abs(v), Math.abs(v) >= 200 && v % 1 ? 1 : 0)} °C`,

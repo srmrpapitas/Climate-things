@@ -11,7 +11,7 @@
     out.push(P[P.length - 1]); return out; }
   const PB = chaikin(PB0), PF = chaikin(PF0);
 
-  let ctx, THREE, waves = [], w = null;
+  let ctx, THREE, waves = [], w = null, yo = null;
 
   class Wave {
     constructor(h, f) {
@@ -107,10 +107,15 @@
   window.FENOMENOS = window.FENOMENOS || {};
   window.FENOMENOS.ola = {
     sinBoom: true,
-    crear(c) { ctx = c; THREE = c.THREE; },
-    fase(c, n, valor, f) { if (!w) { w = new Wave(valor, f); waves.push(w); } else w.crecer(valor, f); },
-    actualizar(c, dt) {
+    // el chico de la sudadera mira el mar desde el paseo; con la bandera roja sale corriendo y la ola lo alcanza
+    crear(c) { ctx = c; THREE = c.THREE; yo = COMUN.protagonista(ctx, { x: .8, z: 104, ry: Math.PI, vel: 4.5 }); yo.est.lento = 0; },
+    fase(c, n, valor, f) { if (!w) { w = new Wave(valor, f); waves.push(w); } else w.crecer(valor, f);
+      if (n === 2) yo.est.hablar = .5; else yo.est.hablar = 0;
+      if (n >= 3 && !yo.est.caer) { yo.g.rotation.y = 0; yo.est.lento = 1; } },
+    actualizar(c, dt, t) {
+      yo.actualizar(dt, t);
       if (!w) return;
+      if (!yo.est.caer && w.zf > yo.g.position.z - 1.5) { yo.est.caer = true; yo.g.rotation.y = Math.PI; } // la ola lo alcanza
       w.update(dt);
       if (w.t < w.T || w.speed > 1) checkHits(dt);
       // a pie de calle la cámara huye de la ola

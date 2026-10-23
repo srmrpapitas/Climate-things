@@ -309,6 +309,27 @@ window.COMUN = (() => {
     g.userData.andar(0, 0);
     return g;
   }
+  // Protagonista que pasea por la acera oeste de la avenida (x -11.5, desde z 120 hacia +z) y reacciona a lo que pasa.
+  // est: lento (0-1), caer (true: se desploma), tiembla (0-1), cabeza (inclinación), tinte {c: Color, k} (p. ej. congelado).
+  // camara(c): las cámaras con cerca: true se mueven con lo que ha andado (para usarlas desde FEN.camara).
+  function protagonista(ctx, o = {}) {
+    const X0 = o.x ?? -11.5, Z0 = o.z ?? 120, VEL = o.vel ?? .9, h = heroe(ctx, o.color ?? 0xd8282f);
+    h.position.set(X0, ctx.groundAt ? ctx.groundAt(X0, Z0) : ctx.GROUND, Z0); h.rotation.y = o.ry ?? 0; h.userData.fenPropio = true;
+    h.traverse(m => { if (m.isMesh) m.castShadow = true; }); ctx.scene.add(h);
+    for (const p of ctx.people) if (Math.abs(p.x - X0) < 1.5 && p.z > Z0 - 4 && p.z < Z0 + 60) { p.x += 3; p.g.position.x = p.x; } // le deja paso
+    const mats = new Map(); h.traverse(m => { if (m.isMesh && !mats.has(m.material)) mats.set(m.material, m.material.color.clone()); });
+    const est = { lento: 1, caer: false, cae: 0, tiembla: 0, cabeza: 0, tinte: null, andado: 0, hablar: 0 }; let bx = X0;
+    return { g: h, est,
+      actualizar(dt, t) {
+        const v = est.caer ? 0 : VEL * est.lento, d = h.rotation.y; bx += Math.sin(d) * v * dt; h.position.z += Math.cos(d) * v * dt; est.andado += v * dt;
+        h.userData.andar(t * 5 * Math.max(.3, est.lento), v > .05 ? 1 : 0);
+        h.position.x = bx + (est.tiembla ? Math.sin(t * 70) * .004 * est.tiembla : 0);
+        h.userData.cabeza.rotation.x = est.caer ? 0 : est.cabeza; h.userData.hablar(est.hablar);
+        if (est.caer) { est.cae = Math.min(1, est.cae + dt / 1.4); h.rotation.x = -Math.PI / 2 * est.cae * est.cae; }
+        if (est.tinte) for (const [m, c0] of mats) m.color.copy(c0).lerp(est.tinte.c, est.tinte.k);
+      },
+      camara(c) { if (!c || !c.cerca) return c; const d = h.rotation.y, a = est.andado, m = v => [v[0] + Math.sin(d) * a, v[1], v[2] + Math.cos(d) * a]; return { ...c, pos: m(c.pos), mira: m(c.mira) }; } };
+  }
   // personas que pasean (dir), se caen al suelo (caer 0→1) o huyen (huir = dirección)
   function moverGente(ctx, list, dt, t) {
     for (const p of list) {
@@ -350,5 +371,5 @@ window.COMUN = (() => {
     };
   }
 
-  return { TNT_J, RT, EN, DE, num, grande, textoTNT, comparaTNT, materiales, tintar, derribar, edificios, planeta, estallarPlaneta, multitud, persona, heroe, geoHumano, materialGente, moverGente, tono, ruido, reloj };
+  return { TNT_J, RT, EN, DE, num, grande, textoTNT, comparaTNT, materiales, tintar, derribar, edificios, planeta, estallarPlaneta, multitud, persona, heroe, protagonista, geoHumano, materialGente, moverGente, tono, ruido, reloj };
 })();
