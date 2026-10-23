@@ -78,6 +78,13 @@
   #menu label { font-size: .5em; font-weight: 600; display: flex; gap: .4em; align-items: center; cursor: pointer; }
   #menu .keys { font-size: .42em; opacity: .8; line-height: 1.6; max-width: 20em; }
   #menu.off { display: none; }
+  #mp4 { font-size: .5em; font-weight: 800; padding: .5em 1.2em; border-radius: 3em; border: 1px solid rgba(255,255,255,.7); background: rgba(0,0,0,.25); color: #fff; cursor: pointer; }
+  #exporta { position: fixed; left: 50%; bottom: 1.2em; transform: translateX(-50%); z-index: 9; display: none; min-width: 16em; padding: .8em 1em; border-radius: .8em;
+    background: rgba(0,0,0,.82); color: #fff; font: 600 15px/1.35 Inter, system-ui, sans-serif; text-align: center; }
+  #exporta.on { display: block; }
+  #exporta .barra { height: 6px; border-radius: 3px; background: rgba(255,255,255,.2); margin: .6em 0; overflow: hidden; }
+  #exporta .barra i { display: block; height: 100%; width: 0; background: #ffd23f; }
+  #exporta .bot button { font: inherit; margin: .2em; padding: .45em 1em; border-radius: 2em; border: 0; background: #ffd23f; color: #111; cursor: pointer; }
 </style>
 <script type="importmap">
 { "imports": {
@@ -85,6 +92,7 @@
 } }
 </script>
 <script src="lista.js"></script>
+<script src="vendor/mp4-muxer.js"></script>
 </head>
 <body>
 <div id="stage">
@@ -102,10 +110,12 @@
     <select class="esc" id="esc"></select>
     <select class="esc" id="lang"><option value="en">English</option><option value="es">Español</option></select>
     <button id="play">▶ PLAY</button>
+    <button id="mp4">🎬 MP4 1080×1920</button>
     <label><input type="checkbox" id="auto"> <span id="autoTxt"></span></label>
     <div class="keys" id="keys"></div>
   </div>
 </div>
+<div id="exporta"><div class="txt"></div><div class="barra"><i></i></div><div class="bot"></div></div>
 
 <script type="module">
 import * as THREE from 'three';
@@ -163,8 +173,14 @@ function textoCmp(t) {
 const stage = document.getElementById('stage');
 // ?bajo=1: calidad baja (sin sombras ni posproceso) para equipos lentos
 const BAJO = params.get('bajo') === '1';
-const renderer = new THREE.WebGLRenderer({ antialias: true, logarithmicDepthBuffer: true });
-renderer.setPixelRatio(Math.min(devicePixelRatio, BAJO ? 1 : 2));
+// ?grabar=1: modo exportación. El tiempo solo avanza con __game.step (fotograma a fotograma), el audio va a un
+// OfflineAudioContext que se renderiza al final, y las transiciones CSS y los retrasos siguen el tiempo del juego.
+const GRABAR = params.get('grabar') === '1';
+// en el móvil, modo ligero (menos resolución, sombras más pequeñas y sin posproceso) para que vaya fluido;
+// ?hd=1 lo quita. Al grabar siempre se usa la calidad completa.
+const LIGERO = !GRABAR && params.get('hd') !== '1' && (params.get('ligero') === '1' || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Macintosh/.test(navigator.userAgent)));
+const renderer = new THREE.WebGLRenderer({ antialias: true, logarithmicDepthBuffer: true, powerPreference: 'high-performance' });
+renderer.setPixelRatio(GRABAR ? devicePixelRatio : Math.min(devicePixelRatio, BAJO ? 1 : LIGERO ? 1.4 : 2));
 renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
 renderer.shadowMap.enabled = !BAJO; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 stage.prepend(renderer.domElement);
@@ -184,16 +200,21 @@ function resize() {
 // posproceso: brillo (bloom) en lo muy luminoso y viñeta suave
 const VIGNETTE = { uniforms: { tDiffuse: { value: null }, fuerza: { value: .32 } },
   vertexShader: 'varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+  // y gradación de color de cine: algo más de contraste y saturación, sombras frías y luces cálidas
   fragmentShader: `uniform sampler2D tDiffuse; uniform float fuerza; varying vec2 vUv;
     void main() { vec4 c = texture2D(tDiffuse, vUv); vec2 d = (vUv - .5) * vec2(1.0, 1.25);
-      c.rgb *= 1.0 - fuerza * smoothstep(.25, .85, dot(d, d) * 2.2); gl_FragColor = c; }` };
+      float l = dot(c.rgb, vec3(.2126, .7152, .0722));
+      c.rgb = mix(vec3(l), c.rgb, 1.12);
+      c.rgb = (c.rgb - .5) * 1.08 + .5;
+      c.rgb += mix(vec3(-.012, -.004, .018), vec3(.022, .01, -.016), smoothstep(.15, .85, l));
+      c.rgb *= 1.0 - fuerza * smoothstep(.25, .85, dot(d, d) * 2.2); gl_FragColor = vec4(max(c.rgb, 0.0), c.a); }` };
 let composer = null, bloom = null;
-if (!BAJO) {
+if (!BAJO && !LIGERO) {
   composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: 4 }));
   composer.addPass(new RenderPass(scene, camera));
   bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), .45, .55, 1.15); composer.addPass(bloom);
-  composer.addPass(new ShaderPass(VIGNETTE));
   composer.addPass(new OutputPass());
+  composer.addPass(new ShaderPass(VIGNETTE)); // después del tono: la gradación trabaja ya en sRGB
 }
 addEventListener('resize', resize); resize();
 
@@ -202,7 +223,7 @@ const sun = new THREE.DirectionalLight(0xfff0d8, 2.9); sun.position.set(-0.6, 1,
 // sombras del sol: su cámara sigue a lo que mira la cámara y se apaga al subir mucho
 const SUN_DIR = new THREE.Vector3(-0.6, 1, 0.45).normalize();
 scene.add(sun.target);
-if (!BAJO) { sun.castShadow = true; sun.shadow.mapSize.set(4096, 4096); sun.shadow.bias = -.0004; }
+if (!BAJO) { sun.castShadow = true; sun.shadow.mapSize.set(LIGERO ? 1536 : 4096, LIGERO ? 1536 : 4096); sun.shadow.bias = -.0004; }
 
 // cielo: degradado del horizonte al cénit con el sol y su halo
 const skyU = { cHor: { value: new THREE.Color(0x9fd3f0) }, cTop: { value: new THREE.Color(0x3d86c8) }, cSol: { value: new THREE.Color(0xfff2d6) }, dirSol: { value: SUN_DIR }, sol: { value: 1 } };
@@ -325,10 +346,17 @@ const ROOFS = [0xb5533c, 0xa04a37, 0x8c5a3c, 0x6d4c41];
 const AWN = [0xd64541, 0x2e86c1, 0x27ae60, 0xf39c12, 0xf5f5f5, 0x8e44ad];
 const lighter = (hex, k = .15) => new THREE.Color(hex).lerp(new THREE.Color(0xffffff), k).getHex();
 
-function windowsOn(k, w, d, y, ww, wh, col, sides = 4) { // ventanas sueltas en las cuatro fachadas
-  const nx = Math.max(1, Math.floor(w / 3.4)), nz = Math.max(1, Math.floor(d / 3.4));
-  for (let i = 0; i < nx; i++) { const x = -w / 2 + (i + .5) * w / nx; k.box(col, x, y, -d / 2 - .05, ww, wh, .14); if (sides > 1) k.box(col, x, y, d / 2 + .05, ww, wh, .14); }
-  if (sides > 2) for (let i = 0; i < nz; i++) { const z = -d / 2 + (i + .5) * d / nz; k.box(col, -w / 2 - .05, y, z, .14, wh, ww); k.box(col, w / 2 + .05, y, z, .14, wh, ww); }
+function windowsOn(k, w, d, y, ww, wh, col, sides = 4) { // ventanas en las fachadas: marco claro, cristal hundido y alféizar
+  const nx = Math.max(1, Math.floor(w / 3.4)), nz = Math.max(1, Math.floor(d / 3.4)), marco = 0xe9e4da, cristal = BAJO || LIGERO ? col : pick([0x3a5368, 0x45607a, 0x2f4658, 0x55738c]);
+  const una = (x, z, rot) => { // rot: la ventana mira hacia ±z (0) o ±x (1)
+    if (BAJO || LIGERO) { k.box(col, x + (rot ? Math.sign(x) * .05 : 0), y, z + (rot ? 0 : Math.sign(z) * .05), rot ? .14 : ww, wh, rot ? ww : .14); return; }
+    const sx = rot ? .1 : 1, sz = rot ? 1 : .1, o = Math.sign(rot ? x : z);
+    k.box(marco, x + (rot ? o * .02 : 0), y, z + (rot ? 0 : o * .02), rot ? .14 : ww + .2, wh + .2, rot ? ww + .2 : .14);
+    k.box(cristal, x + (rot ? o * .06 : 0), y, z + (rot ? 0 : o * .06), rot ? .1 : ww, wh, rot ? ww : .1, 0, .08);
+    if (!BAJO && !LIGERO) k.box(marco, x + (rot ? o * .14 : 0), y - wh / 2 - .12, z + (rot ? 0 : o * .14), rot ? .3 : ww + .35, .1, rot ? ww + .35 : .3);
+  };
+  for (let i = 0; i < nx; i++) { const x = -w / 2 + (i + .5) * w / nx; una(x, -d / 2, 0); if (sides > 1) una(x, d / 2, 0); }
+  if (sides > 2) for (let i = 0; i < nz; i++) { const z = -d / 2 + (i + .5) * d / nz; una(-w / 2, z, 1); una(w / 2, z, 1); }
 }
 function roofTop(k, w, d, h, wall) {
   k.box(wall, 0, h + .5, -d / 2 + .15, w, 1, .3); k.box(wall, 0, h + .5, d / 2 - .15, w, 1, .3);
@@ -606,12 +634,15 @@ for (let k = 0; k < 14; k++) {
 }
 // personas (figuras sin cara)
 const PER_COL = [0xe85d4a, 0xf2b134, 0x3b82c4, 0x58b368, 0xf5f5f5, 0x9b59b6, 0x2d3436];
-const PER_GEOS = PER_COL.map(c => kitGeo(k => { k.box(0x34495e, -.12, .4, 0, .18, .8, .22); k.box(0x34495e, .12, .4, 0, .18, .8, .22);
-  k.box(c, 0, 1.12, 0, .5, .68, .3); k.box(c, -.32, 1.1, 0, .13, .6, .14); k.box(c, .32, 1.1, 0, .13, .6, .14); k.box(0xe0b48c, 0, 1.62, 0, .28, .3, .28); }));
+// figuras con proporciones reales (fenomenos/comun.js); en calidad baja, las de cajas de siempre
+const PER_GEOS = BAJO || LIGERO ? PER_COL.map(c => kitGeo(k => { k.box(0x34495e, -.12, .4, 0, .18, .8, .22); k.box(0x34495e, .12, .4, 0, .18, .8, .22);
+  k.box(c, 0, 1.12, 0, .5, .68, .3); k.box(c, -.32, 1.1, 0, .13, .6, .14); k.box(c, .32, 1.1, 0, .13, .6, .14); k.box(0xe0b48c, 0, 1.62, 0, .28, .3, .28); }))
+  : PER_COL.flatMap((c, i) => [0, 1, 2].map(j => COMUN.geoHumano(THREE, mergeGeometries, { n: 7, ropa: c, pantalon: [0x34495e, 0x1f2a44, 0x6b5b4b][j], piel: [0xe9c3a0, 0xd8a47f, 0xb07a52, 0x8a5a3b][(i + j) % 4], pelo: [0x2b1d14, 0x4a2f1f, 0x7a5232, 0x111111][(i * 3 + j) % 4] })));
+const PER_MAT = BAJO || LIGERO ? VMAT : COMUN.materialGente(THREE);
 const people = [];
 for (let k = 0; k < 320; k++) {
   const onBeach = k < 170, x = onBeach ? rr(-900, 900) : (Math.round(rr(-10, 10)) * 120 + pick([-9, 9])), z = onBeach ? rr(-6, 52) : rr(90, 800);
-  const m = new THREE.Mesh(pick(PER_GEOS), VMAT); m.position.set(x, groundAt(x, z), z); m.rotation.y = R() * 6; cityGroup.add(m);
+  const m = new THREE.Mesh(pick(PER_GEOS), PER_MAT); m.position.set(x, groundAt(x, z), z); m.rotation.y = R() * 6; cityGroup.add(m);
   const ob = { kind: 'person', g: m, x, z, y0: m.position.y, h: 1.7, w: .5, d: .5, state: 0, float: true, run: 0, speed: rr(3, 5.5), ph: R() * 6 };
   objects.push(ob); people.push(ob);
 }
@@ -786,7 +817,8 @@ function updateSky(dt) { skyC.lerp(skyT, 1 - Math.exp(-dt * 1.2)); const a = smo
 // ---------- audio (sintetizado, sin derechos) ----------
 let AC, master, rumbleG, ambG;
 function audioInit() {
-  try { AC = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return; }
+  try { AC = GRABAR ? new OfflineAudioContext(2, 48000 * 240, 48000) : new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return; }
+  if (GRABAR) { const t0 = time; Object.defineProperty(AC, 'currentTime', { get: () => time - t0 }); }
   master = AC.createGain(); master.gain.value = .9; master.connect(AC.destination);
   const buf = AC.createBuffer(1, AC.sampleRate * 3, AC.sampleRate), d = buf.getChannelData(0); let last = 0;
   for (let i = 0; i < d.length; i++) { last = (last + .02 * (Math.random() * 2 - 1)) / 1.02; d[i] = last * 3.5; }
@@ -821,9 +853,9 @@ function audioBuses() {
   for (const b of [busCama, busSfx, busVoz]) b.connect(master);
 }
 function sfx(n, gan = .7, t0 = 0, rate = 1) {
-  if (!AC) return; cargar(sfxUrl(n)).then(b => { if (!b) return;
+  if (!AC) return; const cuando = AC.currentTime + t0; cargar(sfxUrl(n)).then(b => { if (!b) return;
     const s = AC.createBufferSource(), g = AC.createGain(); s.buffer = b; s.playbackRate.value = rate; g.gain.value = gan;
-    s.connect(g).connect(busSfx); s.start(AC.currentTime + t0); });
+    s.connect(g).connect(busSfx); s.start(Math.max(cuando, AC.currentTime)); });
 }
 function cama(n, gan, tc = 1.2) {
   if (!AC) return; let c = camas[n];
@@ -835,8 +867,8 @@ function cama(n, gan, tc = 1.2) {
 const nVoz = VOZ ? fetch('audio/voz/lista.json').then(r => r.ok ? r.json() : {}).then(l => l[`${window.LANG}/${ESC.id}`] || 0).catch(() => 0) : Promise.resolve(0);
 // la narración baja los fondos mientras habla
 function voz(n) {
-  if (!AC) return; nVoz.then(k => n < k ? cargar(vozUrl(n)) : null).then(b => { if (!b) return;
-    const s = AC.createBufferSource(); s.buffer = b; s.connect(busVoz); const t = AC.currentTime + .05 + (n ? VOZ_RETRASO : 0); s.start(t);
+  if (!AC) return; const cuando = AC.currentTime + .05 + (n ? VOZ_RETRASO : 0); nVoz.then(k => n < k ? cargar(vozUrl(n)) : null).then(b => { if (!b) return;
+    const s = AC.createBufferSource(); s.buffer = b; s.connect(busVoz); const t = Math.max(cuando, AC.currentTime); s.start(t);
     busCama.gain.setTargetAtTime(.45, t, .15); busCama.gain.setTargetAtTime(1, t + b.duration, .4);
     busSfx.gain.setTargetAtTime(.65, t, .15); busSfx.gain.setTargetAtTime(1, t + b.duration, .4); });
 }
@@ -851,7 +883,7 @@ const ctx = {
   mat, BOX, VMAT, R, rr, lerp, clamp, smooth, hash, fmt, sun, hemi, skyT, seaNear, camTo, pushCamera, camPos, camTgt, boom, rumble,
   C: { glass: C_GLASS, foam: C_FOAM, spray: C_SPRAY, dust: C_DUST }, escenario: ESC,
   setShake(v) { shake = v; }, get camDist() { return camDist; }, get caidos() { return fallen; }, get total() { return cityTotal; },
-  get audio() { return { AC, master }; }, sfx, cama, camSigue,
+  get audio() { return { AC, master }; }, sfx, cama, camSigue, merge: mergeGeometries,
 };
 FEN.crear(ctx);
 
@@ -885,6 +917,21 @@ function updateLabels() { const r = stage.getBoundingClientRect(), placed = [];
     for (let moved = true, n = 0; moved && n < 8; n++) { moved = false; // que no se monten unas etiquetas sobre otras
       for (const q of placed) if (Math.abs(q.x - x) < (q.w + w) / 2 && Math.abs(q.y - y) < h) { y = q.y - h; moved = true; } }
     placed.push({ x, y, w }); l.e.style.left = x + 'px'; l.e.style.top = y + 'px'; } }
+// retrasos: de reloj normal o, al grabar, de tiempo de juego
+const esperas = []; function espera(fn, ms) { if (GRABAR) esperas.push({ t: time + ms / 1000, fn }); else setTimeout(fn, ms); }
+const animT = new Map();
+function grabarTick() {
+  for (let i = esperas.length - 1; i >= 0; i--) if (time >= esperas[i].t) esperas.splice(i, 1)[0].fn();
+  for (const a of document.getAnimations()) { if (!animT.has(a)) animT.set(a, time); a.pause(); a.currentTime = (time - animT.get(a)) * 1000; }
+}
+function wav(b) { // AudioBuffer → WAV 16 bits en base64
+  const n = b.length, ch = b.numberOfChannels, v = new DataView(new ArrayBuffer(44 + n * ch * 2)), w = (o, s) => [...s].forEach((c, i) => v.setUint8(o + i, c.charCodeAt(0)));
+  w(0, 'RIFF'); v.setUint32(4, 36 + n * ch * 2, true); w(8, 'WAVEfmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, ch, true);
+  v.setUint32(24, b.sampleRate, true); v.setUint32(28, b.sampleRate * ch * 2, true); v.setUint16(32, ch * 2, true); v.setUint16(34, 16, true); w(36, 'data'); v.setUint32(40, n * ch * 2, true);
+  const d = [...Array(ch)].map((_, c) => b.getChannelData(c)); let o = 44;
+  for (let i = 0; i < n; i++) for (let c = 0; c < ch; c++) { v.setInt16(o, Math.max(-1, Math.min(1, d[c][i])) * 32767, true); o += 2; }
+  let s = ''; const u = new Uint8Array(v.buffer); for (let i = 0; i < u.length; i += 32768) s += String.fromCharCode(...u.subarray(i, i + 32768)); return btoa(s);
+}
 let toastT; function toast(t) { const e = $('toast'); e.textContent = t; e.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => e.classList.remove('on'), 1400); }
 
 // ---------- flujo del vídeo ----------
@@ -906,7 +953,7 @@ $('question').textContent = ESC.pregunta; $('end').querySelector('.a').textConte
 function start() {
   auto = $('auto').checked; $('menu').classList.add('off'); document.body.classList.add('playing'); audioInit();
   state = 'intro'; introT = 0; $('question').classList.add('on'); const ic = ESC.intro || { pos: [-650, 120, -560], mira: [0, 60, 800] }; camTo(ic.pos, ic.mira, 3); voz(0);
-  $('hint').classList.add('on'); setTimeout(() => $('hint').classList.remove('on'), 4000);
+  $('hint').classList.add('on'); espera(() => $('hint').classList.remove('on'), 4000);
 }
 function nextPhase() {
   if (phase >= NF) return;
@@ -917,7 +964,7 @@ function nextPhase() {
   if (cam) { if (RITMO && !cam.dur) camSigue(cam.pos, cam.mira); else camTo(cam.pos, cam.mira, cam.dur ?? (phase === 1 ? 1.6 : 2.6)); }
   $('question').classList.remove('on'); hud.classList.add('on'); setHUD(phase, v, f);
   if (!RITMO) { big.textContent = magText(v); big.style.fontSize = big.textContent.length > 11 ? '2em' : big.textContent.length > 6 ? '2.7em' : ''; big.classList.remove('pop'); void big.offsetWidth; big.classList.add('pop'); }
-  cap.classList.remove('on'); setTimeout(() => { cap.textContent = f.texto || '';
+  cap.classList.remove('on'); espera(() => { cap.textContent = f.texto || '';
     if (RITMO) cap.style.top = (hud.getBoundingClientRect().bottom - cap.offsetParent.getBoundingClientRect().top + 10) + 'px'; // justo debajo del marcador, mida lo que mida
     if (f.texto) cap.classList.add('on'); }, RITMO ? 220 : 700);
   skyT.set(f.cielo ?? SKY[Math.min(SKY.length - 1, phase - 1)]); if (!FEN.sinBoom) boom(phase); rumble(Math.min(.5, .12 + phase * .035));
@@ -944,11 +991,11 @@ let paused = false;
 function frame() {
   const dt = Math.min(clock.getDelta(), 1 / 20);
   if (!paused) tick(dt);
-  if (composer) composer.render(); else renderer.render(scene, camera);
+  if (!GRABAR) { if (composer) composer.render(); else renderer.render(scene, camera); } // al grabar solo pinta __game.render()
   requestAnimationFrame(frame);
 }
 function tick(dt) {
-  time += dt;
+  time += dt; if (GRABAR) grabarTick();
   if (state === 'intro') { introT += dt; if (introT > Math.max(ESC.introDur ?? 2.6, (vozDur[0] ?? 0) + .4) && auto) nextPhase(); }
   if (state === 'phase') { phaseTime += dt;
     const act = FEN.activo(); if (wasActive && !act) rumble(0); wasActive = act; idleT = act ? 0 : idleT + dt;
@@ -965,8 +1012,81 @@ function tick(dt) {
   seaNearG.attributes.position.needsUpdate = true; seaNearG.computeVertexNormals();
   updateCamera(dt, time); updateSky(dt); updateHUD(dt); updateLabels();
 }
+// ---------- exportar a MP4 en el propio navegador (?grabar=1&exportar=1) ----------
+// Pinta fotograma a fotograma a 1080×1920 y 30 fps con la tarjeta gráfica del equipo, dibuja encima los textos
+// de la página y codifica con WebCodecs (H.264 + AAC, u Opus si el navegador no tiene AAC) en un MP4.
+$('mp4').onclick = e => { e.stopPropagation(); params.set('grabar', '1'); params.set('exportar', '1'); location.search = params.toString(); };
+function pintarTextos(c2, k) {
+  const sr = stage.getBoundingClientRect();
+  for (const el of stage.querySelectorAll('*')) {
+    if (el.tagName === 'CANVAS' || el.closest('#menu,#toast,#hint')) continue;
+    let op = 1, a = el; while (a && a !== stage) { const cs = getComputedStyle(a); if (cs.display === 'none' || cs.visibility === 'hidden') { op = 0; break; } op *= +cs.opacity; a = a.parentElement; }
+    if (op < .01) continue;
+    const cs = getComputedStyle(el); c2.globalAlpha = op;
+    if (!/rgba\(.*, 0\)|transparent/.test(cs.backgroundColor)) { const r = el.getBoundingClientRect(), rad = parseFloat(cs.borderTopLeftRadius) || 0;
+      c2.shadowColor = 'transparent'; c2.fillStyle = cs.backgroundColor; c2.beginPath(); c2.roundRect((r.left - sr.left) * k, (r.top - sr.top) * k, r.width * k, r.height * k, rad * k); c2.fill(); }
+    const fs = parseFloat(cs.fontSize), ls = parseFloat(cs.letterSpacing) || 0, sh = cs.textShadow.match(/(rgba?\([^)]*\)) (-?[\d.]+)px (-?[\d.]+)px ([\d.]+)px/);
+    c2.font = `${cs.fontStyle} ${cs.fontWeight} ${fs * k}px ${cs.fontFamily}`; c2.fillStyle = cs.color; c2.textBaseline = 'middle';
+    if (sh) { c2.shadowColor = sh[1]; c2.shadowOffsetX = sh[2] * k; c2.shadowOffsetY = sh[3] * k; c2.shadowBlur = sh[4] * k; } else c2.shadowColor = 'transparent';
+    for (const nodo of el.childNodes) { if (nodo.nodeType !== 3) continue;
+      for (const m of nodo.textContent.matchAll(/\S+/g)) { const rg = document.createRange(); rg.setStart(nodo, m.index); rg.setEnd(nodo, m.index + m[0].length);
+        const r = rg.getClientRects()[0]; if (!r) continue; let txt = cs.textTransform === 'uppercase' ? m[0].toUpperCase() : m[0], x = (r.left - sr.left) * k; const y = (r.top - sr.top + r.height / 2) * k;
+        if (!ls) c2.fillText(txt, x, y); else for (const ch of txt) { c2.fillText(ch, x, y); x += c2.measureText(ch).width + ls * k; } } }
+  }
+  c2.globalAlpha = 1; c2.shadowColor = 'transparent';
+}
+async function exportar() {
+  const box = $('exporta'), txt = box.querySelector('.txt'), barra = box.querySelector('.barra i'), bot = box.querySelector('.bot'); box.classList.add('on');
+  const EN = window.LANG === 'en', W = 1080, H = 1920, FPS = 30;
+  if (!window.VideoEncoder || !window.Mp4Muxer) { txt.textContent = EN ? 'This browser cannot export video (try Chrome or Safari 17+).' : 'Este navegador no puede exportar vídeo (prueba con Chrome o Safari 17+).'; return; }
+  txt.textContent = EN ? 'Loading sounds…' : 'Cargando sonidos…';
+  const vcod = (await VideoEncoder.isConfigSupported({ codec: 'avc1.640028', width: W, height: H, bitrate: 12e6, framerate: FPS })).supported ? 'avc1.640028' : 'avc1.42E028';
+  const acod = window.AudioEncoder && (await AudioEncoder.isConfigSupported({ codec: 'mp4a.40.2', sampleRate: 48000, numberOfChannels: 2, bitrate: 192000 })).supported ? 'mp4a.40.2'
+    : window.AudioEncoder && (await AudioEncoder.isConfigSupported({ codec: 'opus', sampleRate: 48000, numberOfChannels: 2, bitrate: 192000 })).supported ? 'opus' : null;
+  // todo cargado antes de empezar: fuentes, narración (y su duración) y efectos
+  await document.fonts.ready; const k = await nVoz;
+  for (let i = 0; i < 100 && Object.keys(vozDur).length < k; i++) await new Promise(r => setTimeout(r, 100));
+  paused = true; $('auto').checked = true; start(); await Promise.all([...[...Array(k)].map((_, i) => cargar(vozUrl(i))), ...Object.keys(crudo).filter(u => u.includes('/sfx/')).map(u => cargar(u))]);
+  // a 1080×1920 sin tocar la maqueta: solo cambia la resolución interna
+  const w0 = stage.getBoundingClientRect().width; renderer.setPixelRatio(W / w0); resize();
+  const c2 = Object.assign(document.createElement('canvas'), { width: W, height: H }).getContext('2d');
+  const mux = new Mp4Muxer.Muxer({ target: new Mp4Muxer.ArrayBufferTarget(), fastStart: 'in-memory', firstTimestampBehavior: 'offset',
+    video: { codec: 'avc', width: W, height: H, frameRate: FPS }, ...(acod ? { audio: { codec: acod === 'opus' ? 'opus' : 'aac', sampleRate: 48000, numberOfChannels: 2 } } : {}) });
+  let fallo = null; const venc = new VideoEncoder({ output: (c, m) => mux.addVideoChunk(c, m), error: e => fallo = e });
+  venc.configure({ codec: vcod, width: W, height: H, bitrate: 12e6, framerate: FPS, latencyMode: 'quality' });
+  let n = 0, fin = null; const total = () => fin !== null ? fin + FPS * 3.5 : Math.max(n + FPS * 10, FPS * 60), t0 = performance.now();
+  while (fin === null || n < fin + FPS * 3.5) {
+    tick(1 / FPS); if (composer) composer.render(); else renderer.render(scene, camera);
+    c2.drawImage(renderer.domElement, 0, 0, W, H); pintarTextos(c2, W / w0);
+    const vf = new VideoFrame(c2.canvas, { timestamp: Math.round(n * 1e6 / FPS), duration: Math.round(1e6 / FPS) }); venc.encode(vf, { keyFrame: n % (FPS * 2) === 0 }); vf.close();
+    n++; if (ended && fin === null) fin = n; if (fallo) break; if (n > FPS * +(params.get('max') || 600)) break; // ?max=s: corta (para pruebas)
+    while (venc.encodeQueueSize > 3) await new Promise(r => setTimeout(r, 2));
+    if (n % 6 === 0) { const p = Math.min(.95, n / total()); barra.style.width = (p * 90) + '%'; txt.textContent = `${EN ? 'Rendering' : 'Renderizando'} ${(n / FPS).toFixed(1)} s · ${Math.round(n / ((performance.now() - t0) / 1000))} fps`; await new Promise(r => setTimeout(r)); }
+  }
+  await venc.flush(); const dur = n / FPS;
+  if (acod) { txt.textContent = EN ? 'Mixing audio…' : 'Mezclando el audio…';
+    const ab = await AC.startRendering(), len = Math.min(ab.length, Math.round(dur * 48000)), fade = 1.5 * 48000;
+    const aenc = new AudioEncoder({ output: (c, m) => mux.addAudioChunk(c, m), error: e => fallo = e });
+    aenc.configure({ codec: acod, sampleRate: 48000, numberOfChannels: 2, bitrate: 192000 });
+    for (let i = 0; i < len; i += 4800) { const m = Math.min(4800, len - i), d = new Float32Array(m * 2);
+      for (let c = 0; c < 2; c++) { const src = ab.getChannelData(c); for (let j = 0; j < m; j++) d[c * m + j] = src[i + j] * Math.min(1, (len - i - j) / fade); }
+      const ad = new AudioData({ format: 'f32-planar', sampleRate: 48000, numberOfFrames: m, numberOfChannels: 2, timestamp: Math.round(i / 48 * 1000), data: d }); aenc.encode(ad); ad.close(); }
+    await aenc.flush(); }
+  if (fallo) { txt.textContent = 'Error: ' + fallo.message; return; }
+  mux.finalize(); const blob = new Blob([mux.target.buffer], { type: 'video/mp4' }), nombre = `siseduplica-${ESC.id}-${window.LANG}.mp4`, url = URL.createObjectURL(blob);
+  window.__mp4 = blob; barra.style.width = '100%';
+  txt.textContent = `${EN ? 'Done' : 'Listo'}: ${dur.toFixed(1)} s · ${(blob.size / 1e6).toFixed(1)} MB${acod === 'opus' ? (EN ? ' (Opus audio)' : ' (audio Opus)') : ''}`;
+  const b1 = Object.assign(document.createElement('button'), { textContent: EN ? 'Download' : 'Descargar' }); b1.onclick = () => Object.assign(document.createElement('a'), { href: url, download: nombre }).click();
+  bot.append(b1);
+  const file = new File([blob], nombre, { type: 'video/mp4' });
+  if (navigator.canShare && navigator.canShare({ files: [file] })) { const b2 = Object.assign(document.createElement('button'), { textContent: EN ? 'Save / share' : 'Guardar / compartir' }); b2.onclick = () => navigator.share({ files: [file] }).catch(() => {}); bot.append(b2); }
+}
+if (GRABAR && params.get('exportar') === '1') { $('menu').classList.add('off'); exportar().catch(e => { $('exporta').querySelector('.txt').textContent = 'Error: ' + e.message; console.error(e); }); }
+
 frame();
-window.__game = { nextPhase, dbg: { bloom: () => bloom, scene, renderer, skyU, sun, pools, camTo, camPos, camTgt }, start, pause(v) { paused = v; }, step(sec) { for (let t = 0; t < sec; t += 1 / 30) tick(1 / 30); }, get phase() { return phase; }, get fallen() { return fallen; } };
+window.__game = { nextPhase, dbg: { bloom: () => bloom, scene, renderer, skyU, sun, pools, camTo, camPos, camTgt }, start, pause(v) { paused = v; }, step(sec) { for (let t = 0; t < sec; t += 1 / 30) tick(1 / 30); },
+  render() { if (composer) composer.render(); else renderer.render(scene, camera); }, get ended() { return ended; }, get time() { return time; },
+  async audio() { return AC && AC.startRendering ? wav(await AC.startRendering()) : null; }, get phase() { return phase; }, get fallen() { return fallen; } };
 </script>
 </body>
 </html>
