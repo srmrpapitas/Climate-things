@@ -1,4 +1,5 @@
 // Fenómeno «ola»: un muro de agua que entra desde el mar y arrasa lo que queda por debajo de su altura.
+// En cada paso la misma ola crece hasta la altura nueva y avanza tierra adentro (escenarios/ola.js).
 // Se registra en window.FENOMENOS.ola; el motor (index.html) lo elige con escenario.tipo = 'ola'.
 (function () {
   // Perfil en unidades de la altura h: [avance respecto al frente, altura]. Rompiendo (PB) y ya asentada (PF).
@@ -15,9 +16,9 @@
   class Wave {
     constructor(h, f) {
       const { lerp, clamp, hash } = ctx;
-      this.h0 = h; this.H = h; this.cfg = f; this.N = 170; this.width = Math.max(6000, h * 420);
-      this.z0 = -(600 + h * 16); this.z1 = f.alcance; this.T = f.duracion; this.t = 0; this.zf = this.z0; this.speed = 0;
-      this.back = this.z0 - Math.max(30000, h * 60); this.b = 1; this.settle = 0; this.time = 0;
+      this.h0 = h; this.H = h; this.cfg = f; this.N = 170; this.time = 0; this.speed = 0; this.b = 1;
+      this.zf = -Math.max(90, h * 40); this.back = this.zf - Math.max(30000, h * 60);
+      this.crecer(h, f);
       const P = PB.length + 1, nv = this.N * (P - 1) * 6;
       this.geo = new THREE.BufferGeometry(); this.pos = new Float32Array(nv * 3);
       this.geo.setAttribute('position', new THREE.BufferAttribute(this.pos, 3));
@@ -35,6 +36,10 @@
       this.mesh = new THREE.Mesh(this.geo, new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: .28, metalness: .05, side: THREE.DoubleSide, transparent: true, opacity: .86 }));
       this.mesh.frustumCulled = false; this.mesh.renderOrder = 2; ctx.scene.add(this.mesh); this.build();
     }
+    // cada paso la misma ola crece hasta la nueva altura y avanza hasta f.alcance (plano continuo, sin volver a salir del mar)
+    crecer(h, f) { this.cfg = f; this.hFrom = this.h0; this.hTo = h; this.zStart = this.zf; this.z1 = Math.max(f.alcance, this.zf);
+      this.t = 0; this.T = f.duracion ?? Math.max(1.5, (ctx.escenario.ritmo || 2.8) * .85); }
+    get width() { return Math.max(6000, this.h0 * 420); }
     zoff(x) { const h = this.h0; return Math.sin(x / (h * 9) + this.time * .6) * h * .25 + Math.sin(x / (h * 31) + 1.3) * h * .9; }
     vert(i, j, out) { // i: punto del perfil (0 = fondo lejano), j: columna
       const x = -this.width / 2 + this.width * j / this.N, h = this.h0, lerp = ctx.lerp;
@@ -54,11 +59,16 @@
     }
     get moving() { return this.t < this.T; }
     update(dt) {
-      const { smooth } = ctx; this.time += dt; const prev = this.zf;
-      if (this.t < this.T) { this.t = Math.min(this.T, this.t + dt); const k = this.t / this.T; this.zf = this.z0 + (this.z1 - this.z0) * (1 - Math.pow(1 - k, 2.2));
-        this.b = 1 - smooth(.72, 1, k) * .45; }
-      else { this.settle = Math.min(1, this.settle + dt / 3); this.b = .55 * (1 - this.settle); this.H = this.h0 * (1 - (this.cfg.asentar ?? .4) * smooth(0, 1, this.settle)); this.zf += dt * this.h0 * .4 * (1 - this.settle); }
+      const { smooth, lerp } = ctx; this.time += dt; const prev = this.zf;
+      if (this.t < this.T) { this.t = Math.min(this.T, this.t + dt); const k = this.t / this.T;
+        this.zf = lerp(this.zStart, this.z1, 1 - Math.pow(1 - k, 2.2));
+        this.h0 = this.H = Math.exp(lerp(Math.log(this.hFrom), Math.log(this.hTo), smooth(0, .55, k)));
+        this.b = 1 - smooth(.75, 1, k) * .3; }
+      else { this.zf += dt * this.h0 * .05; this.b = Math.max(.6, this.b - dt * .2); }
+      this.back = Math.min(this.back, this.zf - Math.max(30000, this.h0 * 60));
       this.speed = (this.zf - prev) / Math.max(dt, 1e-4); this.build();
+      // el agua refleja el mismo cielo que el mar
+      const env = ctx.seaNear?.material?.envMap; if (env && this.mesh.material.envMap !== env) { this.mesh.material.envMap = env; this.mesh.material.envMapIntensity = .8; this.mesh.material.needsUpdate = true; }
     }
     dispose() { ctx.scene.remove(this.mesh); this.geo.dispose(); this.mesh.material.dispose(); }
   }
@@ -79,8 +89,8 @@
   function checkHits(dt) {
     const { rr, R, emit, C, clamp } = ctx;
     for (const o of ctx.objects) {
-      if (o.state === 2 || o.hitBy === w) continue;
-      if (w.zf + w.zoff(o.x) >= o.z - o.d / 2) { o.hitBy = w; hit(o); }
+      if (o.state === 2 || (o.hitH && w.H < o.hitH * 1.25 + .3)) continue; // se vuelve a mirar cuando el agua ha subido
+      if (w.zf + w.zoff(o.x) >= o.z - o.d / 2 && w.H - o.y0 > .4) { o.hitH = w.H; hit(o); }
     }
     const m0 = new THREE.Matrix4().makeScale(0, 0, 0);
     for (const { im, list } of ctx.inst) { let ch = false;
@@ -89,30 +99,32 @@
           if (p.h > 1 && R() < .3) emit(p.x, p.y + p.h * .5, p.z, rr(-3, 3) * w.h0 / 40, rr(3, 9) * w.h0 / 40, rr(4, 12) * w.h0 / 40, R() < .5 ? C.dust : C.foam, rr(1, 2.5), 9.8 * w.h0 / 40); } }
       if (ch) im.instanceMatrix.needsUpdate = true; }
     // espuma en la cresta, cerca de lo que ve la cámara
-    const n = Math.round(clamp(60 * dt * 60, 10, 90)), spread = clamp(ctx.camDist * 1.4, 200, w.width * .45), hs = w.h0 / 20;
+    const n = Math.round(clamp(60 * dt * 60, 10, 90) * clamp(w.h0 / 8, .15, 1)), spread = clamp(ctx.camDist * 1.4, 200, w.width * .45), hs = w.h0 / 20;
     for (let k = 0; k < n; k++) { const x = ctx.camTgt.x + rr(-spread, spread), zf = w.zf + w.zoff(x);
       emit(x, w.H * rr(.85, 1.12), zf + w.h0 * rr(.2, .5), rr(-2, 2) * hs, rr(3, 10) * hs, rr(5, 14) * hs + w.speed * .25, R() < .6 ? C.foam : C.spray, rr(.6, 1.4), 9.8 * hs); }
   }
 
   window.FENOMENOS = window.FENOMENOS || {};
   window.FENOMENOS.ola = {
+    sinBoom: true,
     crear(c) { ctx = c; THREE = c.THREE; },
-    fase(c, n, valor, f) { waves.forEach(x => x.old = true); w = new Wave(valor, f); waves.push(w); },
+    fase(c, n, valor, f) { if (!w) { w = new Wave(valor, f); waves.push(w); } else w.crecer(valor, f); },
     actualizar(c, dt) {
-      for (const x of waves) x.update(dt);
-      for (let i = waves.length - 1; i >= 0; i--) { const x = waves[i]; if (x.old && w.zf > x.zf + x.h0 * 4 && w.H > x.H) { x.dispose(); waves.splice(i, 1); } }
       if (!w) return;
-      if (w.moving) checkHits(dt);
+      w.update(dt);
+      if (w.t < w.T || w.speed > 1) checkHits(dt);
       // a pie de calle la cámara huye de la ola
-      if (w.moving && ctx.camPos.y < w.h0 * .5) { const d = w.zf + w.h0 * 7 - ctx.camPos.z; if (d > 0) ctx.pushCamera(0, 0, d); }
-      for (const p of ctx.people) if (p.state === 0) { if (!p.run && w.zf > p.z - 450) p.run = 1;
+      if (w.t < w.T && ctx.camPos.y < w.h0 * .5) { const d = w.zf + w.h0 * 7 - ctx.camPos.z; if (d > 0) ctx.pushCamera(0, 0, d); }
+      for (const p of ctx.people) if (p.state === 0) { if (!p.run && w.h0 >= 1.5 && w.zf > p.z - Math.max(60, w.h0 * 25)) p.run = 1;
         if (p.run) { p.ph += dt * 12; p.g.rotation.y = 0; p.g.position.z += p.speed * dt; p.z = p.g.position.z; p.g.position.y = ctx.groundAt(p.g.position.x, p.z) + Math.abs(Math.sin(p.ph)) * .15; } }
-      ctx.setShake(w.moving ? w.h0 * .006 * Math.max(0, 1 - Math.abs(w.zf - ctx.camPos.z) / (w.h0 * 25)) : 0);
+      ctx.setShake(w.t < w.T && w.h0 > 3 ? Math.min(w.h0 * .006, ctx.camDist * .004) * Math.max(0, 1 - Math.abs(w.zf - ctx.camPos.z) / (w.h0 * 25 + 200)) : 0);
     },
-    activo() { return !!w && (w.moving || w.settle < .5); },
+    activo() { return !!w && w.t < w.T; },
+    // altura: con decimales por debajo de 10 m
+    mag(h) { return `${ctx.fmt(h, h < 10 && h % 1 ? 1 : 0)} m`; },
     // energía potencial de la ola sobre la costa: ½ · ρ · g · h² · área, en toneladas de TNT (1 t = 4,184·10⁹ J)
     tnt(h) { const e = ctx.escenario.energia || { costa_m: 10000, fondo_m: 1000 }; return .5 * 1000 * 9.81 * h * h * e.costa_m * e.fondo_m / 4.184e9; },
     // corriente que arrastra los restos: altura del agua y velocidad hacia tierra en ese punto
-    corriente(x, z) { return w && z < w.zf ? { y: w.H, vz: w.moving ? w.speed : 0 } : null; },
+    corriente(x, z) { return w && z < w.zf ? { y: w.H, vz: w.t < w.T ? w.speed : 0 } : null; },
   };
 })();
