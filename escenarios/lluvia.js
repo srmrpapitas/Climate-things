@@ -1,0 +1,38 @@
+// La lluvia que se duplica: de 10 mm/h a 5.120 mm/h. El marcador de daños muestra el agua acumulada tras un día.
+// Récord real: 305 mm en 42 minutos (Holt, Misuri, 1947). Cifras aproximadas: compruébalas antes de publicar.
+window.ESCENARIOS.lluvia = {
+  id: 'lluvia',
+  tipo: 'lluvia',
+  titulo: 'La lluvia que se duplica',
+  pregunta: '¿Qué pasaría si la lluvia fuera cada vez el doble de fuerte?',
+  unidad: 'mm/h',
+  inicial: 10,
+  multiplicador: 2,
+  fases: [
+    { texto: 'Lluvia moderada. Paraguas abiertos y charcos en la acera.',
+      camara: { pos: [3, 5, 120], mira: [0, 5, 400] } },
+    { texto: 'Lluvia fuerte. Las alcantarillas aún pueden con ella.',
+      camara: { pos: [-4, 6, 130], mira: [0, 4, 400] } },
+    { texto: 'Tromba de agua. Las calles empiezan a ser ríos.',
+      camara: { pos: [-10, 10, 120], mira: [0, 3, 400] } },
+    { texto: 'Las alcantarillas ya no tragan. En un día el agua llega a las rodillas.',
+      camara: { pos: [-30, 20, 100], mira: [0, 2, 400] } },
+    { texto: 'Como el récord del mundo (305 mm en 42 minutos). Los coches flotan con 60 cm de agua.',
+      camara: { pos: [-80, 45, 80], mira: [0, 2, 450] } },
+    { texto: 'En un día el agua cubre la planta baja de todos los edificios.',
+      camara: { pos: [-250, 120, 0], mira: [0, 5, 600] } },
+    { texto: 'Ya no se ve el suelo: la ciudad es un lago de 14 m de profundidad.',
+      camara: { pos: [-500, 260, -150], mira: [0, 10, 800] } },
+    { texto: 'Solo asoman los edificios de más de 10 plantas.',
+      camara: { pos: [-800, 450, -300], mira: [0, 20, 900] } },
+    { texto: 'Más de 60 m de agua en un día. Las casas, las calles y los parques han desaparecido.',
+      camara: { pos: [-1300, 800, -500], mira: [0, 40, 1000] } },
+    { texto: 'Más de 120 m en un día. Solo asoman los rascacielos: la ciudad está bajo el mar.',
+      camara: { pos: [-2000, 1300, -800], mira: [0, 60, 1000] } },
+  ],
+  marcas: [
+    { texto: 'Burj Khalifa · 828 m', pos: [300, 850, 1640], fases: [9, 10] },
+    { texto: 'Torre Eiffel · 330 m', pos: [-120, 350, 1280], fases: [9, 10] },
+  ],
+  cierre: { titulo: 'Ciudad bajo el agua.', pregunta: '¿Qué duplicamos ahora? 👇' },
+};
