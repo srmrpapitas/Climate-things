@@ -3,6 +3,7 @@
 window.ESCENARIOS = {};
 window.FENOMENOS = {};
 window.LISTA = {
-  fenomenos: ['fenomenos/ola.js'],
-  escenarios: ['escenarios/ola.js'],
+  // comun.js va primero: utilidades que usan los demás fenómenos (window.COMUN)
+  fenomenos: ['fenomenos/comun.js', 'fenomenos/ola.js', 'fenomenos/terremoto.js', 'fenomenos/decibelios.js'],
+  escenarios: ['escenarios/ola.js', 'escenarios/terremoto.js', 'escenarios/decibelios.js'],
 };
