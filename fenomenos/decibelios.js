@@ -47,6 +47,18 @@ window.FENOMENOS.decibelios = (() => {
     ondas.push({ m, s, radio, dur, t: 0, op: Math.min(1, op * 2.2) });
   }
 
+  // cúpula de polvo marrón que crece y se disipa, y un cráter oscuro con borde claro donde estaba
+  function polvo(ctx, r) {
+    const T = ctx.THREE, P = pos();
+    const domo = new T.Mesh(new T.SphereGeometry(1, 36, 14, 0, Math.PI * 2, 0, Math.PI / 2), new T.MeshStandardMaterial({ color: 0x9a7a58, transparent: true, opacity: .7, flatShading: true, roughness: 1, depthWrite: false }));
+    domo.position.set(P.x, P.y - .2, P.z); domo.userData.fenPropio = true; ctx.scene.add(domo);
+    const crater = new T.Mesh(new T.CircleGeometry(1, 40), new T.MeshStandardMaterial({ color: 0x3a2e26, roughness: 1, transparent: true, opacity: .92, polygonOffset: true, polygonOffsetFactor: -2 }));
+    crater.rotation.x = -Math.PI / 2; crater.position.set(P.x, P.y + .15, P.z); crater.scale.setScalar(.01); crater.userData.fenPropio = true; ctx.scene.add(crater);
+    const borde = new T.Mesh(new T.RingGeometry(.92, 1.08, 48), new T.MeshBasicMaterial({ color: 0xe8d8b8, transparent: true, opacity: .8, side: T.DoubleSide, depthWrite: false }));
+    borde.rotation.x = -Math.PI / 2; borde.position.set(P.x, P.y + .3, P.z); borde.scale.setScalar(.01); borde.userData.fenPropio = true; ctx.scene.add(borde);
+    efectos.push({ domo, crater, borde, r, t: 0 });
+  }
+
   // 10 tomas de BOMBOCLAT (audio/sfx/bomboclat/NN.mp3), de decirlo tranquilo a gritarlo con todo: cada paso usa
   // la que toca por intensidad, sin repetir la anterior, con un tono algo distinto y, a lo bestia, con eco
   function gritar(ctx, L) {

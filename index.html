@@ -1110,8 +1110,9 @@ async function exportar() {
     for (let c = 0; c < 2; c++) { const d = ab.getChannelData(c); for (let j = Math.max(0, len - fade); j < d.length; j++) d[j] *= Math.max(0, (len - j) / fade); } // fundido final
     if (acod === 'mr') await audioGrabado(ab, dur, mux, mrTipo, { txt, barra, bot, EN });
     else { const aenc = new AudioEncoder({ output: (c, m) => {
-        // AAC necesita su AudioSpecificConfig; si el navegador no la da, la escribimos (AAC-LC, 48 kHz, estéreo)
-        if (m && m.decoderConfig && !m.decoderConfig.description && acod !== 'opus') m.decoderConfig.description = new Uint8Array([0x11, 0x90]);
+        // AAC necesita su AudioSpecificConfig a secas (AAC-LC, 48 kHz, estéreo = 11 90). Safari da en su lugar el descriptor
+        // esds entero, y el muxer lo envolvía otra vez: el audio salía mudo en todas partes. Así que la escribimos siempre.
+        if (m && m.decoderConfig && acod !== 'opus') m.decoderConfig.description = new Uint8Array([0x11, 0x90]);
         mux.addAudioChunk(c, m); }, error: e => fallo = e });
       aenc.configure({ codec: acod, sampleRate: 48000, numberOfChannels: 2, bitrate: 192000 });
       for (let i = 0; i < len; i += 4800) { const m = Math.min(4800, len - i), d = new Float32Array(m * 2);
