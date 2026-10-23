@@ -176,8 +176,11 @@ const BAJO = params.get('bajo') === '1';
 // ?grabar=1: modo exportación. El tiempo solo avanza con __game.step (fotograma a fotograma), el audio va a un
 // OfflineAudioContext que se renderiza al final, y las transiciones CSS y los retrasos siguen el tiempo del juego.
 const GRABAR = params.get('grabar') === '1';
-const renderer = new THREE.WebGLRenderer({ antialias: true, logarithmicDepthBuffer: true });
-renderer.setPixelRatio(GRABAR ? devicePixelRatio : Math.min(devicePixelRatio, BAJO ? 1 : 2));
+// en el móvil, modo ligero (menos resolución, sombras más pequeñas y sin posproceso) para que vaya fluido;
+// ?hd=1 lo quita. Al grabar siempre se usa la calidad completa.
+const LIGERO = !GRABAR && params.get('hd') !== '1' && (params.get('ligero') === '1' || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Macintosh/.test(navigator.userAgent)));
+const renderer = new THREE.WebGLRenderer({ antialias: true, logarithmicDepthBuffer: true, powerPreference: 'high-performance' });
+renderer.setPixelRatio(GRABAR ? devicePixelRatio : Math.min(devicePixelRatio, BAJO ? 1 : LIGERO ? 1.4 : 2));
 renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
 renderer.shadowMap.enabled = !BAJO; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 stage.prepend(renderer.domElement);
@@ -197,16 +200,21 @@ function resize() {
 // posproceso: brillo (bloom) en lo muy luminoso y viñeta suave
 const VIGNETTE = { uniforms: { tDiffuse: { value: null }, fuerza: { value: .32 } },
   vertexShader: 'varying vec2 vUv; void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+  // y gradación de color de cine: algo más de contraste y saturación, sombras frías y luces cálidas
   fragmentShader: `uniform sampler2D tDiffuse; uniform float fuerza; varying vec2 vUv;
     void main() { vec4 c = texture2D(tDiffuse, vUv); vec2 d = (vUv - .5) * vec2(1.0, 1.25);
-      c.rgb *= 1.0 - fuerza * smoothstep(.25, .85, dot(d, d) * 2.2); gl_FragColor = c; }` };
+      float l = dot(c.rgb, vec3(.2126, .7152, .0722));
+      c.rgb = mix(vec3(l), c.rgb, 1.12);
+      c.rgb = (c.rgb - .5) * 1.08 + .5;
+      c.rgb += mix(vec3(-.012, -.004, .018), vec3(.022, .01, -.016), smoothstep(.15, .85, l));
+      c.rgb *= 1.0 - fuerza * smoothstep(.25, .85, dot(d, d) * 2.2); gl_FragColor = vec4(max(c.rgb, 0.0), c.a); }` };
 let composer = null, bloom = null;
-if (!BAJO) {
+if (!BAJO && !LIGERO) {
   composer = new EffectComposer(renderer, new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: 4 }));
   composer.addPass(new RenderPass(scene, camera));
   bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), .45, .55, 1.15); composer.addPass(bloom);
-  composer.addPass(new ShaderPass(VIGNETTE));
   composer.addPass(new OutputPass());
+  composer.addPass(new ShaderPass(VIGNETTE)); // después del tono: la gradación trabaja ya en sRGB
 }
 addEventListener('resize', resize); resize();
 
@@ -215,7 +223,7 @@ const sun = new THREE.DirectionalLight(0xfff0d8, 2.9); sun.position.set(-0.6, 1,
 // sombras del sol: su cámara sigue a lo que mira la cámara y se apaga al subir mucho
 const SUN_DIR = new THREE.Vector3(-0.6, 1, 0.45).normalize();
 scene.add(sun.target);
-if (!BAJO) { sun.castShadow = true; sun.shadow.mapSize.set(4096, 4096); sun.shadow.bias = -.0004; }
+if (!BAJO) { sun.castShadow = true; sun.shadow.mapSize.set(LIGERO ? 1536 : 4096, LIGERO ? 1536 : 4096); sun.shadow.bias = -.0004; }
 
 // cielo: degradado del horizonte al cénit con el sol y su halo
 const skyU = { cHor: { value: new THREE.Color(0x9fd3f0) }, cTop: { value: new THREE.Color(0x3d86c8) }, cSol: { value: new THREE.Color(0xfff2d6) }, dirSol: { value: SUN_DIR }, sol: { value: 1 } };
@@ -338,10 +346,17 @@ const ROOFS = [0xb5533c, 0xa04a37, 0x8c5a3c, 0x6d4c41];
 const AWN = [0xd64541, 0x2e86c1, 0x27ae60, 0xf39c12, 0xf5f5f5, 0x8e44ad];
 const lighter = (hex, k = .15) => new THREE.Color(hex).lerp(new THREE.Color(0xffffff), k).getHex();
 
-function windowsOn(k, w, d, y, ww, wh, col, sides = 4) { // ventanas sueltas en las cuatro fachadas
-  const nx = Math.max(1, Math.floor(w / 3.4)), nz = Math.max(1, Math.floor(d / 3.4));
-  for (let i = 0; i < nx; i++) { const x = -w / 2 + (i + .5) * w / nx; k.box(col, x, y, -d / 2 - .05, ww, wh, .14); if (sides > 1) k.box(col, x, y, d / 2 + .05, ww, wh, .14); }
-  if (sides > 2) for (let i = 0; i < nz; i++) { const z = -d / 2 + (i + .5) * d / nz; k.box(col, -w / 2 - .05, y, z, .14, wh, ww); k.box(col, w / 2 + .05, y, z, .14, wh, ww); }
+function windowsOn(k, w, d, y, ww, wh, col, sides = 4) { // ventanas en las fachadas: marco claro, cristal hundido y alféizar
+  const nx = Math.max(1, Math.floor(w / 3.4)), nz = Math.max(1, Math.floor(d / 3.4)), marco = 0xe9e4da, cristal = BAJO || LIGERO ? col : pick([0x3a5368, 0x45607a, 0x2f4658, 0x55738c]);
+  const una = (x, z, rot) => { // rot: la ventana mira hacia ±z (0) o ±x (1)
+    if (BAJO || LIGERO) { k.box(col, x + (rot ? Math.sign(x) * .05 : 0), y, z + (rot ? 0 : Math.sign(z) * .05), rot ? .14 : ww, wh, rot ? ww : .14); return; }
+    const sx = rot ? .1 : 1, sz = rot ? 1 : .1, o = Math.sign(rot ? x : z);
+    k.box(marco, x + (rot ? o * .02 : 0), y, z + (rot ? 0 : o * .02), rot ? .14 : ww + .2, wh + .2, rot ? ww + .2 : .14);
+    k.box(cristal, x + (rot ? o * .06 : 0), y, z + (rot ? 0 : o * .06), rot ? .1 : ww, wh, rot ? ww : .1, 0, .08);
+    if (!BAJO && !LIGERO) k.box(marco, x + (rot ? o * .14 : 0), y - wh / 2 - .12, z + (rot ? 0 : o * .14), rot ? .3 : ww + .35, .1, rot ? ww + .35 : .3);
+  };
+  for (let i = 0; i < nx; i++) { const x = -w / 2 + (i + .5) * w / nx; una(x, -d / 2, 0); if (sides > 1) una(x, d / 2, 0); }
+  if (sides > 2) for (let i = 0; i < nz; i++) { const z = -d / 2 + (i + .5) * d / nz; una(-w / 2, z, 1); una(w / 2, z, 1); }
 }
 function roofTop(k, w, d, h, wall) {
   k.box(wall, 0, h + .5, -d / 2 + .15, w, 1, .3); k.box(wall, 0, h + .5, d / 2 - .15, w, 1, .3);
@@ -619,12 +634,15 @@ for (let k = 0; k < 14; k++) {
 }
 // personas (figuras sin cara)
 const PER_COL = [0xe85d4a, 0xf2b134, 0x3b82c4, 0x58b368, 0xf5f5f5, 0x9b59b6, 0x2d3436];
-const PER_GEOS = PER_COL.map(c => kitGeo(k => { k.box(0x34495e, -.12, .4, 0, .18, .8, .22); k.box(0x34495e, .12, .4, 0, .18, .8, .22);
-  k.box(c, 0, 1.12, 0, .5, .68, .3); k.box(c, -.32, 1.1, 0, .13, .6, .14); k.box(c, .32, 1.1, 0, .13, .6, .14); k.box(0xe0b48c, 0, 1.62, 0, .28, .3, .28); }));
+// figuras con proporciones reales (fenomenos/comun.js); en calidad baja, las de cajas de siempre
+const PER_GEOS = BAJO || LIGERO ? PER_COL.map(c => kitGeo(k => { k.box(0x34495e, -.12, .4, 0, .18, .8, .22); k.box(0x34495e, .12, .4, 0, .18, .8, .22);
+  k.box(c, 0, 1.12, 0, .5, .68, .3); k.box(c, -.32, 1.1, 0, .13, .6, .14); k.box(c, .32, 1.1, 0, .13, .6, .14); k.box(0xe0b48c, 0, 1.62, 0, .28, .3, .28); }))
+  : PER_COL.flatMap((c, i) => [0, 1, 2].map(j => COMUN.geoHumano(THREE, mergeGeometries, { n: 7, ropa: c, pantalon: [0x34495e, 0x1f2a44, 0x6b5b4b][j], piel: [0xe9c3a0, 0xd8a47f, 0xb07a52, 0x8a5a3b][(i + j) % 4], pelo: [0x2b1d14, 0x4a2f1f, 0x7a5232, 0x111111][(i * 3 + j) % 4] })));
+const PER_MAT = BAJO || LIGERO ? VMAT : COMUN.materialGente(THREE);
 const people = [];
 for (let k = 0; k < 320; k++) {
   const onBeach = k < 170, x = onBeach ? rr(-900, 900) : (Math.round(rr(-10, 10)) * 120 + pick([-9, 9])), z = onBeach ? rr(-6, 52) : rr(90, 800);
-  const m = new THREE.Mesh(pick(PER_GEOS), VMAT); m.position.set(x, groundAt(x, z), z); m.rotation.y = R() * 6; cityGroup.add(m);
+  const m = new THREE.Mesh(pick(PER_GEOS), PER_MAT); m.position.set(x, groundAt(x, z), z); m.rotation.y = R() * 6; cityGroup.add(m);
   const ob = { kind: 'person', g: m, x, z, y0: m.position.y, h: 1.7, w: .5, d: .5, state: 0, float: true, run: 0, speed: rr(3, 5.5), ph: R() * 6 };
   objects.push(ob); people.push(ob);
 }
@@ -865,7 +883,7 @@ const ctx = {
   mat, BOX, VMAT, R, rr, lerp, clamp, smooth, hash, fmt, sun, hemi, skyT, seaNear, camTo, pushCamera, camPos, camTgt, boom, rumble,
   C: { glass: C_GLASS, foam: C_FOAM, spray: C_SPRAY, dust: C_DUST }, escenario: ESC,
   setShake(v) { shake = v; }, get camDist() { return camDist; }, get caidos() { return fallen; }, get total() { return cityTotal; },
-  get audio() { return { AC, master }; }, sfx, cama, camSigue,
+  get audio() { return { AC, master }; }, sfx, cama, camSigue, merge: mergeGeometries,
 };
 FEN.crear(ctx);
 

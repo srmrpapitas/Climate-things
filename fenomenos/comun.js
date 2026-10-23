@@ -205,33 +205,101 @@ window.COMUN = (() => {
     }
     return list;
   }
-  // figura sin cara: piernas, cuerpo y cabeza
-  function persona(ctx, color) {
-    const T = ctx.THREE, g = new T.Group();
-    const parte = (c, sx, sy, sz, y) => { const m = new T.Mesh(ctx.BOX, ctx.mat(c)); m.scale.set(sx, sy, sz); m.position.y = y; g.add(m); return m; };
-    parte(0x3b4250, .45, .75, .28, .38); parte(color, .52, .7, .32, 1.1); g.userData.cabeza = parte(0xf1c9a5, .3, .3, .3, 1.62);
-    return g;
+  // ---------- figuras humanas con proporciones reales (geometría suave, no cajas) ----------
+  // Medidas en metros, de pie en y = 0 y mirando a +z. Cada pieza: [geometría, color, x, y, z, sx, sy, sz, rx, rz].
+  const PIEL = [0xe9c3a0, 0xd8a47f, 0xb07a52, 0x8a5a3b, 0xf1d2b6], PELOS = [0x2b1d14, 0x4a2f1f, 0x7a5232, 0x111111, 0xb08a5a, 0x8c8c8c];
+  const geos = {};
+  function formas(T) {
+    if (geos.T === T) return geos; geos.T = T;
+    geos.esf = n => geos['e' + n] ||= new T.SphereGeometry(1, n, Math.max(4, n * .7 | 0));
+    geos.cap = (r, L, n) => geos[`c${r}/${L}/${n}`] ||= new T.CapsuleGeometry(r, L, 3, n);
+    geos.cil = n => geos['y' + n] ||= new T.CylinderGeometry(1, 1, 1, n);
+    geos.pelo = n => geos['p' + n] ||= new T.SphereGeometry(1, n, n * .7 | 0, 0, Math.PI * 2, 0, Math.PI * .56);
+    geos.torso = n => geos['t' + n] ||= new T.LatheGeometry([[.001, 0], [.15, 0], [.165, .1], [.155, .22], [.165, .34], [.19, .46], [.2, .5], [.13, .56], [.001, .57]].map(([x, y]) => new T.Vector2(x, y)), n);
+    geos.capucha = n => geos['h' + n] ||= new T.TorusGeometry(1, .42, 6, n, Math.PI * 1.3);
+    return geos;
+  }
+  // cápsula de largo L (sin las semiesferas) y radio r, alineada con y
+  const capsula = (G, n, c, x, y, z, r, L, rx = 0, rz = 0) => [G.cap(r, L, n), c, x, y, z, 1, 1, 1, rx, rz];
+  // piezas de una persona; o: piel, pelo, ropa, manga, pantalon, zapatos, barba, capucha, n (segmentos).
+  // Las 12 últimas (13 con barba) son la cabeza: el protagonista las reutiliza.
+  function piezasHumano(T, o = {}) {
+    const G = formas(T), n = o.n || 12, P = [], add = (...a) => P.push(a);
+    const piel = o.piel ?? PIEL[0], ropa = o.ropa ?? 0x3b82c4, pant = o.pantalon ?? 0x34495e, zap = o.zapatos ?? 0x222226, pelo = o.pelo ?? PELOS[1];
+    for (const s of [-1, 1]) {
+      add(G.esf(n), zap, s * .1, .05, .04, .055, .05, .13);                 // zapatos
+      P.push(capsula(G, n, pant, s * .1, .47, 0, .068, .74));               // pierna
+      add(G.esf(n), ropa, s * .19, 1.39, 0, .056, .056, .056);               // hombro
+      P.push(capsula(G, n, o.manga ?? ropa, s * .225, 1.13, 0, .047, .44, 0, s * .06)); // brazo
+      add(G.esf(n), piel, s * .245, .86, .01, .04, .06, .03);               // mano
+    }
+    add(G.esf(n), pant, 0, .9, 0, .17, .11, .11);                           // cadera
+    add(G.torso(n), ropa, 0, .88, 0, 1, 1, .66);                            // torso
+    add(G.cil(n), piel, 0, 1.49, 0, .045, .1, .045);                        // cuello
+    if (o.capucha) add(G.capucha(n), ropa, 0, 1.47, -.07, .12, .12, .12, Math.PI / 2 + .25);
+    add(G.esf(n + 4), piel, 0, 1.635, .005, .1, .118, .108);                // cabeza
+    add(G.pelo(n + 4), pelo, 0, 1.655, -.008, .106, .112, .114, -.35);      // pelo
+    for (const s of [-1, 1]) { add(G.esf(6), piel, s * .1, 1.63, 0, .018, .03, .015);   // orejas
+      add(G.esf(8), 0xf4f1ea, s * .036, 1.655, .092, .016, .012, .01); add(G.esf(6), 0x2a1d14, s * .036, 1.655, .1, .008, .008, .005); // ojos
+      add(G.esf(6), pelo, s * .038, 1.684, .094, .022, .006, .008); }     // cejas
+    add(G.esf(6), piel, 0, 1.625, .11, .014, .022, .02);                    // nariz
+    add(G.esf(6), 0x8a3b32, 0, 1.588, .104, .022, .006, .01);                 // labios
+    if (o.barba) add(G.esf(n), pelo, 0, 1.57, .035, .088, .048, .072, .15);
+    return P;
+  }
+  function mallaPieza(T, [g, c, x, y, z, sx, sy, sz, rx = 0, rz = 0]) {
+    const q = g.clone(); q.scale(sx, sy, sz); if (rx) q.rotateX(rx); if (rz) q.rotateZ(rz); q.translate(x, y, z);
+    const col = new T.Color(c), n = q.attributes.position.count, a = new Float32Array(n * 3);
+    for (let i = 0; i < n; i++) { a[i * 3] = col.r; a[i * 3 + 1] = col.g; a[i * 3 + 2] = col.b; }
+    q.setAttribute('color', new T.BufferAttribute(a, 3)); return q;
+  }
+  // geometría de una persona entera en una sola pieza (para multitudes: una llamada de dibujo por persona)
+  function geoHumano(T, merge, o) { return merge(piezasHumano(T, o).map(p => mallaPieza(T, p))); }
+  let matGente = null;
+  function materialGente(T) { return matGente ||= new T.MeshStandardMaterial({ vertexColors: true, roughness: .8 }); }
+  // persona de la multitud: se reutilizan unas cuantas variantes ya montadas
+  const variantes = [];
+  function persona(ctx) {
+    const T = ctx.THREE;
+    if (!variantes.length) for (let k = 0; k < 24; k++) variantes.push(geoHumano(T, ctx.merge, { n: 8, ropa: [0xe85d4a, 0xf2b134, 0x3b82c4, 0x58b368, 0xf5f5f5, 0x9b59b6, 0x2d3436, 0xf28db2][k % 8],
+      pantalon: [0x34495e, 0x1f2a44, 0x6b5b4b, 0x222222, 0x8a9bb0][k % 5], piel: PIEL[k % 5], pelo: PELOS[(k * 7) % 6], barba: k % 6 === 1 }));
+    const g = new T.Mesh(variantes[Math.floor(ctx.R() * variantes.length)], materialGente(T)); g.castShadow = true;
+    g.userData.cabeza = g; return g;
   }
   // protagonista con más detalle (como el del clip de referencia): pelo, barba, brazos y piernas que se mueven al andar.
   // userData: cabeza, boca y andar(fase, amplitud) para animar el paso.
   function heroe(ctx, color = 0xd8282f) {
-    const T = ctx.THREE, g = new T.Group();
-    const caja = (padre, c, sx, sy, sz, x, y, z) => { const m = new T.Mesh(ctx.BOX, ctx.mat(c)); m.scale.set(sx, sy, sz); m.position.set(x, y, z); m.castShadow = true; padre.add(m); return m; };
-    const piv = (x, y) => { const p = new T.Group(); p.position.set(x, y, 0); g.add(p); return p; };
-    const PIEL = 0xe0b48e, PELO = 0x4a2f1f, PANT = 0x9aa0aa;
-    const piernas = [-1, 1].map(s => { const p = piv(s * .12, .92); caja(p, PANT, .19, .84, .22, 0, -.42, 0); caja(p, 0x2b2b30, .21, .1, .32, 0, -.87, .05); return p; });
-    caja(g, color, .56, .64, .32, 0, 1.22, 0); caja(g, color, .44, .2, .2, 0, 1.5, -.12); // sudadera y capucha
-    caja(g, 0xb81f25, .5, .08, .33, 0, .93, 0); // bajo de la sudadera
-    const brazos = [-1, 1].map(s => { const p = piv(s * .34, 1.48); caja(p, color, .15, .56, .17, 0, -.27, 0); caja(p, PIEL, .12, .13, .13, 0, -.6, 0); return p; });
-    caja(g, PIEL, .14, .1, .14, 0, 1.58, 0);
-    const cabeza = new T.Group(); cabeza.position.y = 1.62; g.add(cabeza);
-    caja(cabeza, PIEL, .3, .32, .3, 0, .16, 0);
-    caja(cabeza, PELO, .33, .1, .33, 0, .34, -.01); caja(cabeza, PELO, .33, .22, .07, 0, .22, -.14); // pelo
-    caja(cabeza, PELO, .3, .09, .04, 0, .02, .14); // barba
-    for (const s of [-1, 1]) caja(cabeza, 0x1d1d22, .05, .04, .02, s * .075, .2, .151);
-    const boca = caja(cabeza, 0x3a1a1a, .12, .025, .02, 0, .08, .16);
+    const T = ctx.THREE, g = new T.Group(), G = formas(T), n = 20;
+    const mats = {}, M = (c, r = .85) => mats[c + '/' + r] ||= new T.MeshStandardMaterial({ color: c, roughness: r });
+    const pon = (padre, [geo, c, x, y, z, sx, sy, sz, rx = 0, rz = 0], r) => { const m = new T.Mesh(geo, M(c, r)); m.position.set(x, y, z); m.scale.set(sx, sy, sz); m.rotation.set(rx, 0, rz); m.castShadow = true; padre.add(m); return m; };
+    const piv = (padre, x, y, z = 0) => { const p = new T.Group(); p.position.set(x, y, z); padre.add(p); return p; };
+    const PIELH = 0xe2b48f, PELO = 0x3a2516, PANT = 0x4a5a78;
+    // piernas: muslo y espinilla, con rodilla
+    const piernas = [-1, 1].map(s => { const cad = piv(g, s * .1, .92), rod = piv(cad, 0, -.44);
+      pon(cad, capsula(G, n, PANT, 0, -.22, 0, .075, .34)); pon(rod, capsula(G, n, PANT, 0, -.2, 0, .062, .32));
+      pon(rod, [G.esf(n), 0xf2f2f2, 0, -.43, .045, .058, .055, .135], .6); pon(rod, [G.esf(n), 0xd8282f, 0, -.405, .02, .05, .025, .1], .6); // zapatillas
+      return { cad, rod }; });
+    pon(g, [G.esf(n), PANT, 0, .93, 0, .175, .11, .115]);
+    pon(g, [G.torso(n * 2), color, 0, .88, 0, 1.06, 1, .7], .95);                        // sudadera
+    pon(g, [G.cil(n), 0xb81f25, 0, .9, 0, .168, .06, .12], .95);                          // goma de abajo
+    pon(g, [G.esf(n), 0xb81f25, 0, 1.08, .1, .1, .06, .03], .95);                         // bolsillo
+    pon(g, [G.capucha(n * 2), color, 0, 1.47, -.075, .125, .125, .13, Math.PI / 2 + .3], .95); // capucha
+    for (const s of [-1, 1]) pon(g, [G.cil(6), 0xf2f2f2, s * .035, 1.36, .135, .006, .14, .006], .6); // cordones
+    const brazos = [-1, 1].map(s => { const hom = piv(g, s * .205, 1.4); pon(hom, [G.esf(n), color, 0, 0, 0, .06, .06, .06], .95);
+      pon(hom, capsula(G, n, color, 0, -.15, 0, .055, .22), .95); const codo = piv(hom, 0, -.29);
+      pon(codo, capsula(G, n, color, 0, -.12, 0, .048, .2), .95); pon(codo, [G.cil(n), 0xb81f25, 0, -.25, 0, .046, .04, .046], .95);
+      pon(codo, [G.esf(n), PIELH, 0, -.32, .01, .042, .065, .03], .6); return { hom, codo }; });
+    pon(g, [G.cil(n), PIELH, 0, 1.5, 0, .048, .1, .048], .6);
+    // cabeza: las mismas piezas que la gente, con más segmentos y barba
+    const cabeza = piv(g, 0, 1.55), cara = piezasHumano(T, { n, piel: PIELH, pelo: PELO, barba: true }).slice(-13);
+    for (const p of cara) { p[3] -= 1.55; pon(cabeza, p, p[1] === PIELH ? .6 : .8); }
+    const boca = cabeza.children.find(m => m.material.color.getHex() === 0x8a3b32);
     g.userData = { cabeza, boca, andar(ph, k) { const a = Math.sin(ph) * k;
-      piernas[0].rotation.x = a * .55; piernas[1].rotation.x = -a * .55; brazos[0].rotation.x = -a * .45; brazos[1].rotation.x = a * .45; } };
+      piernas[0].cad.rotation.x = a * .5; piernas[1].cad.rotation.x = -a * .5;
+      piernas[0].rod.rotation.x = Math.max(0, -Math.sin(ph)) * .7 * k; piernas[1].rod.rotation.x = Math.max(0, Math.sin(ph)) * .7 * k;
+      brazos[0].hom.rotation.x = -a * .4; brazos[1].hom.rotation.x = a * .4; for (const b of brazos) b.codo.rotation.x = -.25 - .2 * k;
+      brazos[0].hom.rotation.z = -.06; brazos[1].hom.rotation.z = .06; } };
+    g.userData.andar(0, 0);
     return g;
   }
   // personas que pasean (dir), se caen al suelo (caer 0→1) o huyen (huir = dirección)
@@ -275,5 +343,5 @@ window.COMUN = (() => {
     };
   }
 
-  return { TNT_J, RT, EN, DE, num, grande, textoTNT, comparaTNT, materiales, tintar, derribar, edificios, planeta, estallarPlaneta, multitud, persona, heroe, moverGente, tono, ruido, reloj };
+  return { TNT_J, RT, EN, DE, num, grande, textoTNT, comparaTNT, materiales, tintar, derribar, edificios, planeta, estallarPlaneta, multitud, persona, heroe, geoHumano, materialGente, moverGente, tono, ruido, reloj };
 })();

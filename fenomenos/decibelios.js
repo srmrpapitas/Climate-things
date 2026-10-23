@@ -131,7 +131,7 @@ window.FENOMENOS.decibelios = (() => {
     ctx.skyT.set(fActual.espacio || fActual.planeta || fActual.final ? 0x05070c : dB >= 230 ? 0xc9b89a : dB >= 200 && e > .4 ? 0xb9c4c8 : 0x9fd3f0);
     // boca abierta y burbuja mientras grita
     const grita = e > .25 && e < 1.1 && !fActual.final;
-    boca.scale.y = grita ? .06 + Math.abs(Math.sin(e * 22)) * .1 : .03;
+    boca.scale.y = grita ? .014 + Math.abs(Math.sin(e * 22)) * .02 : .006;
     cabeza.rotation.x = grita ? -.25 : 0;
     const v = quien.position.clone(); v.y += 2.2; v.project(ctx.camera);
     const r = stage.getBoundingClientRect(), vis = grita && v.z < 1 && Math.abs(v.x) < 1.2 && Math.abs(v.y) < 1.2 && ctx.camDist < 400;
