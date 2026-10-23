@@ -29,7 +29,7 @@ window.ESCENARIOS = window.ESCENARIOS || {};
       P(T('UN COCHE', 'A CAR'), T('El estruendo hace saltar las alarmas de los coches.', 'The boom sets off every car alarm.'), HC([2, 5.2, 121])),
       P(T('UN AUTOBÚS', 'A BUS'), T('Llegan trozos al suelo. Hay quien se lleva uno a casa.', 'Pieces hit the ground. Someone takes one home.'), HC([2.5, 6, 119])),
       P(T('COMO EL DE CHELIÁBINSK', 'LIKE CHELYABINSK'), T('La onda rompe los cristales de toda la ciudad.', 'The shockwave shatters every window in the city.'), CC([-24, 30, 60], [0, 60, 650])),
-      P(T('COMO EL DE TUNGUSKA', 'LIKE TUNGUSKA'), T('Arrasó 2.000 km² de bosque en 1908. Aquí, el centro.', 'It flattened 2,000 km² of forest in 1908. Here, downtown.'), CC([-80, 160, 40], [0, 0, 650])),
+      P(T('COMO EL DE TUNGUSKA', 'LIKE TUNGUSKA'), T('Arrasó 2.000 km² de bosque en 1908. Aquí, el centro.', 'It flattened 2,000 km² of forest in 1908. Here, downtown.'), CC([-80, 160, 40], [0, 0, 650]), { dur: 5.6 }),
       P(T('UN ESTADIO', 'A STADIUM'), T('Un cráter de un kilómetro. Adiós al barrio.', 'A crater one kilometre wide. Bye bye, neighbourhood.'), CC([-300, 220, -400], [0, 0, 700]), { camas: { ciudad: 0, fuego: .4 } }),
       P(T('UN RASCACIELOS', 'A SKYSCRAPER'), T('La ciudad entera, borrada del mapa.', 'The whole city, wiped off the map.'), CC([-900, 600, -900], [0, 0, 800])),
       P(T('UNA MONTAÑA PEQUEÑA', 'A SMALL MOUNTAIN'), T('Fuego en cien kilómetros a la redonda.', 'Fire for a hundred kilometres around.'), CC([-2400, 1500, -2000], [0, 0, 900])),
