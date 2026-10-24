@@ -815,7 +815,7 @@ function updateShadow() {
 const SKY = [0x9fd3f0, 0x9cc7e0, 0x8fb0c4, 0x8199a8, 0x75879a, 0x6d7d8e, 0x67778a, 0x5f7088, 0x4f6280, 0x3e5478];
 const skyC = new THREE.Color(SKY[0]), skyT = new THREE.Color(SKY[0]), space = new THREE.Color(0x0b1838);
 const _top = new THREE.Color(), _hsl = {};
-function updateSky(dt) { skyC.lerp(skyT, 1 - Math.exp(-dt * 1.2)); const a = smooth(15000, 160000, camera.position.y);
+function updateSky(dt) { skyC.lerp(skyT, 1 - Math.exp(-dt * (corte ? 6 : 1.2))); const a = smooth(15000, 160000, camera.position.y);
   const c = skyC.clone().lerp(space, a * .85); scene.background.copy(c); scene.fog.color.copy(c).lerp(new THREE.Color(0xb8d4e6), a * .3);
   // el cénit: el mismo tono que el horizonte, más oscuro y saturado
   c.getHSL(_hsl); _top.setHSL(_hsl.h, Math.min(1, _hsl.s * 1.25 + .1), _hsl.l * .5).lerp(space, a);
