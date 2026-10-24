@@ -396,7 +396,7 @@ window.COMUN = (() => {
     const SUELO = ['oceano', 'lava', 'polvo', 'lluvia', 'incendio'];
     function on(ctx, efecto, si) {
       const T = ctx.THREE; ef = si ? efecto : null;
-      if (!c.vapor) for (const [k, v] of Object.entries({ vapor: 0xf4f1ea, burbuja: 0xcfe8f5, vidrio: 0xd8f4ff, lava: 0xff6a1a, chispa: 0xffd27a, humo: 0x3a302a, polvo: 0x8a7258, fuego: 0xff7a1a, llama: 0xffc040, teja: 0xb5523b, asfalto: 0x3a3a3e, tierra: 0x6e5a44, arena: 0xe6d49c, raya: 0xffffff })) c[k] = new T.Color(v);
+      if (!c.vapor) for (const [k, v] of Object.entries({ vapor: 0xf4f1ea, burbuja: 0xcfe8f5, vidrio: 0xd8f4ff, lava: 0xff6a1a, chispa: 0xffd27a, humo: 0x3a302a, polvo: 0x8a7258, fuego: 0xff7a1a, llama: 0xffc040, teja: 0xb5523b, asfalto: 0x3a3a3e, tierra: 0x6e5a44, copo: 0xf4f8ff, gota: 0x9fd0ff, arena: 0xe6d49c, raya: 0xffffff })) c[k] = new T.Color(v);
       // los cráteres y cúpulas de polvo tapan el suelo: fuera mientras dura un plano a ras de suelo
       // (se esconden en cada fotograma: al bajar la cámara, el planeta vuelve a enseñar lo que había ocultado)
       if (SUELO.includes(efecto)) { if (si) tapan = ctx.scene.children.filter(ch => ch.userData.fenPropio && ch.geometry && /Circle|Ring|Sphere/.test(ch.geometry.type) && !ch.userData.sobrePlaneta && ch.scale.x > 30);
@@ -430,6 +430,10 @@ window.COMUN = (() => {
         for (let q = 0; q < 25; q++) ctx.emit(P.x + e(-h, h), ctx.GROUND + e(0, h * .4), P.z + e(-h, h), r * e(1, 2), e(0, 3), e(-1, 1), q % 2 ? c.arena : c.teja, e(.3, .6), 2);
         // a velocidades enormes levanta el asfalto y la tierra a trozos
         if (ef === 'arranca') for (let q = 0; q < 20; q++) ctx.emit(P.x + e(-h, h), ctx.GROUND + .2, P.z + e(-h, h) * .6, r * e(.15, .4), e(3, 9), e(-1, 1), q % 2 ? c.asfalto : c.tierra, e(1.2, 2.4), 4);
+      } else if (ef === 'nieve') { // nieve que cae despacio (en el frío extremo, el aire congelado)
+        for (let q = 0; q < 40; q++) ctx.emit(P.x + e(-r, r), P.y + e(r * .3, r), P.z + e(-r, r), e(-.5, .5) * r / 40, -e(.1, .2) * r, e(-.5, .5) * r / 40, c.copo, e(.4, .9), 0);
+      } else if (ef === 'aire') { // llueve aire líquido: gotas azuladas que caen rectas
+        for (let q = 0; q < 60; q++) ctx.emit(P.x + e(-r, r), P.y + e(r * .2, r), P.z + e(-r, r), 0, -r * .35, 0, c.gota, e(.6, 1.1), 9.8);
       } else if (ef === 'polvo') { // el polvo tapa el Sol: cielo pardo y oscuro, cae ceniza
         ctx.skyT.set(0x3b3128);
         for (let q = 0; q < 50; q++) ctx.emit(P.x + e(-r, r), P.y + e(r * .2, r * .8), P.z + e(-r, r), e(-1, 1), -e(1, 3), e(-1, 1), c.polvo, e(2, 4), 0);
