@@ -827,8 +827,13 @@ function updateSky(dt) { skyC.lerp(skyT, 1 - Math.exp(-dt * (corte ? 6 : 1.2)));
 // ---------- audio (sintetizado, sin derechos) ----------
 let AC, master, rumbleG, ambG;
 function audioInit() {
-  // la mezcla grabada dura lo que se calcula que dura el vídeo, con margen (antes eran 240 s fijos: mucha memoria y tiempo en el iPhone)
-  const durMax = ESC.ritmo ? Math.min(240, Math.ceil(((ESC.introDur || 3) + ESC.fases.reduce((s, f) => s + (f.dur || ESC.ritmo), 0)) * 1.4 + 20)) : 240;
+  // la mezcla grabada dura lo que se calcula que dura el vídeo, con margen (antes eran 240 s fijos: mucha memoria y tiempo en el iPhone).
+  // Cada paso espera a que acabe su frase, así que sumando solo f.dur la mezcla se quedaba corta y el final del vídeo salía
+  // mudo (en la gravedad, los últimos 20 s). exportar() carga la narración antes de llamar a start(), así que aquí ya está
+  // en vozDur y se suma lo que dura de verdad cada frase; igual que en durFase() y en el estado 'intro'.
+  const pasoDur = (f, i) => Math.max(f.dur ?? ESC.ritmo, vozDur[i + 1] ? vozDur[i + 1] + VOZ_RETRASO + 1.1 : 0);
+  const durMax = ESC.ritmo ? Math.min(300, Math.ceil((Math.max(ESC.introDur ?? 2.6, (vozDur[0] ?? 0) + .4)
+    + ESC.fases.reduce((s, f, i) => s + pasoDur(f, i), 0)) * 1.08 + 10)) : 300;
   try { AC = GRABAR ? new OfflineAudioContext(2, 48000 * durMax, 48000) : new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return; }
   if (GRABAR) { const t0 = time; Object.defineProperty(AC, 'currentTime', { get: () => time - t0 }); }
   master = AC.createGain(); master.gain.value = .9; master.connect(AC.destination);
@@ -1170,7 +1175,7 @@ try { if (sessionStorage.getItem('exportando') && params.get('exportar') !== '1'
 if (GRABAR && params.get('exportar') === '1') { $('menu').classList.add('off'); exportar().catch(e => { try { sessionStorage.removeItem('exportando'); } catch (x) {} $('exporta').querySelector('.txt').textContent = 'Error: ' + e.message; console.error(e); }); }
 
 frame();
-window.__game = { nextPhase, dbg: { bloom: () => bloom, scene, renderer, skyU, sun, pools, camTo, camPos, camTgt, camera, THREE }, start, pause(v) { paused = v; }, step(sec) { for (let t = 0; t < sec; t += 1 / 30) tick(1 / 30); },
+window.__game = { nextPhase, dbg: { bloom: () => bloom, scene, renderer, skyU, sun, pools, camTo, camPos, camTgt, camera, THREE, vozDur, durMezcla: () => AC ? AC.length / AC.sampleRate : 0 }, start, pause(v) { paused = v; }, step(sec) { for (let t = 0; t < sec; t += 1 / 30) tick(1 / 30); },
   render() { if (composer) composer.render(); else renderer.render(scene, camera); }, get ended() { return ended; }, get time() { return time; },
   async audio() { return AC && AC.startRendering ? wav(await AC.startRendering()) : null; }, get phase() { return phase; }, get fallen() { return fallen; } };
 </script>
