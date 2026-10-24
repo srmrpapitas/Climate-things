@@ -374,6 +374,21 @@ window.COMUN = (() => {
   }
 
   // ---------- planos de corte ----------
+  // Para los planos que miran a un edificio (f.inserto.plano): un sitio para la cámara desde el que se vea sin nada delante.
+  // ¿se ve el punto t desde p sin atravesar ningún edificio en pie (salvo el que se mira)?
+  function libre(edif, p, t, menos) {
+    for (let i = 0; i <= 16; i++) { const k = i / 16, x = p[0] + (t[0] - p[0]) * k, y = p[1] + (t[1] - p[1]) * k, z = p[2] + (t[2] - p[2]) * k, m = i ? 2 : 12; // la cámara, con más holgura
+      for (const o of edif) if (o !== menos && o.state !== 2 && o.g.parent && Math.abs(x - o.x) < o.w / 2 + m && Math.abs(z - o.z) < o.d / 2 + m && y < o.y0 + o.h + m) return false; }
+    return true;
+  }
+  // prueba varias direcciones y alturas alrededor del punto t y se queda con la primera que lo ve limpio
+  function mirador(ctx, edif, t, d, alto, menos) {
+    for (const h of [alto, alto * 1.6, alto * 2.4]) for (let i = 0; i < 12; i++) {
+      const a = Math.PI * 1.25 + Math.ceil(i / 2) * (i % 2 ? 1 : -1) * Math.PI / 6, p = [t[0] + Math.cos(a) * d, ctx.GROUND + h, t[2] + Math.sin(a) * d];
+      if (libre(edif, p, t, menos)) return p;
+    }
+    return [t[0] - d * .55, ctx.GROUND + alto * 3, t[2] - d * .85];
+  }
   // Efectos para los planos de corte (f.inserto.efecto): lo que pasa a ras de suelo mientras el plano principal está lejos.
   // on(ctx, efecto, true/false) al entrar y salir del plano; tick(ctx, dt) en cada fotograma, desde actualizar.
   const corte = (() => {
@@ -381,7 +396,7 @@ window.COMUN = (() => {
     const SUELO = ['oceano', 'lava', 'polvo', 'lluvia', 'incendio'];
     function on(ctx, efecto, si) {
       const T = ctx.THREE; ef = si ? efecto : null;
-      if (!c.vapor) for (const [k, v] of Object.entries({ vapor: 0xf4f1ea, burbuja: 0xcfe8f5, vidrio: 0xd8f4ff, lava: 0xff6a1a, chispa: 0xffd27a, humo: 0x3a302a, polvo: 0x8a7258, fuego: 0xff7a1a, llama: 0xffc040, teja: 0xb5523b, asfalto: 0x3a3a3e, tierra: 0x6e5a44, arena: 0xe6d49c, raya: 0xffffff })) c[k] = new T.Color(v);
+      if (!c.vapor) for (const [k, v] of Object.entries({ vapor: 0xf4f1ea, burbuja: 0xcfe8f5, vidrio: 0xd8f4ff, lava: 0xff6a1a, chispa: 0xffd27a, humo: 0x3a302a, polvo: 0x8a7258, fuego: 0xff7a1a, llama: 0xffc040, teja: 0xb5523b, asfalto: 0x3a3a3e, tierra: 0x6e5a44, copo: 0xf4f8ff, gota: 0x9fd0ff, arena: 0xe6d49c, raya: 0xffffff })) c[k] = new T.Color(v);
       // los cráteres y cúpulas de polvo tapan el suelo: fuera mientras dura un plano a ras de suelo
       // (se esconden en cada fotograma: al bajar la cámara, el planeta vuelve a enseñar lo que había ocultado)
       if (SUELO.includes(efecto)) { if (si) tapan = ctx.scene.children.filter(ch => ch.userData.fenPropio && ch.geometry && /Circle|Ring|Sphere/.test(ch.geometry.type) && !ch.userData.sobrePlaneta && ch.scale.x > 30);
@@ -415,6 +430,10 @@ window.COMUN = (() => {
         for (let q = 0; q < 25; q++) ctx.emit(P.x + e(-h, h), ctx.GROUND + e(0, h * .4), P.z + e(-h, h), r * e(1, 2), e(0, 3), e(-1, 1), q % 2 ? c.arena : c.teja, e(.3, .6), 2);
         // a velocidades enormes levanta el asfalto y la tierra a trozos
         if (ef === 'arranca') for (let q = 0; q < 20; q++) ctx.emit(P.x + e(-h, h), ctx.GROUND + .2, P.z + e(-h, h) * .6, r * e(.15, .4), e(3, 9), e(-1, 1), q % 2 ? c.asfalto : c.tierra, e(1.2, 2.4), 4);
+      } else if (ef === 'nieve') { // nieve que cae despacio (en el frío extremo, el aire congelado)
+        for (let q = 0; q < 40; q++) ctx.emit(P.x + e(-r, r), P.y + e(r * .3, r), P.z + e(-r, r), e(-.5, .5) * r / 40, -e(.1, .2) * r, e(-.5, .5) * r / 40, c.copo, e(.4, .9), 0);
+      } else if (ef === 'aire') { // llueve aire líquido: gotas azuladas que caen rectas
+        for (let q = 0; q < 60; q++) ctx.emit(P.x + e(-r, r), P.y + e(r * .2, r), P.z + e(-r, r), 0, -r * .35, 0, c.gota, e(.6, 1.1), 9.8);
       } else if (ef === 'polvo') { // el polvo tapa el Sol: cielo pardo y oscuro, cae ceniza
         ctx.skyT.set(0x3b3128);
         for (let q = 0; q < 50; q++) ctx.emit(P.x + e(-r, r), P.y + e(r * .2, r * .8), P.z + e(-r, r), e(-1, 1), -e(1, 3), e(-1, 1), c.polvo, e(2, 4), 0);
@@ -431,5 +450,5 @@ window.COMUN = (() => {
     return { on, tick };
   })();
 
-  return { corte, TNT_J, RT, EN, DE, num, grande, textoTNT, comparaTNT, materiales, tintar, derribar, edificios, planeta, estallarPlaneta, multitud, persona, heroe, protagonista, geoHumano, materialGente, moverGente, tono, ruido, reloj };
+  return { corte, mirador, TNT_J, RT, EN, DE, num, grande, textoTNT, comparaTNT, materiales, tintar, derribar, edificios, planeta, estallarPlaneta, multitud, persona, heroe, protagonista, geoHumano, materialGente, moverGente, tono, ruido, reloj };
 })();

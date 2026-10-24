@@ -44,7 +44,7 @@ window.FENOMENOS.gravedad = (() => {
     obj.aplastar = G >= 16 ? Math.min(1, (Math.log2(G) - 3) / 5) : 0;
     obj.mar = G >= 256 ? 1 : 0;
     obj.cielo = G >= 512 ? 1 : 0;
-    cieloObj = G >= 512 ? 0x0b0d16 : G >= 128 ? 0x7f98ad : G >= 32 ? 0x93b7cf : 0x9fd3f0;
+    cieloObj = G >= 512 ? 0x3a5068 : G >= 128 ? 0x7f98ad : G >= 32 ? 0x93b7cf : 0x9fd3f0;
     // los coches se aplastan como latas
     if (G >= 32) coches.forEach(o => o.aplasta = 1);
     // primero ceden las casas bajas, luego todo
@@ -64,7 +64,8 @@ window.FENOMENOS.gravedad = (() => {
     tiempo = t; reloj.tick(t); const k = 1 - Math.exp(-dt * 1.3);
     yo.actualizar(dt, t);
     for (const key in est) est[key] += (obj[key] - est[key]) * k;
-    ctx.skyT.set(cieloObj);
+    COMUN.corte.tick(ctx, dt);
+    if (!ctx.corte) ctx.skyT.set(cieloObj);
     // todo lo que sigue en pie se va achatando
     const sq = 1 - est.aplastar * .55;
     for (const o of edif) if (o.state === 0) o.g.scale.y = sq;
@@ -85,12 +86,31 @@ window.FENOMENOS.gravedad = (() => {
     }
   }
 
+  // plano de corte 'cae': un edificio de la altura pedida (alto: [min, max]) que se hunde bajo su peso mientras se mira
+  function plano(c, fi) {
+    const [a, b] = fi.alto || [0, 1e9], o = edif.filter(o => o.state === 0 && o.h >= a && o.h <= b && !o.landmark)
+      .sort((p, q) => Math.abs(p.z - 450) + p.w * p.d / 10 - Math.abs(q.z - 450) - q.w * q.d / 10)[0];
+    if (!o) return null;
+    reloj.luego(fi.cae ?? .5, () => COMUN.derribar(ctx, o, new ctx.THREE.Vector3(ctx.rr(-.5, .5), -Math.min(o.h, 300) * .6, ctx.rr(-.5, .5)), { polvo: o.h > 60 ? 26 : 12 }));
+    const mira = [o.x, ctx.GROUND + o.h * .4, o.z];
+    return { pos: COMUN.mirador(ctx, edif, mira, Math.max(40, o.h * 2.2, Math.max(o.w, o.d) * 2), o.h * .6 + 10, o), mira };
+  }
+
   return {
-    crear, fase, actualizar, camara: c => yo.camara(c),
+    crear, fase, actualizar, camara: c => yo.camara(c), plano, inserto: (c, ef, on) => COMUN.corte.on(c, ef, on),
     activo: () => tiempo - t0 < 4 || reloj.pendientes > 0,
-    mag: v => `${COMUN.num(v, 0)} g`,
+    mag: v => v >= 1e6 ? `${COMUN.grande(v)} g` : `${COMUN.num(v, 0)} g`,
+    // a escala real: la montaña más alta que aguantaría la roca (≈ 8.848 m / g) y el grosor del aire (altura de escala ≈ 8,5 km / g);
+    // con el planeta, la presión en el centro (≈ 3,6 millones de atmósferas × g)
+    danos: () => {
+      const EN = COMUN.EN, n = COMUN.num, d = m => m >= 1000 ? `${n(m / 1000, 1)} km` : m >= 10 ? `${n(m, 0)} m` : m >= .1 ? `${n(m * 100, 0)} cm` : `${n(m * 1000, 0)} mm`;
+      if (G >= 7e8) return EN ? 'Planet Earth: a black hole' : 'Planeta Tierra: un agujero negro';
+      if (G >= 1024) { const p = 3.6e6 * G; return EN ? `Pressure at the core: ${COMUN.grande(p)} atmospheres` : `Presión en el centro: ${COMUN.grande(p)}${COMUN.DE}atmósferas`; }
+      return EN ? `Tallest possible mountain: ${d(8848 / G)} · air ${d(8500 / G)} thick` : `Montaña más alta posible: ${d(8848 / G)} · aire de ${d(8500 / G)}`;
+    },
     linea3: v => { const kg = 70 * v, c = COSAS.find(([p]) => p >= kg * .99);
-      return [COMUN.EN ? `You weigh ${COMUN.num(kg, 0)} kg` : `Pesas ${COMUN.num(kg, 0)} kg`, v > 1 && c ? (COMUN.EN ? `LIKE ${c[2].toUpperCase()}` : `COMO ${c[1].toUpperCase()}`) : ''];
+      const t = kg / 1000, peso = kg < 1e4 ? `${COMUN.num(kg, 0)} kg` : t < 1e6 ? (COMUN.EN ? `${COMUN.num(t, 0)} tonnes` : `${COMUN.num(t, 0)} toneladas`) : (COMUN.EN ? `${COMUN.grande(t)} tonnes` : `${COMUN.grande(t)}${COMUN.DE}toneladas`);
+      return [COMUN.EN ? `You weigh ${peso}` : `Pesas ${peso}`, v > 1 && c ? (COMUN.EN ? `LIKE ${c[2].toUpperCase()}` : `COMO ${c[1].toUpperCase()}`) : ''];
     },
   };
 })();

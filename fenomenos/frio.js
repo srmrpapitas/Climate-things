@@ -19,6 +19,10 @@ window.FENOMENOS.frio = (() => {
     capa.userData.fenPropio = true; capa.visible = false; capa.position.set(0, ctx.GROUND - 2, 1000); ctx.scene.add(capa);
   }
 
+  // [°C, en castellano, en inglés]: lo último que se congela o se vuelve líquido al bajar
+  const ESTADOS = [[0, 'se hiela el agua', 'water freezes'], [-78.5, 'el CO₂ cae como hielo seco', 'CO₂ falls as dry ice'], [-183, 'el oxígeno se vuelve líquido', 'oxygen turns liquid'],
+    [-196, 'el nitrógeno se vuelve líquido', 'nitrogen turns liquid'], [-210, 'el nitrógeno se congela', 'nitrogen freezes'], [-218, 'el oxígeno se congela', 'oxygen freezes'],
+    [-249, 'el neón se congela', 'neon freezes'], [-259, 'el hidrógeno se congela', 'hydrogen freezes'], [-268.9, 'el helio se vuelve líquido', 'helium turns liquid']];
   const rad = () => Math.max(60, Math.min(1500, ctx.camDist * .8));
   function fase(c, n, valor, f) {
     T = valor; t0 = tiempo;
@@ -47,7 +51,8 @@ window.FENOMENOS.frio = (() => {
     tiempo = t; reloj.tick(t); const e = t - t0, k = 1 - Math.exp(-dt * 1.1);
     for (const key in est) est[key] += (obj[key] - est[key]) * k;
     COMUN.tintar(ctx, 0xe4f0ff, est.tinte, 0xcfe4ff, est.escarcha);
-    ctx.skyT.set(cieloObj);
+    COMUN.corte.tick(ctx, dt);
+    if (!ctx.corte) ctx.skyT.set(cieloObj);
     // el mar se congela: deja de moverse y se vuelve blanco
     ctx.seaNear.scale.y = 1 - est.mar;
     // nieve y, por debajo de −190 °C, lluvia de aire líquido
@@ -64,8 +69,14 @@ window.FENOMENOS.frio = (() => {
   }
 
   return {
-    crear, fase, actualizar, camara: c => yo.camara(c),
+    crear, fase, actualizar, camara: c => yo.camara(c), inserto: (c, ef, on) => COMUN.corte.on(c, ef, on),
     activo: () => tiempo - t0 < 4 || reloj.pendientes > 0,
+    // qué se congela ya y a qué velocidad se mueven las moléculas del aire (v = √(3kT/m), nitrógeno)
+    danos: () => {
+      const EN = COMUN.EN, K = T + 273.15, v = Math.sqrt(3 * 1.380649e-23 * K / 4.65e-26) * 3.6, e = ESTADOS.filter(([t]) => T <= t).pop();
+      const mol = EN ? `air molecules at ${COMUN.num(v, 0)} km/h` : `moléculas del aire a ${COMUN.num(v, 0)} km/h`;
+      const l = [e && (EN ? e[2] : e[1]), mol].filter(Boolean).join(' · '); return l[0].toUpperCase() + l.slice(1);
+    },
     tnt: v => Math.max(0, 15 - v) * 1.2e12 / COMUN.TNT_J,
     mag: v => `${v < 0 ? '−' : ''}${COMUN.num(Math.abs(v), Math.abs(v) >= 200 && v % 1 ? 1 : 0)} °C`,
   };

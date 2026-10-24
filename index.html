@@ -925,7 +925,7 @@ function updateHUD(dt) {
 }
 const labelsEl = $('labels'), labels = (ESC.marcas || []).map(mk => { const e = document.createElement('div'); e.className = 'lbl t'; e.textContent = mk.texto; labelsEl.appendChild(e); return { ...mk, e, v: new THREE.Vector3(...mk.pos) }; });
 function updateLabels() { const r = stage.getBoundingClientRect(), placed = [];
-  for (const l of labels) { const on = l.fases.includes(phase) && !ended; const p = l.v.clone().project(camera);
+  for (const l of labels) { const on = l.fases.includes(phase) && !ended && !corte; const p = l.v.clone().project(camera);
     const vis = on && p.z < 1 && Math.abs(p.x) < 1.1 && Math.abs(p.y) < 1.1; l.e.classList.toggle('on', vis);
     if (!vis) continue;
     const x = (p.x + 1) / 2 * r.width, w = l.e.offsetWidth, h = l.e.offsetHeight + 4; let y = (1 - p.y) / 2 * r.height - r.width * .03;
