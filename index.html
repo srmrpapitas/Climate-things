@@ -817,7 +817,9 @@ function updateSky(dt) { skyC.lerp(skyT, 1 - Math.exp(-dt * 1.2)); const a = smo
 // ---------- audio (sintetizado, sin derechos) ----------
 let AC, master, rumbleG, ambG;
 function audioInit() {
-  try { AC = GRABAR ? new OfflineAudioContext(2, 48000 * 240, 48000) : new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return; }
+  // la mezcla grabada dura lo que se calcula que dura el vídeo, con margen (antes eran 240 s fijos: mucha memoria y tiempo en el iPhone)
+  const durMax = ESC.ritmo ? Math.min(240, Math.ceil(((ESC.introDur || 3) + ESC.fases.reduce((s, f) => s + (f.dur || ESC.ritmo), 0)) * 1.4 + 20)) : 240;
+  try { AC = GRABAR ? new OfflineAudioContext(2, 48000 * durMax, 48000) : new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return; }
   if (GRABAR) { const t0 = time; Object.defineProperty(AC, 'currentTime', { get: () => time - t0 }); }
   master = AC.createGain(); master.gain.value = .9; master.connect(AC.destination);
   const buf = AC.createBuffer(1, AC.sampleRate * 3, AC.sampleRate), d = buf.getChannelData(0); let last = 0;
@@ -934,7 +936,7 @@ function wav(b) { // AudioBuffer → WAV 16 bits en base64
   for (let i = 0; i < n; i++) for (let c = 0; c < ch; c++) { v.setInt16(o, Math.max(-1, Math.min(1, d[c][i])) * 32767, true); o += 2; }
   let s = ''; const u = new Uint8Array(v.buffer); for (let i = 0; i < u.length; i += 32768) s += String.fromCharCode(...u.subarray(i, i + 32768)); return btoa(s);
 }
-let toastT; function toast(t) { const e = $('toast'); e.textContent = t; e.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => e.classList.remove('on'), 1400); }
+let toastT; function toast(t, ms = 1400) { const e = $('toast'); e.textContent = t; e.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => e.classList.remove('on'), ms); }
 
 // ---------- flujo del vídeo ----------
 // ESC.ritmo: segundos por paso; el vídeo avanza solo a ese ritmo sin esperar a que acabe cada efecto
@@ -1072,9 +1074,16 @@ async function audioGrabado(ab, dur, mux, tipo, { txt, barra, bot, EN }) {
 async function exportar() {
   const box = $('exporta'), txt = box.querySelector('.txt'), barra = box.querySelector('.barra i'), bot = box.querySelector('.bot'); box.classList.add('on');
   const EN = window.LANG === 'en', W = 1080, H = 1920, FPS = 30;
+  // en el móvil, menos bitrate: el MP4 entero se guarda en memoria y al final se copia; con 12 Mbit/s el iPhone se quedaba
+  // sin memoria justo al terminar, recargaba la página y, como la dirección llevaba exportar=1, el render volvía a empezar
+  const MOVIL = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Macintosh/.test(navigator.userAgent)), BR = MOVIL ? 6e6 : 12e6;
+  // si la página se recarga a mitad (memoria, cambiar de app), no se repite el render: vuelve al juego y avisa
+  const sinExportar = new URLSearchParams(location.search); sinExportar.delete('exportar'); sinExportar.delete('grabar');
+  history.replaceState(null, '', location.pathname + (sinExportar.toString() ? '?' + sinExportar : ''));
+  try { sessionStorage.setItem('exportando', '1'); } catch (e) {}
   if (!window.VideoEncoder || !window.Mp4Muxer) { txt.textContent = EN ? 'This browser cannot export video (try Chrome or Safari 17+).' : 'Este navegador no puede exportar vídeo (prueba con Chrome o Safari 17+).'; return; }
   txt.textContent = EN ? 'Loading sounds…' : 'Cargando sonidos…';
-  const vcod = (await VideoEncoder.isConfigSupported({ codec: 'avc1.640028', width: W, height: H, bitrate: 12e6, framerate: FPS })).supported ? 'avc1.640028' : 'avc1.42E028';
+  const vcod = (await VideoEncoder.isConfigSupported({ codec: 'avc1.640028', width: W, height: H, bitrate: BR, framerate: FPS })).supported ? 'avc1.640028' : 'avc1.42E028';
   // audio: AAC con AudioEncoder; si no hay (iPhone), AAC grabado con MediaRecorder en tiempo real; Opus solo como último recurso
   // (Opus dentro de MP4 no suena en el iPhone ni en WhatsApp)
   const aEnc = async c => !!window.AudioEncoder && (await AudioEncoder.isConfigSupported({ codec: c, sampleRate: 48000, numberOfChannels: 2, bitrate: 192000 }).catch(() => ({}))).supported;
@@ -1094,7 +1103,7 @@ async function exportar() {
   const mux = new Mp4Muxer.Muxer({ target: new Mp4Muxer.ArrayBufferTarget(), fastStart: 'in-memory', firstTimestampBehavior: 'offset',
     video: { codec: 'avc', width: W, height: H, frameRate: FPS }, ...(acod ? { audio: { codec: aCodec, sampleRate: 48000, numberOfChannels: 2 } } : {}) });
   let fallo = null; const venc = new VideoEncoder({ output: (c, m) => mux.addVideoChunk(c, m), error: e => fallo = e });
-  venc.configure({ codec: vcod, width: W, height: H, bitrate: 12e6, framerate: FPS, latencyMode: 'quality' });
+  venc.configure({ codec: vcod, width: W, height: H, bitrate: BR, framerate: FPS, latencyMode: 'quality' });
   let n = 0, fin = null; const total = () => fin !== null ? fin + FPS * 3.5 : Math.max(n + FPS * 10, FPS * 60), t0 = performance.now();
   while (fin === null || n < fin + FPS * 3.5) {
     tick(1 / FPS); if (composer) composer.render(); else renderer.render(scene, camera);
@@ -1105,6 +1114,10 @@ async function exportar() {
     if (n % 6 === 0) { const p = Math.min(.95, n / total()); barra.style.width = (p * 90) + '%'; txt.textContent = `${EN ? 'Rendering' : 'Renderizando'} ${(n / FPS).toFixed(1)} s · ${Math.round(n / ((performance.now() - t0) / 1000))} fps`; await new Promise(r => setTimeout(r)); }
   }
   await venc.flush(); const dur = n / FPS;
+  // antes de mezclar el audio se libera la memoria del vídeo (codificador, lienzo y la imagen a 1080×1920): en el iPhone
+  // la mezcla era justo el momento en que se quedaba sin memoria y recargaba la página
+  venc.close(); c2.canvas.width = c2.canvas.height = 1; renderer.setPixelRatio(1); resize(); renderer.renderLists && renderer.renderLists.dispose();
+  await new Promise(r => setTimeout(r, 50));
   if (acod) { txt.textContent = EN ? 'Mixing audio…' : 'Mezclando el audio…';
     const ab = await AC.startRendering(), len = Math.min(ab.length, Math.round(dur * 48000)), fade = 1.5 * 48000;
     for (let c = 0; c < 2; c++) { const d = ab.getChannelData(c); for (let j = Math.max(0, len - fade); j < d.length; j++) d[j] *= Math.max(0, (len - j) / fade); } // fundido final
@@ -1119,7 +1132,8 @@ async function exportar() {
         for (let c = 0; c < 2; c++) d.set(ab.getChannelData(c).subarray(i, i + m), c * m);
         const ad = new AudioData({ format: 'f32-planar', sampleRate: 48000, numberOfFrames: m, numberOfChannels: 2, timestamp: Math.round(i / 48 * 1000), data: d }); aenc.encode(ad); ad.close(); }
       await aenc.flush(); } }
-  if (fallo) { txt.textContent = 'Error: ' + fallo.message; return; }
+  if (fallo) { try { sessionStorage.removeItem('exportando'); } catch (e) {} txt.textContent = 'Error: ' + fallo.message; return; }
+  try { sessionStorage.removeItem('exportando'); } catch (e) {}
   mux.finalize(); const blob = new Blob([mux.target.buffer], { type: 'video/mp4' }), nombre = `siseduplica-${ESC.id}-${window.LANG}.mp4`, url = URL.createObjectURL(blob);
   window.__mp4 = blob; barra.style.width = '100%';
   // qué audio lleva el vídeo, para ver de un vistazo si falta algo
@@ -1131,7 +1145,9 @@ async function exportar() {
   const file = new File([blob], nombre, { type: 'video/mp4' });
   if (navigator.canShare && navigator.canShare({ files: [file] })) { const b2 = Object.assign(document.createElement('button'), { textContent: EN ? 'Save / share' : 'Guardar / compartir' }); b2.onclick = () => navigator.share({ files: [file] }).catch(() => {}); bot.append(b2); }
 }
-if (GRABAR && params.get('exportar') === '1') { $('menu').classList.add('off'); exportar().catch(e => { $('exporta').querySelector('.txt').textContent = 'Error: ' + e.message; console.error(e); }); }
+try { if (sessionStorage.getItem('exportando') && params.get('exportar') !== '1') { sessionStorage.removeItem('exportando');
+  setTimeout(() => toast(window.LANG === 'en' ? 'The export was cut off (out of memory or you left the app). Try again and keep the screen on.' : 'La exportación se cortó (falta de memoria o saliste de la app). Vuelve a probar sin salir de la pantalla.', 8000), 800); } } catch (e) {}
+if (GRABAR && params.get('exportar') === '1') { $('menu').classList.add('off'); exportar().catch(e => { try { sessionStorage.removeItem('exportando'); } catch (x) {} $('exporta').querySelector('.txt').textContent = 'Error: ' + e.message; console.error(e); }); }
 
 frame();
 window.__game = { nextPhase, dbg: { bloom: () => bloom, scene, renderer, skyU, sun, pools, camTo, camPos, camTgt }, start, pause(v) { paused = v; }, step(sec) { for (let t = 0; t < sec; t += 1 / 30) tick(1 / 30); },
