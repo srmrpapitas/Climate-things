@@ -374,6 +374,21 @@ window.COMUN = (() => {
   }
 
   // ---------- planos de corte ----------
+  // Para los planos que miran a un edificio (f.inserto.plano): un sitio para la cámara desde el que se vea sin nada delante.
+  // ¿se ve el punto t desde p sin atravesar ningún edificio en pie (salvo el que se mira)?
+  function libre(edif, p, t, menos) {
+    for (let i = 0; i <= 16; i++) { const k = i / 16, x = p[0] + (t[0] - p[0]) * k, y = p[1] + (t[1] - p[1]) * k, z = p[2] + (t[2] - p[2]) * k, m = i ? 2 : 12; // la cámara, con más holgura
+      for (const o of edif) if (o !== menos && o.state !== 2 && o.g.parent && Math.abs(x - o.x) < o.w / 2 + m && Math.abs(z - o.z) < o.d / 2 + m && y < o.y0 + o.h + m) return false; }
+    return true;
+  }
+  // prueba varias direcciones y alturas alrededor del punto t y se queda con la primera que lo ve limpio
+  function mirador(ctx, edif, t, d, alto, menos) {
+    for (const h of [alto, alto * 1.6, alto * 2.4]) for (let i = 0; i < 12; i++) {
+      const a = Math.PI * 1.25 + Math.ceil(i / 2) * (i % 2 ? 1 : -1) * Math.PI / 6, p = [t[0] + Math.cos(a) * d, ctx.GROUND + h, t[2] + Math.sin(a) * d];
+      if (libre(edif, p, t, menos)) return p;
+    }
+    return [t[0] - d * .55, ctx.GROUND + alto * 3, t[2] - d * .85];
+  }
   // Efectos para los planos de corte (f.inserto.efecto): lo que pasa a ras de suelo mientras el plano principal está lejos.
   // on(ctx, efecto, true/false) al entrar y salir del plano; tick(ctx, dt) en cada fotograma, desde actualizar.
   const corte = (() => {
@@ -431,5 +446,5 @@ window.COMUN = (() => {
     return { on, tick };
   })();
 
-  return { corte, TNT_J, RT, EN, DE, num, grande, textoTNT, comparaTNT, materiales, tintar, derribar, edificios, planeta, estallarPlaneta, multitud, persona, heroe, protagonista, geoHumano, materialGente, moverGente, tono, ruido, reloj };
+  return { corte, mirador, TNT_J, RT, EN, DE, num, grande, textoTNT, comparaTNT, materiales, tintar, derribar, edificios, planeta, estallarPlaneta, multitud, persona, heroe, protagonista, geoHumano, materialGente, moverGente, tono, ruido, reloj };
 })();
