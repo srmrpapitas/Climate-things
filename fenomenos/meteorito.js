@@ -37,8 +37,8 @@ window.FENOMENOS.meteorito = (() => {
     // la roca entra en diagonal; tarda más cuanto más lejos se ve
     const enPlaneta = !!planeta, dur = enPlaneta ? 2.2 : 1.6, h = alturaExplosion(D);
     const fin = enPlaneta ? { x: 0, y: 0, z: 0 } : { x: IMPACTO.x, y: ctx.GROUND + h, z: IMPACTO.z };
-    const L = enPlaneta ? 4e6 : 3000, ini = { x: fin.x - DIR[0] * L, y: fin.y - DIR[1] * L, z: fin.z - DIR[2] * L };
-    const visible = enPlaneta ? 9e4 : Math.max(D / 2, 6 + D * .5);
+    const L = enPlaneta ? Math.max(4e6, D * 2.5) : 3000, ini = { x: fin.x - DIR[0] * L, y: fin.y - DIR[1] * L, z: fin.z - DIR[2] * L };
+    const visible = enPlaneta ? Math.max(9e4, D / 2) : Math.max(D / 2, 6 + D * .5);
     roca.g.scale.setScalar(visible); roca.g.position.set(ini.x, ini.y, ini.z); roca.g.visible = true;
     cayendo = { ini, fin, dur, t: 0, h };
     sfx('whoosh', .5); if (D >= 64) sfx('riser', .45);
@@ -55,7 +55,10 @@ window.FENOMENOS.meteorito = (() => {
     COMUN.ruido(ctx, 3 + Math.log2(D) * .3, 120, Math.min(.9, .25 + Math.log2(D) * .05));
     COMUN.tono(ctx, 60, 25, 3, 'sawtooth', Math.min(.3, .05 + Math.log2(D) * .02));
     sfx('impacto', Math.min(1, .35 + Math.log2(D) * .05));
-    if (enPlaneta) { brasaObj = Math.min(1, (Math.log2(D) - 9) / 4); polvoObj = 1; if (D >= 2048) sfx('planeta', .5, .3); return; }
+    if (enPlaneta) { brasaObj = Math.min(1, (Math.log2(D) - 9) / 4); polvoObj = 1; if (D >= 2048) sfx('planeta', .5, .3);
+      // casi otra Tierra: el planeta se parte en dos
+      if (D >= 1e6) { planeta.partir(.14); COMUN.estallarPlaneta(ctx, 1600); COMUN.ruido(ctx, 6, 120, .9); COMUN.tono(ctx, 70, 20, 5, 'sawtooth', .35); }
+      return; }
     ctx.setShake(Math.min(4, .05 + D * .02));
     ctx.rumble(Math.min(.6, .1 + Math.log2(D) * .04));
     // a partir de 8 m llegan trozos al suelo; desde 32 m, cráter y onda expansiva
@@ -126,12 +129,13 @@ window.FENOMENOS.meteorito = (() => {
     danos: () => {
       const n = COMUN.num, EN = COMUN.EN, d = m => m >= 1000 ? `${n(m / 1000, m < 1e4 ? 1 : 0)} km` : `${n(m, 0)} m`;
       const kg = .5 * 3000 * Math.PI / 6 * D ** 3 * 2e4 ** 2 / COMUN.TNT_J * 1000, R5 = 4.7 * Math.cbrt(kg), R1 = 24 * Math.cbrt(kg);
+      if (D >= 1e6) return EN ? 'Planet Earth: split in two' : 'Planeta Tierra: partido en dos';
       if (D <= 8) { const h = D <= 1 ? 55 : D <= 2 ? 50 : D <= 4 ? 42 : 35; return EN ? `Explodes ${h} km up · the ground is untouched` : `Explota a ${h} km de altura · el suelo, intacto`; }
       if (D <= 32) { const h = D <= 16 ? 27 : 12; return EN ? `Explodes ${h} km up · glass breaks up to ${d(R1)} away` : `Explota a ${h} km de altura · cristales rotos hasta ${d(R1)}`; }
       const ed = Math.PI * (R5 / 1000) ** 2 * 1000, zona = R5 < 3e4 ? (EN ? ` (≈ ${ed >= 1e6 ? COMUN.grande(ed) + ' ' : n(ed, 0) + ' '}buildings)` : ` (≈ ${ed >= 1e6 ? COMUN.grande(ed) + COMUN.DE : n(ed, 0) + ' '}edificios)`) : '';
       return EN ? `${d(D * 20)} crater · flattens ${d(R5)} around${zona}` : `Cráter de ${d(D * 20)} · arrasa ${d(R5)} a la redonda${zona}`;
     },
-    activo: () => tiempo - t0 < 4.5 || reloj.pendientes > 0,
+    activo: () => tiempo - t0 < 4.5 || reloj.pendientes > 0 || (planeta && planeta.split > 0 && planeta.split < .9),
     tnt: d => .5 * 3000 * Math.PI / 6 * d ** 3 * 2e4 ** 2 / COMUN.TNT_J,
     mag: d => d >= 1000 ? `${COMUN.num(d / 1000, d % 1000 ? 1 : 0)} km` : `${COMUN.num(d, 0)} m`,
   };
