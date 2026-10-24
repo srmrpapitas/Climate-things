@@ -13,6 +13,16 @@ window.FENOMENOS.viento = (() => {
     [2560, 'una bala', 'a bullet'], [5120, 'un misil', 'a missile'], [10240, 'un meteorito', 'a meteor'],
     [20480, 'una nave volviendo del espacio', 'a capsule coming back from space'], [40960, 'un cohete que se escapa de la Tierra', 'a rocket leaving Earth']];
 
+  // [número, efecto en castellano, en inglés, hasta km/h]
+  const BEAUFORT = [[0, 'calma', 'calm', 1], [1, 'ventolina: el humo se inclina', 'light air: smoke drifts', 5], [2, 'flojito: se mueven las hojas', 'light breeze: leaves rustle', 11],
+    [3, 'flojo: ondean las banderas', 'gentle breeze: flags flap', 19], [4, 'bonancible: vuelan papeles y polvo', 'moderate breeze: dust and paper fly', 28],
+    [5, 'fresquito: se mecen los árboles', 'fresh breeze: small trees sway', 38], [6, 'fresco: cuesta usar el paraguas', 'strong breeze: umbrellas are hard to use', 49],
+    [7, 'frescachón: cuesta andar', 'near gale: hard to walk', 61], [8, 'temporal: se rompen ramas', 'gale: twigs break off', 74],
+    [9, 'temporal fuerte: vuelan tejas', 'strong gale: roof tiles fly', 88], [10, 'temporal duro: caen árboles', 'storm: trees are uprooted', 102],
+    [11, 'temporal muy duro: daños por todas partes', 'violent storm: damage everywhere', 117]];
+  const HURACAN = [[1, 'tejados y cables dañados', 'roofs and power lines damaged', 153], [2, 'arranca árboles y tejados', 'trees and roofs torn off', 177],
+    [3, 'casas destrozadas, días sin luz', 'homes wrecked, days without power', 208], [4, 'casas sin tejado ni paredes', 'homes lose roofs and walls', 251],
+    [5, 'casas destruidas, zona inhabitable durante meses', 'homes destroyed, area unlivable for months', 1e9]];
   // velocidad (km/h) a la que cae o sale volando cada cosa
   function aguante(o) {
     if (o.kind === 'person') return ctx.rr(110, 160);
@@ -82,7 +92,7 @@ window.FENOMENOS.viento = (() => {
   }
 
   function actualizar(c, dt, t) {
-    tiempo = t; reloj.tick(t); const v = ms(V);
+    tiempo = t; reloj.tick(t); COMUN.corte.tick(ctx, dt); const v = ms(V);
     const k = 1 - Math.exp(-dt * 1.2); for (const key in est) est[key] += (obj[key] - est[key]) * k;
     const racha = .5 + .5 * Math.sin(t * 2.3) * Math.sin(t * .9 + 1);
     // el protagonista: inclinado contra el viento y, cuando ya no aguanta, por los aires dando vueltas
@@ -122,12 +132,22 @@ window.FENOMENOS.viento = (() => {
       ctx.emit(cx + ctx.rr(-r, r), ctx.GROUND + ctx.rr(0, 3 + Math.min(V, 2560) / 50), cz + ctx.rr(-r, r), Math.min(v, 300) * ctx.rr(.5, 1), ctx.rr(0, 3), ctx.rr(-1, 1), col.arena, ctx.rr(1, 2), 2);
     if (V >= 20 && V < 640) for (let q = 0; q < 6; q++) ctx.emit(cx + ctx.rr(-r, r), ctx.GROUND + ctx.rr(2, 20), cz + ctx.rr(-r, r), Math.min(v, 120) * ctx.rr(.4, .9), ctx.rr(-2, 4), ctx.rr(-3, 3), col.hoja, ctx.rr(1.5, 3), 1);
     if (V >= 2560) for (let q = 0; q < 50; q++) ctx.emit(cx + ctx.rr(-r, r), ctx.GROUND + ctx.rr(0, 40), cz + ctx.rr(-r, r), 300 * ctx.rr(.4, .8), ctx.rr(2, 20), ctx.rr(-5, 5), col.tierra, ctx.rr(1.5, 3), 3);
-    ctx.skyT.set(V >= 1280 ? 0x8a7d6a : V >= 320 ? 0x7b8794 : V >= 160 ? 0x8a99a8 : V >= 80 ? 0xa3b6c6 : 0x9fd3f0);
+    if (!ctx.corte) ctx.skyT.set(V >= 1280 ? 0x8a7d6a : V >= 320 ? 0x7b8794 : V >= 160 ? 0x8a99a8 : V >= 80 ? 0xa3b6c6 : 0x9fd3f0);
     ctx.setShake(V >= 320 ? Math.min(ctx.camDist * .004, V / 800) * (.6 + .4 * racha) : 0);
   }
 
   return {
-    crear, fase, actualizar, sinBoom: true, camara: c => yo.camara(c),
+    crear, fase, actualizar, sinBoom: true, camara: c => yo.camara(c), inserto: (ctx, ef, on) => COMUN.corte.on(ctx, ef, on),
+    // qué rompe el viento a esa velocidad: escala de Beaufort, huracanes de Saffir-Simpson y, más allá, la presión del aire comparada con bucear
+    danos: () => {
+      const EN = COMUN.EN, n = COMUN.num;
+      if (V <= 117) { const [b, es, en] = BEAUFORT.find(([, , , m]) => V <= m); return EN ? `Beaufort ${b} · ${en}` : `Beaufort ${b} · ${es}`; }
+      if (V < 330) { const [c, es, en] = HURACAN.find(([, , , m]) => V <= m); return EN ? `Category ${c} hurricane · ${en}` : `Huracán de categoría ${c} · ${es}`; }
+      if (V < 1235) return EN ? 'Stronger than any hurricane or tornado measured · no house left standing' : 'Más que cualquier huracán o tornado medido · no queda casa en pie';
+      const m = .5 * 1.2 * ms(V) ** 2 / (1025 * 9.81);
+      if (V < 2560) return EN ? 'Supersonic: a sonic boom in every gust · skyscrapers fall' : 'Supersónico: un estampido en cada ráfaga · caen los rascacielos';
+      return EN ? `Pressure like ${n(m, 0)} m under the sea` : `Presión como a ${n(m, 0)} m bajo el mar`;
+    },
     activo: () => tiempo - t0 < 4 || reloj.pendientes > 0,
     mag: v => `${COMUN.num(v, 0)} km/h`,
     linea3: v => { const kg = .5 * 1.2 * ms(v) ** 2 / 9.81, c = COSAS.find(([s]) => s >= v * .99), x = kg < 10 ? COMUN.num(kg, 1) : COMUN.num(kg, 0);

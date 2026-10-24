@@ -381,7 +381,7 @@ window.COMUN = (() => {
     const SUELO = ['oceano', 'lava', 'polvo', 'lluvia', 'incendio'];
     function on(ctx, efecto, si) {
       const T = ctx.THREE; ef = si ? efecto : null;
-      if (!c.vapor) for (const [k, v] of Object.entries({ vapor: 0xf4f1ea, burbuja: 0xcfe8f5, vidrio: 0xd8f4ff, lava: 0xff6a1a, chispa: 0xffd27a, humo: 0x3a302a, polvo: 0x8a7258, fuego: 0xff7a1a, llama: 0xffc040 })) c[k] = new T.Color(v);
+      if (!c.vapor) for (const [k, v] of Object.entries({ vapor: 0xf4f1ea, burbuja: 0xcfe8f5, vidrio: 0xd8f4ff, lava: 0xff6a1a, chispa: 0xffd27a, humo: 0x3a302a, polvo: 0x8a7258, fuego: 0xff7a1a, llama: 0xffc040, teja: 0xb5523b, asfalto: 0x3a3a3e, tierra: 0x6e5a44, arena: 0xe6d49c, raya: 0xffffff })) c[k] = new T.Color(v);
       // los cráteres y cúpulas de polvo tapan el suelo: fuera mientras dura un plano a ras de suelo
       // (se esconden en cada fotograma: al bajar la cámara, el planeta vuelve a enseñar lo que había ocultado)
       if (SUELO.includes(efecto)) { if (si) tapan = ctx.scene.children.filter(ch => ch.userData.fenPropio && ch.geometry && /Circle|Ring|Sphere/.test(ch.geometry.type) && !ch.userData.sobrePlaneta && ch.scale.x > 30);
@@ -393,11 +393,11 @@ window.COMUN = (() => {
       if (efecto === 'lava') tintar(ctx, 0x2a1810, .85, 0xff4a10, si ? .9 : .5);
       if (efecto === 'incendio' && si) tintar(ctx, 0x2a2420, .6, 0xff5a10, .25);
       const sfx = (n, g) => ctx.sfx && ctx.sfx(n, g, 0);
-      if (si) ({ cristales: () => sfx('cristales', .6), oceano: () => sfx('fuego', .5), incendio: () => sfx('fuego', .6), lluvia: () => sfx('impacto', .4), lava: () => sfx('fuego', .4) })[efecto]?.();
+      if (si) ({ vendaval: () => sfx('whoosh', .6), arranca: () => sfx('derrumbe', .6), cristales: () => sfx('cristales', .6), oceano: () => sfx('fuego', .5), incendio: () => sfx('fuego', .6), lluvia: () => sfx('impacto', .4), lava: () => sfx('fuego', .4) })[efecto]?.();
     }
     function tick(ctx, dt) {
       const k = ctx.corte; if (!k || !ef) return;
-      const lejos = !['cristales', 'oceano'].includes(ef), P = lejos ? k.p.clone().lerp(k.t, .45) : k.t, r = Math.max(20, k.p.distanceTo(k.t) * (lejos ? .45 : .8)), e = (a, b) => ctx.rr(a, b);
+      const lejos = !['cristales', 'oceano', 'vendaval', 'arranca'].includes(ef), P = lejos ? k.p.clone().lerp(k.t, .45) : k.t, r = Math.max(20, k.p.distanceTo(k.t) * (lejos ? .45 : .8)), e = (a, b) => ctx.rr(a, b);
       if (tapan) for (const ch of tapan) ch.visible = false;
       if (ef === 'oceano') { // el mar hierve: vapor que sube a chorros y burbujas que saltan
         ctx.skyT.set(0xd9a27a);
@@ -409,6 +409,12 @@ window.COMUN = (() => {
         for (let q = 0; q < 15; q++) ctx.emit(P.x + e(-r, r), ctx.GROUND + e(0, 4), P.z + e(-r, r), e(-1, 1), e(3, 8), e(-1, 1), c.humo, e(2, 4), -1);
       } else if (ef === 'cristales') { // revientan los cristales de la fachada
         for (let q = 0; q < 25; q++) ctx.emit(P.x + e(-1, 1) * 3, P.y + e(-1, 1) * 4, P.z + e(-1, 1) * 6, e(1, 6), e(-2, 3), e(-2, 2), c.vidrio, e(.8, 1.6), 9.8);
+      } else if (ef === 'vendaval' || ef === 'arranca') { // el viento barre la calle hacia x positivo: rayas, arena y tejas (lejos de la cámara, que si no tapan el plano)
+        const h = r * .5;
+        for (let q = 0; q < 30; q++) ctx.emit(P.x + e(-h, h), ctx.GROUND + e(.3, h * .6), P.z + e(-h, h), r * e(2, 3), e(-.5, .5), e(-.5, .5), c.raya, e(.3, .6), 0);
+        for (let q = 0; q < 25; q++) ctx.emit(P.x + e(-h, h), ctx.GROUND + e(0, h * .4), P.z + e(-h, h), r * e(1, 2), e(0, 3), e(-1, 1), q % 2 ? c.arena : c.teja, e(.3, .6), 2);
+        // a velocidades enormes levanta el asfalto y la tierra a trozos
+        if (ef === 'arranca') for (let q = 0; q < 20; q++) ctx.emit(P.x + e(-h, h), ctx.GROUND + .2, P.z + e(-h, h) * .6, r * e(.15, .4), e(3, 9), e(-1, 1), q % 2 ? c.asfalto : c.tierra, e(1.2, 2.4), 4);
       } else if (ef === 'polvo') { // el polvo tapa el Sol: cielo pardo y oscuro, cae ceniza
         ctx.skyT.set(0x3b3128);
         for (let q = 0; q < 50; q++) ctx.emit(P.x + e(-r, r), P.y + e(r * .2, r * .8), P.z + e(-r, r), e(-1, 1), -e(1, 3), e(-1, 1), c.polvo, e(2, 4), 0);
