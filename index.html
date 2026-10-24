@@ -50,6 +50,8 @@
   #question { position: absolute; left: 7%; right: 7%; top: 30%; text-align: center; font-family: 'Archivo Black', Inter, sans-serif;
     font-size: 1.45em; line-height: 1.15; opacity: 0; transition: opacity .7s; pointer-events: none; }
   #question.on { opacity: 1; }
+  #flash { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; transition: opacity .35s; }
+  #flash.on { opacity: .85; transition: none; }
   #end { position: absolute; left: 6%; right: 6%; top: 36%; text-align: center; opacity: 0; transition: opacity 1s; pointer-events: none; }
   #end.on { opacity: 1; }
   #end .a { font-family: 'Archivo Black', Inter, sans-serif; font-size: 2em; }
@@ -101,6 +103,7 @@
   <div id="big" class="t"></div>
   <div id="question" class="t"></div>
   <div id="caption" class="t"></div>
+  <div id="flash"></div>
   <div id="end" class="t"><div class="a"></div><div class="b"></div></div>
   <div id="hint" class="t"></div>
   <div id="toast"></div>
@@ -771,6 +774,9 @@ let sigue = null; const camVP = new THREE.Vector3(), camVT = new THREE.Vector3()
 function camSigue(pos, tgt) { if (tween) tween = null; if (!sigue) { camVP.set(0, 0, 0); camVT.set(0, 0, 0); } sigue = { p: new THREE.Vector3(...pos), t: new THREE.Vector3(...tgt) }; }
 function muelle(x, v, meta, w, dt) { const a = meta.clone().sub(x).multiplyScalar(w * w).addScaledVector(v, -2 * w); v.addScaledVector(a, dt); x.addScaledVector(v, dt); }
 function pushCamera(dx, dy, dz) { for (const v of [camPos, camTgt, ...(tween ? [tween.p0, tween.p1, tween.t0, tween.t1] : []), ...(sigue ? [sigue.p, sigue.t] : [])]) { v.x += dx; v.y += dy; v.z += dz; } }
+// plano de corte (f.inserto = { pos, mira, t, dur, efecto, rel }): durante unos segundos se corta a otro plano que enseña
+// lo que dice la frase (el océano hirviendo, los cristales que revientan...) y luego se vuelve al plano principal
+let corte = null;
 function updateCamera(dt, time) {
   if (sigue) { const w = ESC.suave ?? 1.3; for (let s = 0; s < 4; s++) { muelle(camPos, camVP, sigue.p, w, dt / 4); muelle(camTgt, camVT, sigue.t, w, dt / 4); } }
   if (tween) { tween.t += dt; const k = easeInOut(clamp(tween.t / tween.dur, 0, 1));
@@ -782,19 +788,23 @@ function updateCamera(dt, time) {
   camera.position.copy(camTgt).add(off);
   if (shake > 0) { camera.position.x += rr(-1, 1) * shake; camera.position.y += rr(-1, 1) * shake; }
   camera.lookAt(camTgt);
-  camera.near = clamp(camDist * .0015, .3, 200); camera.far = Math.max(60000, camDist * 30); camera.updateProjectionMatrix();
-  const fd = Math.max(camDist, camPos.y * 1.5); // con la cámara muy alta el suelo está lejos aunque mire a un punto cercano
+  if (corte) { corte.k += dt / corte.dur; const p = corte.p.clone().lerp(corte.t, Math.min(1, corte.k) * .12); // se acerca despacio
+    camera.position.copy(p); if (shake > 0) { camera.position.x += rr(-1, 1) * shake * .3; camera.position.y += rr(-1, 1) * shake * .3; } camera.lookAt(corte.t); }
+  const cd = corte ? corte.p.distanceTo(corte.t) : camDist;
+  camera.near = clamp(cd * .0015, .3, 200); camera.far = Math.max(60000, cd * 30); camera.updateProjectionMatrix();
+  const fd = corte ? Math.max(cd, corte.p.y * 1.5) : Math.max(camDist, camPos.y * 1.5); // con la cámara muy alta el suelo está lejos aunque mire a un punto cercano
   scene.fog.near = fd * 1.2; scene.fog.far = fd * (camPos.y > 20000 ? 14 : 9);
-  for (const P of pools) P.mat.size = clamp(camDist * .0085, .7, 4000);
+  for (const P of pools) P.mat.size = clamp(cd * .0085, corte ? .15 : .7, 4000);
   updateShadow();
 }
 // la cámara de sombras abarca lo que se ve; muy arriba se lleva lejos para no gastar (todo queda iluminado)
 let shadowOn = true;
 function updateShadow() {
   if (BAJO) return;
-  const on = camPos.y < 3000 && camDist < 3500, sc = sun.shadow.camera;
-  if (on) { const half = clamp(camDist * 1.7, 60, 4500);
-    sun.target.position.copy(camTgt); sun.position.copy(camTgt).addScaledVector(SUN_DIR, half * 3 + 800);
+  const cp = corte ? corte.p : camPos, ct = corte ? corte.t : camTgt, cdist = cp.distanceTo(ct);
+  const on = cp.y < 3000 && cdist < 3500, sc = sun.shadow.camera;
+  if (on) { const half = clamp(cdist * 1.7, 60, 4500);
+    sun.target.position.copy(ct); sun.position.copy(ct).addScaledVector(SUN_DIR, half * 3 + 800);
     sc.left = sc.bottom = -half; sc.right = sc.top = half; sc.near = 1; sc.far = half * 6 + 2000; sc.updateProjectionMatrix();
     sun.shadow.normalBias = half / 4096 * 1.5; renderer.shadowMap.autoUpdate = true; }
   else if (shadowOn) { sun.target.position.set(0, -1e7, 0); sun.position.copy(sun.target.position).addScaledVector(SUN_DIR, 100); renderer.shadowMap.needsUpdate = true; renderer.shadowMap.autoUpdate = false; }
@@ -886,7 +896,7 @@ const ctx = {
   THREE, scene, camera, renderer, cityGroup, objects, inst, people, GROUND, groundAt, terrainY, emit, addDebris, derribar,
   mat, BOX, VMAT, R, rr, lerp, clamp, smooth, hash, fmt, sun, hemi, skyT, seaNear, camTo, pushCamera, camPos, camTgt, boom, rumble,
   C: { glass: C_GLASS, foam: C_FOAM, spray: C_SPRAY, dust: C_DUST }, escenario: ESC,
-  setShake(v) { shake = v; }, get camDist() { return camDist; }, get caidos() { return fallen; }, get total() { return cityTotal; },
+  setShake(v) { shake = v; }, get camDist() { return corte ? corte.p.distanceTo(corte.t) : camDist; }, get corte() { return corte; }, get caidos() { return fallen; }, get total() { return cityTotal; },
   get audio() { return { AC, master }; }, sfx, cama, camSigue, merge: mergeGeometries,
 };
 FEN.crear(ctx);
@@ -978,6 +988,7 @@ function nextPhase() {
   if (RITMO && SON?.paso) sfx(SON.paso, SON.pasoGan ?? .5);
   voz(phase);
 }
+function destello() { const e = $('flash'); e.classList.add('on'); void e.offsetWidth; espera(() => e.classList.remove('on'), 60); }
 function advance() { if (state === 'intro' && introT > .6) nextPhase(); else if (state === 'phase' && phaseTime > .8) nextPhase(); }
 $('play').onclick = e => { e.stopPropagation(); start(); };
 stage.addEventListener('pointerdown', e => { if (state !== 'menu') advance(); });
@@ -1003,6 +1014,12 @@ function tick(dt) {
   if (state === 'intro') { introT += dt; if (introT > Math.max(ESC.introDur ?? 2.6, (vozDur[0] ?? 0) + .4) && auto) nextPhase(); }
   if (state === 'phase') { phaseTime += dt;
     const act = FEN.activo(); if (wasActive && !act) rumble(0); wasActive = act; idleT = act ? 0 : idleT + dt;
+    const fi = ESC.fases[phase - 1]?.inserto;
+    if (fi && !corte && !fi._hecho && phaseTime >= (fi.t ?? 1)) { fi._hecho = true;
+      const c = fi.rel && FEN.camara ? FEN.camara({ pos: fi.pos, mira: fi.mira }, phase) : fi;
+      corte = { p: new THREE.Vector3(...c.pos), t: new THREE.Vector3(...c.mira), k: 0, dur: fi.dur ?? 1.8, fin: phaseTime + (fi.dur ?? 1.8), efecto: fi.efecto, fase: phase };
+      FEN.inserto && FEN.inserto(ctx, fi.efecto, true); destello(); }
+    if (corte && (phaseTime >= corte.fin || phase !== corte.fase)) { FEN.inserto && FEN.inserto(ctx, corte.efecto, false); corte = null; destello(); }
     if (auto && phase < NF && (RITMO ? phaseTime > durPaso() : idleT > AUTO_EXTRA)) nextPhase();
     if (phase === NF && !ended && (RITMO ? phaseTime > durPaso() : idleT > .3)) { ended = true; $('end').classList.add('on'); cap.classList.remove('on'); }
   }
@@ -1150,7 +1167,7 @@ try { if (sessionStorage.getItem('exportando') && params.get('exportar') !== '1'
 if (GRABAR && params.get('exportar') === '1') { $('menu').classList.add('off'); exportar().catch(e => { try { sessionStorage.removeItem('exportando'); } catch (x) {} $('exporta').querySelector('.txt').textContent = 'Error: ' + e.message; console.error(e); }); }
 
 frame();
-window.__game = { nextPhase, dbg: { bloom: () => bloom, scene, renderer, skyU, sun, pools, camTo, camPos, camTgt }, start, pause(v) { paused = v; }, step(sec) { for (let t = 0; t < sec; t += 1 / 30) tick(1 / 30); },
+window.__game = { nextPhase, dbg: { bloom: () => bloom, scene, renderer, skyU, sun, pools, camTo, camPos, camTgt, camera, THREE }, start, pause(v) { paused = v; }, step(sec) { for (let t = 0; t < sec; t += 1 / 30) tick(1 / 30); },
   render() { if (composer) composer.render(); else renderer.render(scene, camera); }, get ended() { return ended; }, get time() { return time; },
   async audio() { return AC && AC.startRendering ? wav(await AC.startRendering()) : null; }, get phase() { return phase; }, get fallen() { return fallen; } };
 </script>

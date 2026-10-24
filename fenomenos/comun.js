@@ -151,6 +151,8 @@ window.COMUN = (() => {
       // el planeta aparece cuando la cámara se aleja lo bastante; el resto de la escena se oculta
       update(dt) {
         const lejos = forzado || ctx.camera.position.distanceTo(g.position) > RT + 6e5;
+        // si la cámara vuelve cerca del suelo (un plano de corte), se ve otra vez la ciudad
+        if (!lejos && g.visible && ocultos) { g.visible = false; for (const ch of ocultos) ch.visible = true; ocultos = null; }
         if (lejos && !g.visible) { g.visible = true; ocultos = [];
           for (const ch of ctx.scene.children) if (ch !== g && ch.visible && !ch.isLight && !ch.isPoints && !ch.userData.sobrePlaneta) { ch.visible = false; ocultos.push(ch); } }
         if (splitV) { split = Math.min(1, split + dt * splitV); const e = 1 - Math.pow(1 - split, 2);
