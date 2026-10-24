@@ -91,6 +91,7 @@ window.FENOMENOS.meteorito = (() => {
 
   function actualizar(c, dt, t) {
     tiempo = t; reloj.tick(t); yo.actualizar(dt, t);
+    COMUN.corte.tick(ctx, dt);
     const k = 1 - Math.exp(-dt * 1.6); polvo += (polvoObj - polvo) * k; brasa += (brasaObj - brasa) * k;
     // la roca en caída, con su estela de fuego y humo
     if (cayendo && roca.g.visible) {
@@ -112,13 +113,24 @@ window.FENOMENOS.meteorito = (() => {
     // columna de polvo y fuego sobre el cráter mientras dura
     if (polvo > .05 && !planeta) for (let q = 0; q < 6 * polvo; q++) ctx.emit(IMPACTO.x + ctx.rr(-1, 1) * D * 4, ctx.GROUND + ctx.rr(0, 30), IMPACTO.z + ctx.rr(-1, 1) * D * 4,
       ctx.rr(-4, 4), ctx.rr(10, 40) * (1 + D / 64), ctx.rr(-4, 4), ctx.R() < .3 ? col.fuego : col.humo, ctx.rr(3, 6), -1);
-    ctx.skyT.set(cieloObj);
+    if (!ctx.corte) ctx.skyT.set(cieloObj);
     if (!planeta && t - t0 > 1.8) ctx.setShake(0);
     if (planeta) { planeta.update(dt); planeta.teñir(0x3a3430, brasa * .85, 0xff5a1a, brasa * .12); planeta.nubes.material.color.set(0xffffff).lerp(col.polvo, polvo * .8); }
   }
 
   return {
-    crear, fase, actualizar, sinBoom: true, camara: c => yo.camara(c),
+    crear, fase, actualizar, sinBoom: true, camara: c => yo.camara(c), inserto: (ctx, ef, on) => COMUN.corte.on(ctx, ef, on),
+    // daños a escala real (los de la ciudad del juego son de juguete). Hasta ~25 m explotan en el aire, muy alto.
+    // Al llegar al suelo: cráter ≈ 20 veces el diámetro, arrasa (≈ 5 psi) 4,7 m·kg^⅓, cristales rotos (≈ 0,5 psi) 24 m·kg^⅓,
+    // ≈ 1.000 edificios por km² si cae en una ciudad
+    danos: () => {
+      const n = COMUN.num, EN = COMUN.EN, d = m => m >= 1000 ? `${n(m / 1000, m < 1e4 ? 1 : 0)} km` : `${n(m, 0)} m`;
+      const kg = .5 * 3000 * Math.PI / 6 * D ** 3 * 2e4 ** 2 / COMUN.TNT_J * 1000, R5 = 4.7 * Math.cbrt(kg), R1 = 24 * Math.cbrt(kg);
+      if (D <= 8) { const h = D <= 1 ? 55 : D <= 2 ? 50 : D <= 4 ? 42 : 35; return EN ? `Explodes ${h} km up · the ground is untouched` : `Explota a ${h} km de altura · el suelo, intacto`; }
+      if (D <= 32) { const h = D <= 16 ? 27 : 12; return EN ? `Explodes ${h} km up · glass breaks up to ${d(R1)} away` : `Explota a ${h} km de altura · cristales rotos hasta ${d(R1)}`; }
+      const ed = Math.PI * (R5 / 1000) ** 2 * 1000, zona = R5 < 3e4 ? (EN ? ` (≈ ${ed >= 1e6 ? COMUN.grande(ed) + ' ' : n(ed, 0) + ' '}buildings)` : ` (≈ ${ed >= 1e6 ? COMUN.grande(ed) + COMUN.DE : n(ed, 0) + ' '}edificios)`) : '';
+      return EN ? `${d(D * 20)} crater · flattens ${d(R5)} around${zona}` : `Cráter de ${d(D * 20)} · arrasa ${d(R5)} a la redonda${zona}`;
+    },
     activo: () => tiempo - t0 < 4.5 || reloj.pendientes > 0,
     tnt: d => .5 * 3000 * Math.PI / 6 * d ** 3 * 2e4 ** 2 / COMUN.TNT_J,
     mag: d => d >= 1000 ? `${COMUN.num(d / 1000, d % 1000 ? 1 : 0)} km` : `${COMUN.num(d, 0)} m`,

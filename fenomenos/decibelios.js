@@ -81,6 +81,9 @@ window.FENOMENOS.decibelios = (() => {
   function fase(ctx, n, valor, f) {
     dB = valor; t0 = tiempo; fActual = f; caidos0 = ctx.caidos;
     if (dB >= 150 || f.espacio || f.final) andar = false;
+    // antes de la onda expansiva, unos coches aparcados en su calle para verlos salir volando (plano de corte de 200 dB)
+    if (dB === 190) { const P = pos(); ctx.objects.filter(o => o.kind === 'car' && o.state !== 2).slice(0, 6).forEach((o, k) => {
+      o.x = k % 2 ? 4.2 : -4.2; o.z = P.z + 6 + k * 5; o.g.position.set(o.x, ctx.GROUND, o.z); o.g.rotation.y = k % 2 ? 0 : Math.PI; }); }
     burbuja.textContent = COMUN.EN ? 'BOMBOCLAT!' : '¡BOMBOCLAT!';
     if (f.final) { // en el espacio no hay sonido: el protagonista flota entre los restos
       const T = ctx.THREE; astronauta = COMUN.heroe(ctx, 0xd8282f); astronauta.userData.andar(1.2, .9); astronauta.scale.setScalar(1300); astronauta.userData.fenPropio = true; ctx.scene.add(astronauta);
@@ -152,6 +155,7 @@ window.FENOMENOS.decibelios = (() => {
     const fig = quien.children[0]; fig.position.y = andar ? Math.abs(Math.sin(t * 5)) * .05 : 0; fig.userData.andar(t * 5, andar ? 1 : 0);
     quien.rotation.y = 0;
     ctx.skyT.set(fActual.espacio || fActual.planeta || fActual.final ? 0x05070c : dB >= 230 ? 0xc9b89a : dB >= 200 && e > .4 ? 0xb9c4c8 : 0x9fd3f0);
+    COMUN.corte.tick(ctx, dt);
     // boca abierta y burbuja mientras grita
     const env = envBoca[toma], iB = Math.floor((e - .25) * 30 * rateGrito), vB = env && iB >= 0 && iB < env.length ? env[iB] : 0;
     const grita = e > .25 && (env ? iB < env.length : e < 1.1) && !fActual.final;
@@ -206,8 +210,11 @@ window.FENOMENOS.decibelios = (() => {
     }
   }
 
+  // planos de corte (los efectos están en COMUN.corte); la cúpula y las grietas son para verse desde el espacio
+  function insertoFn(ctx, efecto, on) { if (cupula) cupula.visible = !on; if (grietas) grietas.visible = !on; COMUN.corte.on(ctx, efecto, on); }
+
   return {
-    sinBoom: true,
+    sinBoom: true, inserto: insertoFn,
     crear, fase, actualizar, camara,
     activo: () => tiempo - t0 < (dB >= 200 ? 4 : 2) || (planeta && explota && planeta.split < .9),
     mag: v => `${COMUN.num(v, 0)} dB`,
@@ -217,10 +224,20 @@ window.FENOMENOS.decibelios = (() => {
       if (W < 1e3) return [`${EN ? 'Power' : 'Potencia'}: ${W < 1 ? COMUN.num(W * 1e3, W < 1e-2 ? 3 : 1) + (EN ? ' milliwatts' : ' milivatios') : COMUN.num(W) + (EN ? ' watts' : ' vatios')}`];
       return [`${EN ? 'Energy' : 'Energía'} ≈ ${COMUN.textoTNT(t)} ${EN ? 'per second' : 'por segundo'}`];
     },
+    // datos de destrucción a escala real (los de la ciudad del juego son de juguete):
+    // se trata cada segundo de grito como una explosión de esa energía y se escala con la raíz cúbica (como en las tablas de explosivos)
+    // · arrasa (≈ 5 psi): 4,7 m·kg^⅓   · cristales rotos (≈ 0,5 psi): 24 m·kg^⅓   · ≈ 1.000 edificios por km² en una ciudad
+    // por debajo de 170 dB: hasta dónde se oye (baja 6 dB cada vez que se duplica la distancia, hasta 30 dB, un susurro)
     danos: () => {
-      const v = ventanas, c = ctxRef.caidos, n = COMUN.num, EN = COMUN.EN; if (!v && !c) return '';
-      return EN ? `${n(v, 0)} window${v === 1 ? '' : 's'} broken · ${n(c, 0)} building${c === 1 ? '' : 's'} down`
-        : `${n(v, 0)} ventana${v === 1 ? '' : 's'} rota${v === 1 ? '' : 's'} · ${n(c, 0)} edificio${c === 1 ? '' : 's'} caído${c === 1 ? '' : 's'}`;
+      const n = COMUN.num, EN = COMUN.EN, d = m => m >= 1000 ? `${n(m / 1000, m < 1e4 ? 1 : 0)} km` : `${n(m, 0)} m`;
+      if (fActual.final) return '';
+      if (fActual.planeta) return EN ? 'Planet Earth: destroyed' : 'Planeta Tierra: destruido';
+      if (dB < 170) { const r = Math.pow(10, (dB - 30) / 20); return EN ? `Heard up to ${d(r)} away` : `Se oye hasta a ${d(r)}`; }
+      const kg = vatios(dB) / COMUN.TNT_J * 1000, R5 = 4.7 * Math.cbrt(kg), R1 = 24 * Math.cbrt(kg);
+      if (R5 > 2e6) return EN ? 'Destruction across the whole planet' : 'Destrucción en todo el planeta';
+      const ed = Math.PI * (R5 / 1000) ** 2 * 1000, e = ed >= 1e6 ? COMUN.grande(ed) + COMUN.DE : n(ed, 0) + ' ';
+      return EN ? `Flattens ${d(R5)} around${ed >= 1 ? ` (≈ ${e}buildings)` : ''} · glass breaks up to ${d(R1)}`
+        : `Arrasa ${d(R5)} a la redonda${ed >= 1 ? ` (≈ ${e}edificios)` : ''} · cristales rotos hasta ${d(R1)}`;
     },
   };
 })();

@@ -151,6 +151,8 @@ window.COMUN = (() => {
       // el planeta aparece cuando la cámara se aleja lo bastante; el resto de la escena se oculta
       update(dt) {
         const lejos = forzado || ctx.camera.position.distanceTo(g.position) > RT + 6e5;
+        // si la cámara vuelve cerca del suelo (un plano de corte), se ve otra vez la ciudad
+        if (!lejos && g.visible && ocultos) { g.visible = false; for (const ch of ocultos) ch.visible = true; ocultos = null; }
         if (lejos && !g.visible) { g.visible = true; ocultos = [];
           for (const ch of ctx.scene.children) if (ch !== g && ch.visible && !ch.isLight && !ch.isPoints && !ch.userData.sobrePlaneta) { ch.visible = false; ocultos.push(ch); } }
         if (splitV) { split = Math.min(1, split + dt * splitV); const e = 1 - Math.pow(1 - split, 2);
@@ -371,5 +373,57 @@ window.COMUN = (() => {
     };
   }
 
-  return { TNT_J, RT, EN, DE, num, grande, textoTNT, comparaTNT, materiales, tintar, derribar, edificios, planeta, estallarPlaneta, multitud, persona, heroe, protagonista, geoHumano, materialGente, moverGente, tono, ruido, reloj };
+  // ---------- planos de corte ----------
+  // Efectos para los planos de corte (f.inserto.efecto): lo que pasa a ras de suelo mientras el plano principal está lejos.
+  // on(ctx, efecto, true/false) al entrar y salir del plano; tick(ctx, dt) en cada fotograma, desde actualizar.
+  const corte = (() => {
+    let ef = null, tapan = null; const c = {};
+    const SUELO = ['oceano', 'lava', 'polvo', 'lluvia', 'incendio'];
+    function on(ctx, efecto, si) {
+      const T = ctx.THREE; ef = si ? efecto : null;
+      if (!c.vapor) for (const [k, v] of Object.entries({ vapor: 0xf4f1ea, burbuja: 0xcfe8f5, vidrio: 0xd8f4ff, lava: 0xff6a1a, chispa: 0xffd27a, humo: 0x3a302a, polvo: 0x8a7258, fuego: 0xff7a1a, llama: 0xffc040 })) c[k] = new T.Color(v);
+      // los cráteres y cúpulas de polvo tapan el suelo: fuera mientras dura un plano a ras de suelo
+      // (se esconden en cada fotograma: al bajar la cámara, el planeta vuelve a enseñar lo que había ocultado)
+      if (SUELO.includes(efecto)) { if (si) tapan = ctx.scene.children.filter(ch => ch.userData.fenPropio && ch.geometry && /Circle|Ring|Sphere/.test(ch.geometry.type) && !ch.userData.sobrePlaneta && ch.scale.x > 30);
+        else if (tapan) { for (const ch of tapan) ch.visible = true; tapan = null; } }
+      if (efecto === 'oceano') { const m = ctx.seaNear.material; if (si) { m.color.set(0x7fa3b2); m.emissive.set(0x1c2a30); m.roughness = .35; m.metalness = 0; } else { m.emissive.set(0x000000); m.roughness = .12; m.metalness = .2; } }
+      // luz: con el polvo apenas llega el Sol; con fuego, un poco menos
+      const luz = { polvo: .25, lluvia: .55, incendio: .6, lava: .5 }[efecto];
+      if (luz) { if (si) { c.luz = [ctx.sun.intensity, ctx.hemi.intensity]; ctx.sun.intensity *= luz; ctx.hemi.intensity *= luz; } else if (c.luz) { [ctx.sun.intensity, ctx.hemi.intensity] = c.luz; c.luz = null; } }
+      if (efecto === 'lava') tintar(ctx, 0x2a1810, .85, 0xff4a10, si ? .9 : .5);
+      if (efecto === 'incendio' && si) tintar(ctx, 0x2a2420, .6, 0xff5a10, .25);
+      const sfx = (n, g) => ctx.sfx && ctx.sfx(n, g, 0);
+      if (si) ({ cristales: () => sfx('cristales', .6), oceano: () => sfx('fuego', .5), incendio: () => sfx('fuego', .6), lluvia: () => sfx('impacto', .4), lava: () => sfx('fuego', .4) })[efecto]?.();
+    }
+    function tick(ctx, dt) {
+      const k = ctx.corte; if (!k || !ef) return;
+      const lejos = !['cristales', 'oceano'].includes(ef), P = lejos ? k.p.clone().lerp(k.t, .45) : k.t, r = Math.max(20, k.p.distanceTo(k.t) * (lejos ? .45 : .8)), e = (a, b) => ctx.rr(a, b);
+      if (tapan) for (const ch of tapan) ch.visible = false;
+      if (ef === 'oceano') { // el mar hierve: vapor que sube a chorros y burbujas que saltan
+        ctx.skyT.set(0xd9a27a);
+        for (let q = 0; q < 110; q++) ctx.emit(P.x + e(-r, r), e(0, 2), P.z + e(-r, r * .9), e(-1, 1), e(3, 10), e(-1, 1), c.vapor, e(2, 4), -1.2);
+        for (let q = 0; q < 60; q++) ctx.emit(P.x + e(-r, r) * .5, .4, P.z + e(-r * .2, r * .9), e(-.6, .6), e(1.5, 4), e(-.6, .6), c.burbuja, e(.3, .6), 9.8);
+      } else if (ef === 'lava') { // el suelo se derrite: brilla al rojo y salta lava
+        ctx.skyT.set(0x2a0d06);
+        for (let q = 0; q < 40; q++) ctx.emit(P.x + e(-r, r), ctx.GROUND + .5, P.z + e(-r, r), e(-2, 2), e(3, 10), e(-2, 2), ctx.R() < .5 ? c.lava : c.chispa, e(.6, 1.4), 9.8);
+        for (let q = 0; q < 15; q++) ctx.emit(P.x + e(-r, r), ctx.GROUND + e(0, 4), P.z + e(-r, r), e(-1, 1), e(3, 8), e(-1, 1), c.humo, e(2, 4), -1);
+      } else if (ef === 'cristales') { // revientan los cristales de la fachada
+        for (let q = 0; q < 25; q++) ctx.emit(P.x + e(-1, 1) * 3, P.y + e(-1, 1) * 4, P.z + e(-1, 1) * 6, e(1, 6), e(-2, 3), e(-2, 2), c.vidrio, e(.8, 1.6), 9.8);
+      } else if (ef === 'polvo') { // el polvo tapa el Sol: cielo pardo y oscuro, cae ceniza
+        ctx.skyT.set(0x3b3128);
+        for (let q = 0; q < 50; q++) ctx.emit(P.x + e(-r, r), P.y + e(r * .2, r * .8), P.z + e(-r, r), e(-1, 1), -e(1, 3), e(-1, 1), c.polvo, e(2, 4), 0);
+      } else if (ef === 'lluvia') { // llueve roca fundida: bolas de fuego que caen en diagonal y estallan
+        ctx.skyT.set(0x5a2a18);
+        for (let q = 0; q < 14; q++) ctx.emit(P.x + e(-r, r) - r * .4, P.y + r * e(.6, 1.2), P.z + e(-r, r), r * .25, -r * e(.5, .8), e(-2, 2), ctx.R() < .6 ? c.fuego : c.llama, e(1, 2), 9.8);
+        for (let q = 0; q < 20; q++) ctx.emit(P.x + e(-r, r), ctx.GROUND + .5, P.z + e(-r, r), e(-3, 3), e(2, 8), e(-3, 3), c.chispa, e(.4, .9), 9.8);
+      } else if (ef === 'incendio') { // todo arde: llamas y humo negro
+        ctx.skyT.set(0x7a2a10);
+        for (let q = 0; q < 60; q++) ctx.emit(P.x + e(-r, r), ctx.GROUND + e(0, 3), P.z + e(-r, r), e(-1, 1), e(3, 9), e(-1, 1), ctx.R() < .5 ? c.fuego : c.llama, e(.6, 1.3), -2);
+        for (let q = 0; q < 25; q++) ctx.emit(P.x + e(-r, r), ctx.GROUND + e(3, 10), P.z + e(-r, r), e(-1, 1), e(4, 9), e(-1, 1), c.humo, e(2, 4), -1);
+      }
+    }
+    return { on, tick };
+  })();
+
+  return { corte, TNT_J, RT, EN, DE, num, grande, textoTNT, comparaTNT, materiales, tintar, derribar, edificios, planeta, estallarPlaneta, multitud, persona, heroe, protagonista, geoHumano, materialGente, moverGente, tono, ruido, reloj };
 })();
