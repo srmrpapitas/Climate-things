@@ -38,7 +38,10 @@ window.ESCENARIOS = window.ESCENARIOS || {};
       P(T('DOS KILÓMETROS', 'TWO KILOMETRES'), T('Seiscientos gigatones. Llueve roca fundida sobre medio planeta.', 'Six hundred gigatons. Molten rock rains down on half the planet.'), C([0, 9e6, 1.5e7], ESP), { inserto: { pos: [-90, 80, 40], mira: [0, 0, 400], t: 2.5, dur: 2, efecto: 'lluvia' }, planeta: true }),
       P(T('CUATRO KILÓMETROS', 'FOUR KILOMETRES'), T('Cinco mil gigatones. El cielo arde y se queman los bosques del mundo.', 'Five thousand gigatons. The sky burns and the world\'s forests catch fire.'), C([0, 9e6, 1.5e7], ESP), { inserto: { pos: [-70, 50, 70], mira: [0, 0, 400], t: 2.5, dur: 2, efecto: 'incendio' }, planeta: true }),
       P(T('COMO EL DE LOS DINOSAURIOS', 'LIKE THE DINOSAUR KILLER'), T('Cuarenta mil gigatones. Hace 66 millones de años, uno así acabó con los dinosaurios.', 'Forty thousand gigatons. 66 million years ago, one like this wiped out the dinosaurs.'), C([0, 9e6, 1.5e7], ESP), { planeta: true, dur: 4.8 }),
+      // el último salta de golpe: uno casi del tamaño de la Tierra, con más energía de la que mantiene unido el planeta (≈ 2,2·10³² J)
+      P(T('CASI OTRA TIERRA', 'ALMOST ANOTHER EARTH'), T('Diez mil kilómetros, casi otra Tierra. Más energía de la que mantiene unido el planeta. La Tierra se parte en dos.', 'Ten thousand kilometres, almost another Earth. More energy than holds the planet together. Earth splits in two.'),
+        C([0, 6e6, 3.2e7], ESP), { valor: 1e7, planeta: true, dur: 8, sfx: [['riser', .6, 0]], camas: { dron: .35, espacio: .3 } }),
     ],
-    cierre: { titulo: T('Que vuelvan los dinosaurios.', 'Bring back the dinosaurs.'), pregunta: T('¿Qué duplicamos ahora? 👇', 'What should we double next? 👇') },
+    cierre: { titulo: T('Por lo menos los dinosaurios no lo vieron.', 'At least the dinosaurs missed this one.'), pregunta: T('¿Qué duplicamos ahora? 👇', 'What should we double next? 👇') },
   };
 })();

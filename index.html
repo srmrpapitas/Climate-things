@@ -921,7 +921,7 @@ function updateHUD(dt) {
   if (tntT < 1) { tntT = Math.min(1, tntT + dt / 1.6); const k = 1 - Math.pow(1 - tntT, 3);
     tntShown = Math.exp(lerp(Math.log(tntFrom), Math.log(tntTo), k));
     hud.querySelector('.tnt').textContent = textoTNT(tntShown); const cmp = textoCmp(tntShown); hud.querySelector('.cmp').textContent = cmp ? `(${cmp})` : ''; }
-  if (phase > 0) hud.querySelector('.dmg').textContent = FEN.danos ? FEN.danos() : T(`${fmt(fallen, 0)} edificios caídos · ${fmt(Math.round(100 * fallen / cityTotal), 0)} % de la ciudad`, `${fmt(fallen, 0)} buildings down · ${fmt(Math.round(100 * fallen / cityTotal), 0)}% of the city`);
+  if (phase > 0) hud.querySelector('.dmg').textContent = FEN.danos ? FEN.danos(fallen, cityTotal) : T(`${fmt(fallen, 0)} edificios caídos · ${fmt(Math.round(100 * fallen / cityTotal), 0)} % de la ciudad`, `${fmt(fallen, 0)} buildings down · ${fmt(Math.round(100 * fallen / cityTotal), 0)}% of the city`);
 }
 const labelsEl = $('labels'), labels = (ESC.marcas || []).map(mk => { const e = document.createElement('div'); e.className = 'lbl t'; e.textContent = mk.texto; labelsEl.appendChild(e); return { ...mk, e, v: new THREE.Vector3(...mk.pos) }; });
 function updateLabels() { const r = stage.getBoundingClientRect(), placed = [];
@@ -1018,8 +1018,8 @@ function tick(dt) {
   if (state === 'phase') { phaseTime += dt;
     const act = FEN.activo(); if (wasActive && !act) rumble(0); wasActive = act; idleT = act ? 0 : idleT + dt;
     const fi = ESC.fases[phase - 1]?.inserto;
-    if (fi && !corte && !fi._hecho && phaseTime >= (fi.t ?? 1)) { fi._hecho = true;
-      const c = fi.rel && FEN.camara ? FEN.camara({ pos: fi.pos, mira: fi.mira }, phase) : fi;
+    if (fi && !corte && phaseTime >= (fi.t ?? 1) && phaseTime - dt < (fi.t ?? 1)) { // una vez por fase, también al repetir
+      const c = (fi.plano && FEN.plano && FEN.plano(ctx, fi)) || (fi.rel && FEN.camara ? FEN.camara({ pos: fi.pos, mira: fi.mira }, phase) : fi); // plano: el fenómeno elige a qué mirar
       corte = { p: new THREE.Vector3(...c.pos), t: new THREE.Vector3(...c.mira), k: 0, dur: fi.dur ?? 1.8, fin: phaseTime + (fi.dur ?? 1.8), efecto: fi.efecto, fase: phase };
       FEN.inserto && FEN.inserto(ctx, fi.efecto, true); destello(); }
     if (corte && (phaseTime >= corte.fin || phase !== corte.fase)) { FEN.inserto && FEN.inserto(ctx, corte.efecto, false); corte = null; destello(); }
