@@ -113,7 +113,7 @@
       if (n === 2) yo.est.hablar = .5; else yo.est.hablar = 0;
       if (n >= 3 && !yo.est.caer) { yo.g.rotation.y = 0; yo.est.lento = 1; } },
     actualizar(c, dt, t) {
-      yo.actualizar(dt, t);
+      yo.actualizar(dt, t); COMUN.corte.tick(ctx, dt);
       if (!w) return;
       if (!yo.est.caer && w.zf > yo.g.position.z - 1.5) { yo.est.caer = true; yo.g.rotation.y = Math.PI; } // la ola lo alcanza
       w.update(dt);
@@ -125,6 +125,14 @@
       ctx.setShake(w.t < w.T && w.h0 > 3 ? Math.min(w.h0 * .006, ctx.camDist * .004) * Math.max(0, 1 - Math.abs(w.zf - ctx.camPos.z) / (w.h0 * 25 + 200)) : 0);
     },
     activo() { return !!w && w.t < w.T; },
+    inserto: (c, ef, on) => COMUN.corte.on(c, ef, on),
+    // a escala real: el frente avanza a ≈ √(g·h) y al pie empuja ρ·g·h (un metro de agua = una tonelada por m²)
+    danos(caidos = 0) {
+      if (!w) return ''; const h = w.hTo ?? w.h0, EN = COMUN.EN, n = COMUN.num, v = 3.6 * Math.sqrt(9.81 * h), t = h;
+      const vel = EN ? `moves at ${n(v, 0)} km/h` : `avanza a ${n(v, 0)} km/h`, emp = EN ? `${n(t, t < 10 && t % 1 ? 1 : 0)} t per m² at the base` : `${n(t, t < 10 && t % 1 ? 1 : 0)} t por m² al pie`;
+      const ed = caidos > 0 ? (EN ? `${n(caidos, 0)} buildings down` : `${n(caidos, 0)} edificios caídos`) : '';
+      const l = [vel, emp, ed].filter(Boolean).join(' · '); return l[0].toUpperCase() + l.slice(1);
+    },
     // altura: con decimales por debajo de 10 m
     mag(h) { return `${ctx.fmt(h, h < 10 && h % 1 ? 1 : 0)} m`; },
     // energía potencial de la ola sobre la costa: ½ · ρ · g · h² · área, en toneladas de TNT (1 t = 4,184·10⁹ J)
