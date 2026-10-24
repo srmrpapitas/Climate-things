@@ -23,6 +23,9 @@ window.FENOMENOS.calor = (() => {
     if (ctx.R() < .3) ctx.emit(x, y + 3 * s, z, ctx.rr(-1, 1) * s, ctx.rr(6, 12) * s, ctx.rr(-1, 1) * s, temp.humo, ctx.rr(2, 4), -1.5 * s);
   }
 
+  const FUNDE = [[0, 'el hielo', 'ice'], [32, 'la mantequilla', 'butter'], [327, 'el plomo', 'lead'], [660, 'el aluminio', 'aluminium'], [1085, 'el cobre', 'copper'],
+    [1200, 'la roca', 'rock'], [1538, 'el hierro', 'iron'], [3422, 'el tungsteno', 'tungsten']];
+  const HIERVE = [[100, 'el agua', 'water'], [1749, 'el plomo', 'lead'], [2230, 'la roca', 'rock'], [2470, 'el aluminio', 'aluminium'], [2862, 'el hierro', 'iron'], [5555, 'el tungsteno', 'tungsten']];
   function fase(c, n, valor, f) {
     T = valor; t0 = tiempo;
     obj.tinte = Math.min(.85, Math.max(0, (T - 40) / 900));
@@ -45,6 +48,8 @@ window.FENOMENOS.calor = (() => {
       COMUN.derribar(ctx, o, new ctx.THREE.Vector3(ctx.rr(-2, 2), -Math.min(o.h, 300) * .1, ctx.rr(-2, 2)), { colorEscombros: 0x6a4030, polvo: 10, colorPolvo: temp.naranja });
     });
     if (f.planeta) { planeta = COMUN.planeta(ctx); cieloObj = 0x05070c; } // en el espacio, cielo negro
+    // a unos cien mil grados los átomos van más rápido de lo que la gravedad de la Tierra puede sujetar: se evapora
+    if (T >= 5e4 && planeta) reloj.luego(1.6, () => { planeta.partir(.1); COMUN.estallarPlaneta(ctx, 1800, 0xfff0c8); COMUN.ruido(ctx, 6, 120, .9); });
     COMUN.ruido(ctx, 4, 300 + Math.min(T, 3000) * .3, Math.min(.6, .1 + n * .06));
   }
 
@@ -53,7 +58,8 @@ window.FENOMENOS.calor = (() => {
     yo.actualizar(dt, t);
     for (const key in est) est[key] += (obj[key] - est[key]) * k;
     COMUN.tintar(ctx, colTinte, est.tinte, colBrillo, est.brillo);
-    ctx.skyT.set(cieloObj);
+    COMUN.corte.tick(ctx, dt);
+    if (!ctx.corte) ctx.skyT.set(cieloObj);
     // el mar se evapora
     ctx.seaNear.position.y = -est.mar * 40; ctx.seaNear.visible = est.mar < .98;
     if (T >= 150 && T < 2500 && ctx.R() < .8) for (let q = 0; q < 6; q++) ctx.emit(ctx.rr(-900, 900), 0, ctx.rr(-200, 20), 0, ctx.rr(4, 12), 0, temp.vapor, ctx.rr(2, 4), -1);
@@ -74,8 +80,15 @@ window.FENOMENOS.calor = (() => {
   }
 
   return {
-    crear, fase, actualizar, camara: c => yo.camara(c),
-    activo: () => tiempo - t0 < 4 || reloj.pendientes > 0,
+    crear, fase, actualizar, camara: c => yo.camara(c), inserto: (c, ef, on) => COMUN.corte.on(c, ef, on),
+    activo: () => tiempo - t0 < 4 || reloj.pendientes > 0 || (planeta && planeta.split > 0 && planeta.split < .9),
+    // qué se funde y qué hierve ya a esa temperatura (°C)
+    danos: () => {
+      const EN = COMUN.EN, ult = l => l.filter(([t]) => T >= t).pop();
+      if (T >= 5e4) return EN ? 'Everything is plasma · Earth evaporates' : 'Todo es plasma · la Tierra se evapora';
+      const m = ult(FUNDE), b = ult(HIERVE);
+      return [m && (EN ? `Melting: ${m[2]}` : `Ya se funde ${m[1]}`), b && (EN ? `boiling: ${b[2]}` : `ya hierve ${b[1]}`)].filter(Boolean).join(' · ');
+    },
     tnt: v => Math.max(0, v - 15) * 1.2e12 / COMUN.TNT_J,
     mag: v => `${COMUN.num(v, 0)} °C`,
   };
