@@ -12,7 +12,7 @@ window.HISTORIA = (() => {
     descripcion: 'Un país inventado, datos públicos y un consejo: piensa antes de votar.',
     voces: 'audio/voz/es/espanistan-01',
     subtitulos: true,
-    pausa: 1.4, // ritmo de documental: deja respirar cada frase
+    pausa: .6,
     imagenes: { cueva: D + 'cueva.webp', portada: D + 'portada.webp', despacho: D + 'despacho.webp', coche: D + 'coche.webp', mochila: D + 'mochila.webp',
       llave: D + 'llave.webp', hucha: D + 'hucha.webp', congreso: D + 'congreso.webp', laboratorio: D + 'laboratorio.webp', balanza: D + 'balanza.webp', urna: D + 'urna.webp' },
     planos: [
@@ -88,6 +88,8 @@ window.HISTORIA = (() => {
         rotulos: [{ en: '@Una', tipo: 'aviso', texto: '1. ¿Qué prometieron y qué cumplieron?', y: .3, hasta: '@Dos' }, { en: '@Dos', tipo: 'aviso', texto: '2. ¿Euros o porcentajes?', y: .3, hasta: '@Tres' }, { en: '@Tres', tipo: 'aviso', texto: '3. ¿Me fío de su gente?', y: .3 }] }),
       P('urna', 'Kant lo resumió en dos palabras: sapere aude. Atrévete a pensar por ti mismo. Aquí no te decimos a quién votar. Te decimos que votes, y que votes pensando.', { cam: ACERCA,
         rotulos: [cita('@Kant', 'Sapere aude: atrévete a pensar por ti mismo.', 'Kant, «¿Qué es la Ilustración?»', { hasta: '@Aquí' })] }),
+      P('cueva', 'Antes de despedirnos, repasemos lo que hemos aprendido hoy. Que un porcentaje que baja puede esconder una cifra que sube. Que recaudar más no es bueno ni malo: depende de lo que te devuelven. Que legal y conveniente no siempre son lo mismo. Y que una sospecha no es una sentencia, pero tampoco es para mirar hacia otro lado. Lo difícil no es salir de la cueva. Lo difícil es no volver a entrar.', { cam: ACERCA,
+        rotulos: [titulo('Lo que hemos aprendido hoy', { hasta: '@Lo difícil no' })] }),
       P('portada', 'En el próximo episodio de Españistán: el líder de la oposición. Mismas reglas. Mismas preguntas.', { cam: LEJOS, dur: 6,
         rotulos: [{ en: '@próximo', tipo: 'aviso', texto: 'Fuentes de todos los datos en la descripción', y: .08 }] }),
       // Viñeta final sin voz: deja sitio a las pantallas finales de YouTube (vídeo sugerido y suscribirse)

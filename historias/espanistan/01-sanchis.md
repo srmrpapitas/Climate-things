@@ -106,6 +106,8 @@ Antes del 29 de noviembre, hazte tres preguntas, con este partido y con todos:
 
 Kant lo resumió en dos palabras: *sapere aude*, atrévete a pensar por ti mismo.
 Aquí no te decimos a quién votar. Te decimos que votes, y que votes pensando.
+**Repaso.** Antes de despedirnos, repasemos lo que hemos aprendido hoy. Que un porcentaje que baja puede esconder una cifra que sube. Que recaudar más no es bueno ni malo: depende de lo que te devuelven. Que legal y conveniente no siempre son lo mismo. Y que una sospecha no es una sentencia, pero tampoco es para mirar hacia otro lado. Lo difícil no es salir de la cueva. Lo difícil es no volver a entrar.
+
 En el próximo episodio de Españistán: el líder de la oposición. Mismas reglas. Mismas preguntas.
 
 [Rótulo final: Fuentes en la descripción.]
