@@ -1,6 +1,6 @@
-// La altura que se duplica: 12 fases, de 1,75 m a medir lo que la Luna de ancho (3.475 km).
-// Fases 1 a 11: tu altura se duplica (1,75 m → 1.792 m). Fase 12: no se duplica, se multiplica por 2.048 (once duplicaciones
-// de golpe, como el golpe final del puñetazo) → 3.670 km.
+// La altura que se duplica: 12 fases, de una persona promedio (1,75 m) a medir más que la Luna de ancho (3.475 km).
+// La persona promedio sale en la pregunta inicial. Fases 1 a 11: tu altura se duplica (3,5 m → 3.584 m; fase n = n duplicaciones).
+// Fase 12: no se duplica, se multiplica por 1.024 (diez duplicaciones de golpe, como el golpe final del puñetazo) → 3.670 km.
 //
 // Física (ley cuadrado-cubo, Galileo 1638): con el doble de altura pesas 8 veces más (volumen), pero huesos, tendones y
 // músculos solo son 4 veces más gruesos (sección). Cada duplicación, todo lo que te sostiene soporta el DOBLE de presión:
@@ -14,6 +14,8 @@
 //    n = 3: 216 mmHg (desmayo; la jirafa, con ~2 m de cuello, va a ~200-300 mmHg); n = 5: 864 mmHg, más de una atmósfera;
 //    n = 8: ~6.900 mmHg ≈ 9 atmósferas, la presión a 90 m bajo el agua.
 //  - pies: ~20 kPa de pie × 2ⁿ. n = 5: 640 kPa, más de lo que aguanta el suelo bajo una zapata ancha (100-600 kPa).
+//    n = 11: 41 MPa, más que el hormigón (~30 MPa).
+//  - nervios: el tacto viaja a ~60-70 m/s. n = 11 (3.584 m): del pie al cerebro, casi un minuto.
 //  - andar: el paso dura ~1 s × √(2ⁿ) y la velocidad 1,4 m/s × √(2ⁿ) (péndulo). n = 6: 8 s por paso, ~40 km/h.
 //    Caerse de tu altura (una barra que cae): la cabeza llega a √(3·g·h); n = 6 → 57 m/s ≈ caer desde 166 m (50 pisos).
 //  - material para aguantar de pie (fémur quieto ≈ 1,8 MPa × 2ⁿ; andando ≈ 25 MPa × 2ⁿ, en n = 10 ya pide diamante): acero de construcción (~355 MPa) hasta n = 7, el mejor acero
@@ -33,18 +35,14 @@ window.ESCENARIOS = window.ESCENARIOS || {};
     id: 'altura',
     tipo: 'altura',
     titulo: T('La altura que se duplica', 'The doubling height'),
-    pregunta: T('¿Y si tu altura se duplicara?', 'What if your height doubled?'),
+    pregunta: T('Eres una persona promedio. ¿Y si tu altura se duplicara?', 'You are an average person. What if your height doubled?'),
     unidad: 'm',
-    inicial: 1.75,
+    inicial: 3.5,   // fase 1 = el doble de una persona promedio (1,75 m)
     multiplicador: 2,
     ritmo: 3, introDur: 2.6,
     paso: T('FASE', 'STAGE'),
     lema: T('EL DOBLE DE ALTO CADA VEZ', 'TWICE AS TALL EVERY TIME'),
     fases: [
-      P(T('UNA PERSONA PROMEDIO', 'AN AVERAGE PERSON'),
-        T('Una persona promedio. Al andar, tus huesos aguantan siete veces más de lo que les pides.',
-          'An average person. When you walk, your bones can take seven times what you ask of them.'),
-        T('Todo en orden', 'All fine'), T('Hueso', 'Bone')),
       P(T('EL DOBLE', 'DOUBLE'),
         T('Mides el doble, pero pesas ocho veces más: como un caballo. Y tus huesos solo son cuatro veces más gruesos.',
           'Twice as tall, but eight times heavier: a horse. And your bones are only four times thicker.'),
@@ -85,12 +83,16 @@ window.ESCENARIOS = window.ESCENARIOS || {};
         T('Casi dos kilómetros. La cabeza en las nubes. Quieto, el mejor acero va justo al límite. Para dar un paso, tus huesos tendrían que ser de diamante.',
           'Almost two kilometres. Head in the clouds. Standing still, the best steel is at its limit. To take a step, your bones would have to be diamond.'),
         T('Fémur a 1.800 MPa quieto · 25.000 al andar', 'Femur at 1,800 MPa still · 25,000 walking'), T('Diamante', 'Diamond')),
-      // la última no se duplica: once duplicaciones de golpe (× 2.048) → 3.670 km, más que el diámetro de la Luna (3.475 km)
+      P(T('APLASTAS EL HORMIGÓN', 'CRUSHING CONCRETE'),
+        T('Tres kilómetros y medio. Pisas tan fuerte que aplastas el hormigón. Y si te pisan un pie, lo notas casi un minuto después.',
+          'Three and a half kilometres. You step so hard you crush concrete. And if someone treads on your foot, you feel it almost a minute later.'),
+        T('Pies a 41 MPa: más que el hormigón', 'Feet at 41 MPa: more than concrete'), T('Diamante', 'Diamond')),
+      // la última no se duplica: diez duplicaciones de golpe (× 1.024) → 3.670 km, más que el diámetro de la Luna (3.475 km)
       P(T('COMO LA LUNA', 'AS BIG AS THE MOON'),
-        T('La última no se duplica: se multiplica por dos mil. Tres mil seiscientos kilómetros: mides más que la Luna de ancho. Pesas casi como un planeta enano. Ni el diamante aguanta: solo unos huesos de estrella de neutrones.',
-          'The last one does not double: it goes two thousand times bigger. Three thousand six hundred kilometres: taller than the Moon is wide. You weigh almost as much as a dwarf planet. Not even diamond holds: only bones made of neutron star.'),
+        T('La última no se duplica: se multiplica por mil. Tres mil seiscientos kilómetros: mides más que la Luna de ancho. Pesas casi como un planeta enano. Ni el diamante aguanta: solo unos huesos de estrella de neutrones.',
+          'The last one does not double: it goes a thousand times bigger. Three thousand six hundred kilometres: taller than the Moon is wide. You weigh almost as much as a dwarf planet. Not even diamond holds: only bones made of neutron star.'),
         T('Ningún material hecho de átomos aguanta', 'No material made of atoms can hold'), T('Estrella de neutrones', 'Neutron star'),
-        { valor: 1.75 * 2 ** 21, dur: 9, lema: T('¡DOS MIL VECES MÁS, DE GOLPE!', 'TWO THOUSAND TIMES MORE, AT ONCE!') }),
+        { valor: 1.75 * 2 ** 21, dur: 9, lema: T('¡MIL VECES MÁS, DE GOLPE!', 'A THOUSAND TIMES MORE, AT ONCE!') }),
     ],
     cierre: { titulo: T('Ni el diamante aguanta.', 'Not even diamond holds.'), pregunta: T('¿Qué duplicamos ahora? 👇', 'What should we double next? 👇') },
   };
