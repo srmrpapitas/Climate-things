@@ -832,7 +832,7 @@ function audioInit() {
   // Cada paso espera a que acabe su frase, así que sumando solo f.dur la mezcla se quedaba corta y el final del vídeo salía
   // mudo (en la gravedad, los últimos 20 s). exportar() carga la narración antes de llamar a start(), así que aquí ya está
   // en vozDur y se suma lo que dura de verdad cada frase; igual que en durFase() y en el estado 'intro'.
-  const pasoDur = (f, i) => Math.max(f.dur ?? ESC.ritmo, vozDur[i + 1] ? vozDur[i + 1] + retrasoVoz(i + 1) + 1.1 : 0);
+  const pasoDur = (f, i) => Math.max(f.dur ?? ESC.ritmo, vozDur[i + 1] ? vozDur[i + 1] + retrasoVoz(i + 1) + PAUSA : 0);
   const durMax = ESC.ritmo ? Math.min(300, Math.ceil((Math.max(ESC.introDur ?? 2.6, (vozDur[0] ?? 0) + .4)
     + ESC.fases.reduce((s, f, i) => s + pasoDur(f, i), 0)) * 1.08 + 10)) : 300;
   try { AC = GRABAR ? new OfflineAudioContext(2, 48000 * durMax, 48000) : new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return; }
@@ -862,6 +862,7 @@ function rumble(v) { if (AC) rumbleG.gain.setTargetAtTime(v, AC.currentTime, .4)
 // ESC.vozRetraso: segundos que espera la narración de cada paso (p. ej. para no pisar el grito)
 const vozPend = {}; const VOZ = params.get('voz') !== '0', SON = ESC.sonido, VOZ_RETRASO = ESC.vozRetraso ?? 0;
 const retrasoVoz = n => n ? (ESC.fases[n - 1]?.vozRetraso ?? VOZ_RETRASO) : 0;
+const PAUSA = ESC.pausa ?? 1.1; // silencio después de cada frase antes del paso siguiente
 const crudo = {}, bufs = {}, camas = {}, vozDur = {};
 const traer = url => crudo[url] ||= fetch(url).then(r => r.ok ? r.arrayBuffer() : null).catch(() => null);
 // decodificar con callbacks además de promesa: algunos Safari (contextos webkit) no devuelven promesa
@@ -964,7 +965,7 @@ let phase = 0, state = 'menu', phaseTime = 0, idleT = 0, wasActive = false, ende
 if (RITMO) document.body.classList.add('ritmo');
 // cada paso dura al menos lo que tarda la narración, más una pausa para que se asimile; si la frase aún no ha cargado, espera (hasta 6 s)
 const durPaso = () => vozPend[phase] !== undefined && time - vozPend[phase] < 6 ? Infinity
-  : Math.max(ESC.fases[phase - 1]?.dur ?? RITMO, (vozDur[phase] ? vozDur[phase] + retrasoVoz(phase) + 1.1 : 0));
+  : Math.max(ESC.fases[phase - 1]?.dur ?? RITMO, (vozDur[phase] ? vozDur[phase] + retrasoVoz(phase) + PAUSA : 0));
 const AUTO_EXTRA = +(params.get('intervalo') || 1);
 $('auto').checked = auto; $('mtitle').textContent = ESC.pregunta;
 $('autoTxt').textContent = T('Modo auto (avanza solo)', 'Auto mode (advances by itself)');
@@ -1104,7 +1105,8 @@ async function exportar() {
   const EN = window.LANG === 'en', W = 1080, H = 1920, FPS = 30;
   // en el móvil, menos bitrate: el MP4 entero se guarda en memoria y al final se copia; con 12 Mbit/s el iPhone se quedaba
   // sin memoria justo al terminar, recargaba la página y, como la dirección llevaba exportar=1, el render volvía a empezar
-  const MOVIL = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Macintosh/.test(navigator.userAgent)), BR = MOVIL ? 6e6 : 12e6;
+  const MOVIL = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Macintosh/.test(navigator.userAgent));
+  let BR = MOVIL ? 6e6 : 12e6;
   // si la página se recarga a mitad (memoria, cambiar de app), no se repite el render: vuelve al juego y avisa
   const sinExportar = new URLSearchParams(location.search); sinExportar.delete('exportar'); sinExportar.delete('grabar');
   history.replaceState(null, '', location.pathname + (sinExportar.toString() ? '?' + sinExportar : ''));
@@ -1123,6 +1125,9 @@ async function exportar() {
   // todo cargado antes de empezar: fuentes, narración (y su duración) y efectos
   await document.fonts.ready; if (FEN.listo) await FEN.listo; const k = await nVoz;
   for (let i = 0; i < 100 && Object.keys(vozDur).length < k; i++) await new Promise(r => setTimeout(r, 100));
+  // en el móvil, en vídeos largos el bitrate baja para que el MP4 (que vive entero en memoria hasta que se descarga) no pase de ~140 MB
+  const durEst = (ESC.introDur ?? 2.6) + ESC.fases.reduce((s, f, i) => s + Math.max(f.dur ?? ESC.ritmo ?? 4, (vozDur[i + 1] ?? 4) + retrasoVoz(i + 1) + PAUSA), 0);
+  if (MOVIL) BR = Math.max(3e6, Math.min(6e6, 1.12e9 / durEst));
   paused = true; $('auto').checked = true; start(); const vozOk = (await Promise.all([...Array(k)].map((_, i) => cargar(vozUrl(i))))).filter(Boolean).length;
   await Promise.all(Object.keys(crudo).filter(u => u.includes('/sfx/')).map(u => cargar(u)));
   // a 1080×1920 sin tocar la maqueta: solo cambia la resolución interna
