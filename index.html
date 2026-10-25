@@ -918,7 +918,7 @@ let tntShown = 0, tntFrom = 0, tntTo = 0, tntT = 1;
 const magText = v => FEN.mag ? FEN.mag(v) : `${fmt(v, 0)} ${ESC.unidad}`;
 function setHUD(phase, v, f) {
   hud.querySelector('.fase').textContent = ESC.paso ? `${ESC.paso} #${phase}` : `${T('FASE', 'PHASE')} ${phase} / ${NF}`;
-  hud.querySelector('.sub').textContent = f.sub || ''; hud.querySelector('.lema').textContent = ESC.lema || '';
+  hud.querySelector('.sub').textContent = f.sub || ''; hud.querySelector('.lema').textContent = f.lema ?? ESC.lema ?? '';   // un paso puede cambiar el lema (p. ej. el golpe final)
   hud.querySelector('.mag').textContent = magText(v);
   hud.querySelector('.mag').style.fontSize = magText(v).length > 10 ? '1.35em' : '';
   if (FEN.linea3) { tntT = 1; const l = [].concat(FEN.linea3(v)); hud.querySelector('.tnt').textContent = l[0]; hud.querySelector('.cmp').textContent = l[1] || ''; return; }

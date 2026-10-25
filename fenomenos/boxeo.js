@@ -447,8 +447,9 @@ window.FENOMENOS.boxeo = (() => {
     const anillo = new T.Mesh(new T.RingGeometry(.86, 1, 64), new T.MeshBasicMaterial({ color: 0xfff4e0, transparent: true, opacity: .8, side: T.DoubleSide, depthWrite: false, fog: false }));
     anillo.rotation.x = -Math.PI / 2; anillo.position.set(CX, ctx.GROUND + .4, CZ); anillo.userData.fenPropio = true; ctx.scene.add(anillo);
     efectos.push({ bola, anillo, t: 0, r: radio }); }
+    const rEdif = fin ? Math.min(radio, 260) : radio;
     for (const o of edif) { const dx = o.x - CX, dz = o.z - CZ, d = Math.hypot(dx, dz);
-      if (d > radio || o.state === 2) continue;
+      if (d > rEdif || o.state === 2) continue;
       reloj.luego(ctx.rr(.05, .5) + d / 340, () => COMUN.derribar(ctx, o, new T.Vector3(dx / d * 14, 5, dz / d * 14), { polvo: 12, colorPolvo: col.polvo })); }
     barrer(CX, CZ, radio * 1.15, 22 + radio * .6);
     // gradas, pared y tejado
@@ -608,7 +609,7 @@ window.FENOMENOS.boxeo = (() => {
     if (V.t > .5) ANIME.lineas(Math.min(.85, (V.t - .5) * .6), [.5, .55]);
     if (!sol) solNuevo();
     // al llegar al Sol, destello blanco
-    if (V.t > 11.8 && !V.sol) { V.sol = true; ANIME.destello(1, 2.2, 0xfff1c0); ctx.sfx('whoosh', .5); }
+    if (V.t > 12.6 && !V.sol) { V.sol = true; ANIME.destello(1, 2.2, 0xfff1c0); ctx.sfx('whoosh', .5); }   // llega al Sol justo al acabar la frase
   }
   function solNuevo() {
     sol = new T.Group(); sol.userData.fenPropio = sol.userData.sobrePlaneta = true;
@@ -694,7 +695,7 @@ window.FENOMENOS.boxeo = (() => {
     const d = Math.hypot(c.pos[0] - c.mira[0], c.pos[1] - c.mira[1], c.pos[2] - c.mira[2]);
     sacudida = Math.max(0, sacudida - dt * 2.2); ctx.setShake(sacudida * Math.min(1.5, d * .012));
     // el sol del final se queda delante, cada vez más grande
-    if (sol && vuelo && vuelo.final) { sol.userData.t += dt; const kk = Math.min(1, Math.max(0, (vuelo.t - 1.5) / 10)), ang = .012 + Math.pow(kk, 2.2) * .42, D = THREE_DIR();
+    if (sol && vuelo && vuelo.final) { sol.userData.t += dt; const kk = Math.min(1, Math.max(0, (vuelo.t - 1.5) / 11)), ang = .012 + Math.pow(kk, 2.2) * .42, D = THREE_DIR();
       const dist = 30000; sol.position.copy(ctx.camera.position).addScaledVector(D, dist); sol.scale.setScalar(Math.tan(ang) * dist); }
   }
 
@@ -743,6 +744,7 @@ window.FENOMENOS.boxeo = (() => {
       if (kg >= 2) { const r = 4.7 * Math.cbrt(kg);
         return EN ? `Everything flattened within ${COMUN.num(r, 0)} m · ${COMUN.num(ctx.caidos, 0)} buildings down`
           : `Todo plano en ${COMUN.num(r, 0)} m · ${COMUN.num(ctx.caidos, 0)} edificios caídos`; }
+      if (fActual.grito === 'final') return EN ? 'Straight into the Sun · he gets there in two days' : 'Directo al Sol · llega en dos días';
       if (v >= 11186) return EN ? 'Past escape velocity · he is not coming back' : 'Supera la velocidad de escape · ya no vuelve';
       const a = v * v * Math.sin(2 * .32) / 9.8, d = a < 1000 ? `${COMUN.num(a, a < 10 ? 1 : 0)} m` : `${COMUN.num(a / 1000, 1)} km`;
       return EN ? `He lands ${d} away` : `Cae a ${d} de aquí`;
