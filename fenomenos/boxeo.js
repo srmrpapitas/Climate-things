@@ -373,17 +373,18 @@ window.FENOMENOS.boxeo = (() => {
     retroceso = null; if (vuelo || rival.tirado || !rival.g.visible || Math.abs(rival.g.position.x - RVX) > .01) { vuelo = null; reponer(); }
     if (marcador) marcador.pon(`${EN ? 'PUNCH' : 'GOLPE'} #${n}`, COMUN.grande(valor) + (valor >= 1e6 ? COMUN.DE : ' ') + 'J');
     // cuándo llega el puño: depende del grito
-    tp = f.grito === 'corto' ? .3 + GRITOS.corto.clat : f.grito === 'carga' ? .3 + GRITOS.carga.clat : f.grito === 'final' ? 4.75 : .8;
     // en los golpes sin grito largo también dicen algo: «¡CLAT!» al pegar, «¡BOMBO!» al cargar el brazo, o «BOMBO… CLAT!»
     dice = f.grito ? 'clat' : f.rival ? 'bombo' : ['clat', 'bombo', 'bomboclat'][n % 3];
+    // el puño llega enseguida: nada de quedarse parados al empezar el paso (el grito empieza con el paso)
+    tp = f.grito === 'corto' ? GRITOS.corto.clat : f.grito === 'carga' ? .1 + GRITOS.carga.clat : f.grito === 'final' ? 4.75 : dice === 'clat' ? .3 : .64;
     if (!f.grito) {
       const rot = (texto, kana, t, y = -.66) => reloj.luego(t, () => ANIME.rotulo({ texto, kana, y, ancho: 1.05, dur: .85, rot: n % 2 ? -.08 : .07 }));
-      if (dice !== 'clat') { gritar(n % 2 ? 'bombo' : 'bombo2', tp - .74); rot('BOMBO!', 'ボンボ！', tp - .66, -.6); }
+      if (dice !== 'clat') { gritar(n % 2 ? 'bombo' : 'bombo2', 0); rot('BOMBO!', 'ボンボ！', .05, -.6); }
       if (dice !== 'bombo') { gritar(n % 2 ? 'clat1' : 'clat2', tp - .08); if (E < 1e6) rot('CLAT!', 'クラット！', tp, -.74); }
     }
-    if (f.grito === 'corto') { gritar('corto', .3); reloj.luego(.3, () => ANIME.rotulo({ texto: 'BOMBO…', kana: 'ボンボ…', y: -.66, ancho: 1.2, dur: .95, rot: -.08 })); }
-    if (f.grito === 'carga') { gritar('carga', .3); reloj.luego(.45, () => ANIME.rotulo({ texto: 'BOOOOM…', kana: 'ボォォォム…', y: -.7, ancho: 1.3, dur: 1.2, rot: -.06 }));
-      reloj.luego(1.95, () => ANIME.rotulo({ texto: 'BOOOOOOO…', kana: 'ボォォォォ…', y: -.58, ancho: 1.6, dur: 1.35, rot: .05 })); }
+    if (f.grito === 'corto') { gritar('corto', 0); reloj.luego(.05, () => ANIME.rotulo({ texto: 'BOMBO…', kana: 'ボンボ…', y: -.66, ancho: 1.2, dur: .95, rot: -.08 })); }
+    if (f.grito === 'carga') { gritar('carga', .1); reloj.luego(.25, () => ANIME.rotulo({ texto: 'BOOOOM…', kana: 'ボォォォム…', y: -.7, ancho: 1.3, dur: 1.2, rot: -.06 }));
+      reloj.luego(1.75, () => ANIME.rotulo({ texto: 'BOOOOOOO…', kana: 'ボォォォォ…', y: -.58, ancho: 1.6, dur: 1.35, rot: .05 })); }
     if (f.grito === 'final') { gritar('final', .3); gritar('nani', 3.35, 'rival');
       reloj.luego(.45, () => ANIME.rotulo({ texto: 'BOOOOM…', kana: 'ボォォォム…', y: -.7, ancho: 1.3, dur: 1.2, rot: -.06 }));
       reloj.luego(1.95, () => ANIME.rotulo({ texto: 'BOOOOOOO…', kana: 'ボォォォォ…', y: -.58, ancho: 1.7, dur: 1.4, rot: .05 }));
