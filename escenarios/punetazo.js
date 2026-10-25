@@ -52,7 +52,7 @@ window.ESCENARIOS = window.ESCENARIOS || {};
       P(T('FILA TRES', 'ROW THREE'),
         T('Nueve mil seiscientos. Fila tres, asiento de pasillo.',
           'Nine thousand six hundred. Row three, aisle seat.'),
-        { planos: [[-99, 'dos', { v: 2 }], [.05, 'grada']], rival: true, vozRetraso: 2.3 }),
+        { planos: [[-99, 'dos', { v: 2 }], [.05, 'grada']] }),
       P(T('UN COCHE ENTERO', 'A WHOLE CAR'),
         T('Diecinueve mil. Como un coche. El árbitro cuenta por costumbre.',
           'Nineteen thousand. Like a car. The referee counts out of habit.'),
