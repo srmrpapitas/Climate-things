@@ -1006,15 +1006,16 @@ function nextPhase() {
   voz(phase);
 }
 function destello() { const e = $('flash'); e.classList.add('on'); void e.offsetWidth; espera(() => e.classList.remove('on'), 60); }
-function advance() { if (state === 'intro' && introT > .6) nextPhase(); else if (state === 'phase' && phaseTime > .8) nextPhase(); }
+// al grabar, el vídeo avanza solo: un clic o una tecla sin querer adelantaba el paso y la frase anterior se oía encima de la siguiente
+function advance() { if (GRABAR) return; if (state === 'intro' && introT > .6) nextPhase(); else if (state === 'phase' && phaseTime > .8) nextPhase(); }
 $('play').onclick = e => { e.stopPropagation(); start(); };
 stage.addEventListener('pointerdown', e => { if (state !== 'menu') advance(); });
 addEventListener('keydown', e => {
   const k = e.key.toLowerCase();
   if (k === ' ' || k === 'enter') { e.preventDefault(); if (state === 'menu') start(); else advance(); }
   if (k === 'h') document.body.classList.toggle('clean');
-  if (k === 'a') { auto = !auto; toast(auto ? T('Modo auto: activado', 'Auto mode: on') : T('Modo auto: desactivado', 'Auto mode: off')); }
-  if (k === 'r') { const p = new URLSearchParams(location.search); if (auto) p.set('auto', '1'); else p.delete('auto'); location.search = p.toString(); }
+  if (!GRABAR && k === 'a') { auto = !auto; toast(auto ? T('Modo auto: activado', 'Auto mode: on') : T('Modo auto: desactivado', 'Auto mode: off')); }
+  if (!GRABAR && k === 'r') { const p = new URLSearchParams(location.search); if (auto) p.set('auto', '1'); else p.delete('auto'); location.search = p.toString(); }
 });
 
 // ---------- bucle ----------
