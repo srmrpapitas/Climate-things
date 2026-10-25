@@ -860,7 +860,7 @@ function rumble(v) { if (AC) rumbleG.gain.setTargetAtTime(v, AC.currentTime, .4)
 // ESC.sonido.camas: bucles de fondo con su volumen; cada fase puede cambiarlos (f.camas) y lanzar efectos (f.sfx: [[nombre, volumen, retraso]]).
 // ?voz=0 quita la narración.
 // ESC.vozRetraso: segundos que espera la narración de cada paso (p. ej. para no pisar el grito)
-const vozPend = {}; const VOZ = params.get('voz') !== '0', SON = ESC.sonido, VOZ_RETRASO = ESC.vozRetraso ?? 0;
+const vozPend = {}, vozFin = {}; const VOZ = params.get('voz') !== '0', SON = ESC.sonido, VOZ_RETRASO = ESC.vozRetraso ?? 0;
 const retrasoVoz = n => n ? (ESC.fases[n - 1]?.vozRetraso ?? VOZ_RETRASO) : 0;
 const PAUSA = ESC.pausa ?? 1.1; // silencio después de cada frase antes del paso siguiente
 const crudo = {}, bufs = {}, camas = {}, vozDur = {};
@@ -891,7 +891,7 @@ const nVoz = VOZ ? fetch('audio/voz/lista.json').then(r => r.ok ? r.json() : {})
 function voz(n) {
   if (!AC) return; const cuando = AC.currentTime + .05 + retrasoVoz(n); vozPend[n] = time;
   nVoz.then(k => n < k ? cargar(vozUrl(n)) : null).then(b => { delete vozPend[n]; if (!b) return; vozDur[n] ??= b.duration;
-    const s = AC.createBufferSource(); s.buffer = b; s.connect(busVoz); const t = Math.max(cuando, AC.currentTime); s.start(t);
+    const s = AC.createBufferSource(); s.buffer = b; s.connect(busVoz); const t = Math.max(cuando, AC.currentTime); s.start(t); vozFin[n] = t + b.duration;
     busCama.gain.setTargetAtTime(.45, t, .15); busCama.gain.setTargetAtTime(1, t + b.duration, .4);
     busSfx.gain.setTargetAtTime(.65, t, .15); busSfx.gain.setTargetAtTime(1, t + b.duration, .4); });
 }
@@ -966,6 +966,11 @@ if (RITMO) document.body.classList.add('ritmo');
 // cada paso dura al menos lo que tarda la narración, más una pausa para que se asimile; si la frase aún no ha cargado, espera (hasta 6 s)
 const durPaso = () => vozPend[phase] !== undefined && time - vozPend[phase] < 6 ? Infinity
   : Math.max(ESC.fases[phase - 1]?.dur ?? RITMO, (vozDur[phase] ? vozDur[phase] + retrasoVoz(phase) + PAUSA : 0));
+// en directo, si el móvil va a pocos fotogramas el reloj del juego se queda atrás del audio y, al acabar la frase, el paso
+// siguiente tardaba en llegar: se pasa en cuanto la frase ha acabado de verdad (reloj del audio), siempre que el paso haya
+// durado lo mínimo que pide (su dur, o 1,2 s para que dé tiempo al golpe). Al grabar los dos relojes son el mismo.
+const fraseAcabada = () => !GRABAR && AC && vozFin[phase] !== undefined && AC.currentTime >= vozFin[phase] + PAUSA
+  && phaseTime > Math.min(durPaso(), ESC.fases[phase - 1]?.dur ?? 1.2);
 const AUTO_EXTRA = +(params.get('intervalo') || 1);
 $('auto').checked = auto; $('mtitle').textContent = ESC.pregunta;
 $('autoTxt').textContent = T('Modo auto (avanza solo)', 'Auto mode (advances by itself)');
@@ -1016,7 +1021,7 @@ addEventListener('keydown', e => {
 const clock = new THREE.Clock(); let time = 0;
 let paused = false;
 function frame() {
-  const dt = Math.min(clock.getDelta(), 1 / 20);
+  const dt = Math.min(clock.getDelta(), 1 / 12);   // hasta 12 fps el juego va a la par del audio (con 1/20 se retrasaba)
   if (!paused) tick(dt);
   if (!GRABAR) { if (composer) composer.render(); else renderer.render(scene, camera); } // al grabar solo pinta __game.render()
   requestAnimationFrame(frame);
@@ -1032,8 +1037,8 @@ function tick(dt) {
       corte = { p: new THREE.Vector3(...c.pos), t: new THREE.Vector3(...c.mira), k: 0, dur: fi.dur ?? 1.8, fin: phaseTime + (fi.dur ?? 1.8), efecto: fi.efecto, fase: phase };
       FEN.inserto && FEN.inserto(ctx, fi.efecto, true); destello(); }
     if (corte && (phaseTime >= corte.fin || phase !== corte.fase)) { FEN.inserto && FEN.inserto(ctx, corte.efecto, false); corte = null; destello(); }
-    if (auto && phase < NF && (RITMO ? phaseTime > durPaso() : idleT > AUTO_EXTRA)) nextPhase();
-    if (phase === NF && !ended && (RITMO ? phaseTime > durPaso() : idleT > .3)) { ended = true; $('end').classList.add('on'); cap.classList.remove('on'); }
+    if (auto && phase < NF && (RITMO ? phaseTime > durPaso() || fraseAcabada() : idleT > AUTO_EXTRA)) nextPhase();
+    if (phase === NF && !ended && (RITMO ? phaseTime > durPaso() || fraseAcabada() : idleT > .3)) { ended = true; $('end').classList.add('on'); cap.classList.remove('on'); }
   }
   if (phase > 0) FEN.actualizar(ctx, dt, time);
   if (window.__wheel && window.__wheel.parent === cityGroup) window.__wheel.rotation.z += dt * .06;
