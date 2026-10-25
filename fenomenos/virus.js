@@ -164,9 +164,11 @@ window.FENOMENOS.virus = (() => {
           .sort((a, b) => cerca(a, yo) - cerca(b, yo));
         const p = hay.find(q => !q.andar) || hay[0];
         if (!p) return fijo && yo.camara({ ...fijo, cerca: true }); // el plano fijo, movido a donde ya ha llegado el protagonista
-        // picado corto: la cámara por encima de la cabeza para que el punto verde caiga por debajo de la frase
-        const P = p.g.position;
-        return { pos: [P.x + 2.2, ctx.GROUND + 2.4, P.z - 2.6], mira: [P.x, ctx.GROUND + 1.1, P.z] };
+        // cada uno mira hacia donde le tocó al crearlo (p.dir es aleatorio), así que la cámara se pone delante de ESTA
+        // persona, no en un lado fijo: si no, la mitad de las veces el corte era una espalda y el punto verde del pecho
+        // no se veía. Un poco por encima de los ojos y algo ladeada, para que el punto quede por debajo de la frase.
+        const P = p.g.position, a = p.g.rotation.y + .45, d = 3.8;
+        return { pos: [P.x + Math.sin(a) * d, ctx.GROUND + 2.6, P.z + Math.cos(a) * d], mira: [P.x, ctx.GROUND + 2.1, P.z] };
       }
       // la acera con la gente tumbada: se enfoca a un cuerpo de verdad, no a un punto de la calle
       if (fi.plano === 'calle') {

@@ -59,7 +59,7 @@ window.ESCENARIOS = window.ESCENARIOS || {};
         T('Ciento veintiocho: tu edificio entero por culpa de un ascensor. Catorce días para el planeta. El del quinto jura que él no ha tosido.',
           'A hundred and twenty-eight: your whole building, thanks to one lift. Fourteen days for the planet. The guy on the fifth floor swears he never coughed.'),
         C([-70, 40, 100], [0, 10, 300]),
-        { inserto: { plano: 'heroe', pos: [-6.8, 4.2, 123.5], mira: [-11.5, 3.4, 121], t: 1.2, dur: 2.4 } }),
+        { inserto: { plano: 'heroe', pos: [-9.2, 4.9, 125.6], mira: [-11.5, 5.2, 120.6], t: 1.2, dur: 2.4 } }),
       P(T('LA MANZANA COMPLETA', 'THE WHOLE BLOCK'),
         T('Doscientos cincuenta y seis. Pasas por la calle y contagias la manzana. Doce días. Los repartidores se hacen de oro, hasta que les toca.',
           'Two hundred and fifty-six. You walk down the street and infect the block. Twelve days. Delivery drivers make a fortune, right up until their turn.'),
