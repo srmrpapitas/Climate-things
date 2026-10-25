@@ -144,9 +144,9 @@ function frasco(r, k) {
   g.beginPath(); g.roundRect(-w / 2, -h, w, h, 30); g.fill(); g.stroke();
   g.fillStyle = '#5b4636'; g.fillRect(-w / 2 + 20, -h - 40, w - 40, 44);
   g.fillStyle = c; g.globalAlpha *= .55; g.fillRect(-w / 2 + 8, -h * .45 * fuera(k / 1.2), w - 16, h * .45 * fuera(k / 1.2) - 8); g.globalAlpha /= .55;
-  tarjeta(-w / 2 - 30, -h * .72, w + 60, 150, '#f4efe6');
-  g.textAlign = 'center'; g.fillStyle = '#222'; g.font = '800 30px Inter'; g.fillText(r.quien, 0, -h * .72 + 46);
-  g.fillStyle = c; g.font = '26px "Archivo Black"'; lineas(r.estado, w + 20, '26px "Archivo Black"').forEach((l, i) => g.fillText(l, 0, -h * .72 + 90 + i * 30));
+  const ls = lineas(r.estado, w + 20, '24px "Archivo Black"'); tarjeta(-w / 2 - 30, -h * .78, w + 60, 76 + ls.length * 28, '#f4efe6');
+  g.textAlign = 'center'; g.fillStyle = '#222'; g.font = '800 28px Inter'; g.fillText(r.quien, 0, -h * .78 + 40);
+  g.fillStyle = c; g.font = '24px "Archivo Black"'; ls.forEach((l, i) => g.fillText(l, 0, -h * .78 + 76 + i * 28));
   g.restore();
 }
 function barras(r, k) {
@@ -168,7 +168,11 @@ function subtitulo(p, lt) {
   g.restore();
 }
 function plano(p, lt) {
-  const cam = fondo(p, lt / p.dur); capas(p, lt, cam); rotulos(p, lt); subtitulo(p, lt);
+  const cam = fondo(p, lt / p.dur); capas(p, lt, cam);
+  // los frascos de los planos anteriores con el mismo fondo se quedan en la estantería
+  for (let j = p.i - 1; j >= 0 && planos[j].fondo === p.fondo; j--) for (const r of planos[j].rot) if (r.tipo === 'frasco') {
+    g.save(); g.translate((r.x ?? .5) * W, (r.y ?? .2) * H); g.scale(.9, .9); frasco(r, 9); g.restore(); }
+  rotulos(p, lt); subtitulo(p, lt);
 }
 function pintar(t) {
   g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.fillStyle = '#000'; g.fillRect(0, 0, W, H);
