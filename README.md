@@ -41,3 +41,12 @@ window.FENOMENOS.tipo = {
 ## Técnica
 
 Three.js 0.160 (incluido en `vendor/`, sin dependencias externas ni paso de compilación). Sonido sintetizado con Web Audio, sin música con derechos.
+
+## La altura que se duplica
+
+- `escenarios/altura.js` + `fenomenos/altura.js`: una persona promedio que duplica su altura en 12 fases hasta medir más que la Luna de ancho. Enseña la ley cuadrado-cubo (el peso crece más rápido que la fuerza); la física y las cifras están comentadas en el escenario.
+- El chico de la sudadera (`COMUN.heroe`) crece en una calle; la cámara la lleva el fenómeno (planos `crece`, `calle`, `pov`, `pies`, `lado`, `aereo`, `nubes`, `compara`, `rayos`, `atomo`, `nervio`, `despega`, `espacio`).
+- Rayos X estilo Mortal Kombat: huesos, músculos, tendones, corazón y sangre (`rayos` con `rompe`, `dobla`, `latido`, `sangre`, `musculo`). Zoom a los átomos (`atomo`: hueso, acero, diamante o neutrones, con cara `feliz`, `suda`, `rota` o `chulo`).
+- Los planos y efectos pueden ir a la palabra del narrador: `T('@palabra', '@word')` (usa la duración real de la frase si ya está cargada).
+- Falta grabar la narración (`audio/voz/<idioma>/altura/00.mp3` = pregunta, `01`–`12` = fases) y darla de alta en `audio/voz/lista.json`.
+
