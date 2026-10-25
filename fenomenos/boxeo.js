@@ -609,7 +609,7 @@ window.FENOMENOS.boxeo = (() => {
     if (V.t > .5) ANIME.lineas(Math.min(.85, (V.t - .5) * .6), [.5, .55]);
     if (!sol) solNuevo();
     // al llegar al Sol, destello blanco
-    if (V.t > 12.6 && !V.sol) { V.sol = true; ANIME.destello(1, 2.2, 0xfff1c0); ctx.sfx('whoosh', .5); }   // llega al Sol justo al acabar la frase
+    if (V.t > 17.4 && !V.sol) { V.sol = true; ANIME.destello(1, 2.2, 0xfff1c0); ctx.sfx('whoosh', .5); }   // llega al Sol justo al acabar la frase
   }
   function solNuevo() {
     sol = new T.Group(); sol.userData.fenPropio = sol.userData.sobrePlaneta = true;
@@ -695,7 +695,7 @@ window.FENOMENOS.boxeo = (() => {
     const d = Math.hypot(c.pos[0] - c.mira[0], c.pos[1] - c.mira[1], c.pos[2] - c.mira[2]);
     sacudida = Math.max(0, sacudida - dt * 2.2); ctx.setShake(sacudida * Math.min(1.5, d * .012));
     // el sol del final se queda delante, cada vez más grande
-    if (sol && vuelo && vuelo.final) { sol.userData.t += dt; const kk = Math.min(1, Math.max(0, (vuelo.t - 1.5) / 11)), ang = .012 + Math.pow(kk, 2.2) * .42, D = THREE_DIR();
+    if (sol && vuelo && vuelo.final) { sol.userData.t += dt; const kk = Math.min(1, Math.max(0, (vuelo.t - 1.5) / 15.5)), ang = .012 + Math.pow(kk, 2.2) * .42, D = THREE_DIR();
       const dist = 30000; sol.position.copy(ctx.camera.position).addScaledVector(D, dist); sol.scale.setScalar(Math.tan(ang) * dist); }
   }
 
