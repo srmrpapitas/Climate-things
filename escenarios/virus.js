@@ -59,7 +59,7 @@ window.ESCENARIOS = window.ESCENARIOS || {};
         T('Ciento veintiocho: tu edificio entero por culpa de un ascensor. Catorce días para el planeta. El del quinto jura que él no ha tosido.',
           'A hundred and twenty-eight: your whole building, thanks to one lift. Fourteen days for the planet. The guy on the fifth floor swears he never coughed.'),
         C([-70, 40, 100], [0, 10, 300]),
-        { inserto: { plano: 'heroe', pos: [-6.8, 4.2, 123.5], mira: [-11.5, 3.4, 121], t: 1.2, dur: 2.4 } }),
+        { inserto: { plano: 'heroe', pos: [-9.2, 4.9, 125.6], mira: [-11.5, 5.2, 120.6], t: 1.2, dur: 2.4 } }),
       P(T('LA MANZANA COMPLETA', 'THE WHOLE BLOCK'),
         T('Doscientos cincuenta y seis. Pasas por la calle y contagias la manzana. Doce días. Los repartidores se hacen de oro, hasta que les toca.',
           'Two hundred and fifty-six. You walk down the street and infect the block. Twelve days. Delivery drivers make a fortune, right up until their turn.'),
@@ -93,13 +93,13 @@ window.ESCENARIOS = window.ESCENARIOS || {};
           'Sixteen thousand three hundred and eighty-four, and here physics puts its foot down: you cannot infect more people than exist. In seven days there are no hosts left. The virus stares at the map, puzzled.'),
         C([0, 9e6, 1.5e7], ESP),
         { planeta: true, camas: { ciudad: 0, panico: 0, espacio: .3 }, dur: 5 }),
-      // último paso: sin gente a la que pasar, lo único que le queda por duplicar son sus propias copias.
-      // Un virus de la gripe pesa unos 6·10⁻¹⁹ kg; la Tierra, 5,97·10²⁴ kg: hacen falta 10⁴³ copias, unas 143 duplicaciones.
-      P(T('SE DUPLICA A SÍ MISMO', 'IT DOUBLES ITSELF'),
-        T('Sin gente que contagiar, solo le queda duplicar sus copias. Ciento cuarenta y tres duplicaciones más y el montón de virus pesa más que la Tierra. El planeta no aguanta y se parte.',
-          'With nobody left to infect, all it can double is its own copies. A hundred and forty-three more doublings and the pile of virus outweighs the Earth. The planet gives up and splits apart.'),
-        C([0, 6e6, 3.2e7], ESP),
-        { valor: 1e43, planeta: true, dur: 8, sfx: [['riser', .6, 0], ['planeta', .5, 1.4]], camas: { dron: .35, espacio: .3 } }),
+      // último paso: el final de verdad de una epidemia. Cada contagio necesita a alguien sano al lado; si no queda
+      // nadie susceptible, la cadena se corta y el virus se extingue con sus huéspedes. No hace falta partir el planeta.
+      P(T('SE APAGA SOLO', 'IT BURNS ITSELF OUT'),
+        T('Todos contagiados a la vez y nadie sano a quien pasárselo. La cadena se corta y el virus se extingue con sus huéspedes. Ha ganado tan bien que se ha quedado sin trabajo.',
+          'Everyone infected at once and nobody healthy left to pass it to. The chain breaks and the virus dies out with its hosts. It won so well it put itself out of a job.'),
+        C([0, 7e6, 3e7], ESP),
+        { planeta: true, apagar: true, dur: 8, sfx: [['riser', .35, 0]], camas: { dron: .3, espacio: .25 } }),
     ],
     cierre: { titulo: T('Y todo empezó por no taparte la boca.', 'And it all started with one uncovered sneeze.'), pregunta: T('¿Qué duplicamos ahora? 👇', 'What should we double next? 👇') },
   };

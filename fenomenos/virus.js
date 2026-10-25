@@ -12,12 +12,15 @@ window.FENOMENOS.virus = (() => {
   const reloj = COMUN.reloj();
   let ctx, R0 = 1, t0 = 0, tiempo = 0, gente = [], todos = [], orden = [], planeta = null, yo = null;
   let motas = null, pos = null, nInf = 0, anillos = [], tos = 0, verde = null;
+  let apagar = false, apagado = 0;                // último paso: sin nadie sano, la cadena se corta y el virus se extingue
+  let cSup = null, cEmi = null, apagadoSup = null, apagadoEmi = null;   // la superficie del planeta mientras se apaga el verde
   const est = { pandemia: 0 }, obj = { ...est };
   let cieloObj = 0x9fd3f0;
 
   function crear(c) {
     ctx = c; const T = ctx.THREE;
     verde = new T.Color(0x8fe06a);
+    cSup = new T.Color(); cEmi = new T.Color(); apagadoSup = new T.Color(0x4a4f46); apagadoEmi = new T.Color(0x2a2e28);
     yo = COMUN.protagonista(ctx, { x: -11.5, z: 120, vel: .55 });
     // la multitud, apretada en el tramo por el que pasea el protagonista: así se ve la mancha verde desde la acera
     gente = COMUN.multitud(ctx, 120, -10, 10, 115, 320, { andar: true });
@@ -84,14 +87,13 @@ window.FENOMENOS.virus = (() => {
     // nada explota: solo un golpe sordo y un siseo
     COMUN.tono(ctx, 140, 95, 2.4, 'sine', .12);
     COMUN.ruido(ctx, 1.4, 2600, .07);
-    if (R0 >= 1e20 && planeta) { // el montón de virus pesa más que la Tierra: el planeta se parte
-      planeta.partir(.14); COMUN.estallarPlaneta(ctx, 1600, 0x9cff78);
-      COMUN.ruido(ctx, 6, 120, .9); COMUN.tono(ctx, 70, 20, 5, 'sawtooth', .35);
-    }
+    // la epidemia se acaba sola: el verde del planeta se apaga despacio, sin estruendo
+    if (f.apagar) { apagar = true; obj.pandemia = 0; COMUN.tono(ctx, 90, 42, 5.5, 'sine', .14); }
   }
 
   function actualizar(c, dt, t) {
     tiempo = t; reloj.tick(t); yo.actualizar(dt, t);
+    if (apagar) apagado = Math.min(1, apagado + dt / 5);
     COMUN.corte.tick(ctx, dt);
     const k = 1 - Math.exp(-dt * 1.1);
     for (const key in est) est[key] += (obj[key] - est[key]) * k;
@@ -129,7 +131,12 @@ window.FENOMENOS.virus = (() => {
     const r = Math.max(25, Math.min(700, ctx.camDist * .55)), n = Math.round(est.pandemia * 8);
     for (let q = 0; q < n; q++) ctx.emit(ctx.camTgt.x + ctx.rr(-r, r), ctx.camTgt.y + ctx.rr(-r, r) * .5, ctx.camTgt.z + ctx.rr(-r, r),
       ctx.rr(-1, 1), ctx.rr(-.4, .6), ctx.rr(-1, 1), verde, Math.max(.6, Math.min(2.4, ctx.camDist * .006)), 0);
-    if (planeta) { planeta.update(dt); planeta.teñir(0x6f8f4a, .8, 0x4a7a22, .08); planeta.nubes.material.color.set(0xffffff).lerp(verde, .55); }
+    if (planeta) { planeta.update(dt);
+      // al apagarse la epidemia el verde se va y queda una Tierra apagada: ni verde ni viva
+      const k2 = apagado * apagado;
+      cSup.set(0x6f8f4a).lerp(apagadoSup, k2); cEmi.set(0x4a7a22).lerp(apagadoEmi, k2);
+      planeta.teñir(cSup.getHex(), .8 + .15 * k2, cEmi.getHex(), .08);
+      planeta.nubes.material.color.set(0xffffff).lerp(verde, .55 * (1 - k2)); }
   }
 
   // días que tarda en contagiar a todo el planeta: una ronda cada 3 días, y nunca menos de dos rondas
@@ -157,9 +164,11 @@ window.FENOMENOS.virus = (() => {
           .sort((a, b) => cerca(a, yo) - cerca(b, yo));
         const p = hay.find(q => !q.andar) || hay[0];
         if (!p) return fijo && yo.camara({ ...fijo, cerca: true }); // el plano fijo, movido a donde ya ha llegado el protagonista
-        // picado corto: la cámara por encima de la cabeza para que el punto verde caiga por debajo de la frase
-        const P = p.g.position;
-        return { pos: [P.x + 2.2, ctx.GROUND + 2.4, P.z - 2.6], mira: [P.x, ctx.GROUND + 1.1, P.z] };
+        // cada uno mira hacia donde le tocó al crearlo (p.dir es aleatorio), así que la cámara se pone delante de ESTA
+        // persona, no en un lado fijo: si no, la mitad de las veces el corte era una espalda y el punto verde del pecho
+        // no se veía. Un poco por encima de los ojos y algo ladeada, para que el punto quede por debajo de la frase.
+        const P = p.g.position, a = p.g.rotation.y + .45, d = 3.8;
+        return { pos: [P.x + Math.sin(a) * d, ctx.GROUND + 2.6, P.z + Math.cos(a) * d], mira: [P.x, ctx.GROUND + 2.1, P.z] };
       }
       // la acera con la gente tumbada: se enfoca a un cuerpo de verdad, no a un punto de la calle
       if (fi.plano === 'calle') {
@@ -172,13 +181,13 @@ window.FENOMENOS.virus = (() => {
       }
       return fijo;
     },
-    activo: () => tiempo - t0 < 4 || anillos.length > 0 || reloj.pendientes > 0 || (planeta && planeta.split > 0 && planeta.split < .9),
-    mag: v => v >= 1e20 ? (COMUN.EN ? '10⁴³ copies' : '10⁴³ copias') : `R₀ ${COMUN.num(v, 0)}`,
+    activo: () => tiempo - t0 < 4 || anillos.length > 0 || reloj.pendientes > 0 || (apagar && apagado < 1),
+    mag: v => `R₀ ${COMUN.num(v, 0)}`,
     // tercera línea del marcador: a cuánta gente llega un solo enfermo en dos rondas (seis días).
     // Dos rondas y no tres: con tres, a partir del paso 12 ya sale «todo el planeta» y la línea deja de cambiar.
     linea3: v => {
       const EN = COMUN.EN;
-      if (v >= 1e20) return EN ? ['AS HEAVY AS THE EARTH', '(5.97 × 10²⁴ kg of virus)'] : ['PESA LO QUE LA TIERRA', '(5,97 × 10²⁴ kg de virus)'];
+      if (apagar) return EN ? ['NOBODY HEALTHY LEFT', '(the chain breaks)'] : ['NO QUEDA NADIE SANO', '(la cadena se corta)'];
       if (v <= 1) return EN ? ['IT NEVER TAKES OFF', '(and it never goes away)'] : ['NO ARRANCA NUNCA', '(y nunca se va)'];
       const dos = Math.min(MUNDO, v * v), c = dos < 1e6 ? COMUN.num(dos, 0) : COMUN.grande(dos); // 1.024 y 16.384 enteros, no «1 mil»
       return EN ? [`≈ ${c} people in 6 days`, '(from a single patient)'] : [`≈ ${c}${dos >= 1e6 ? COMUN.DE : ' '}personas en 6 días`, '(a partir de un solo enfermo)'];
@@ -187,7 +196,7 @@ window.FENOMENOS.virus = (() => {
     danos: () => {
       const EN = COMUN.EN, pc = COMUN.num(Math.round(100 * nInf / orden.length), 0);
       const n = todos.filter(p => p.caer && tiempo > p.retraso).length, cama = COMUN.num(Math.round(100 * n / todos.length), 0);
-      if (R0 >= 1e20) return EN ? 'Planet Earth: split in two' : 'Planeta Tierra: partido en dos';
+      if (apagar) return EN ? 'The virus dies out · it ran out of hosts' : 'El virus se extingue · se quedó sin huéspedes';
       const d = dias(R0);
       if (!d) return EN ? 'It never dies out · patient zero still has it' : 'No se apaga nunca · el primer enfermo sigue igual';
       const todo = EN ? `Everyone on Earth in ${texto(d)}` : `Todo el planeta en ${texto(d)}`;
