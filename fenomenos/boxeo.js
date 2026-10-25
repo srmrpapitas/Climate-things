@@ -52,8 +52,8 @@ window.FENOMENOS.boxeo = (() => {
       const dx = CX - p.g.position.x, dz = CZ - p.g.position.z;
       if (dx * dx + dz * dz < 900) p.g.rotation.y = Math.atan2(dx, dz);
     }
-    for (let k = 0; k < 14; k++) {                                                          // la cola: el siguiente retador, y el siguiente
-      const m = COMUN.persona(ctx), x = CX - LADO - 2.2, z = CZ - 2 - k * 1.1;
+    for (let k = 0; k < 26; k++) {                                                          // la cola: el siguiente retador, y el siguiente
+      const m = COMUN.persona(ctx), x = CX - LADO - 2.4 + (k % 2) * .5, z = CZ - 2.5 - k * 1.15;
       m.position.set(x, ctx.groundAt(x, z), z); m.rotation.y = 0; ctx.cityGroup.add(m); cola.push(m);
     }
   }
@@ -121,7 +121,7 @@ window.FENOMENOS.boxeo = (() => {
   function reponer() {
     if (fuera) { rival.visible = false; return; }
     rival.visible = true; rival.position.set(RVX, ctx.GROUND + LONA, CZ); rival.rotation.set(0, -Math.PI / 2, 0);
-    const m = cola.shift(); if (m) { m.visible = false; for (const o of cola) o.position.z += 1.1; }
+    if (cola.length > 6) { const m = cola.shift(); m.visible = false; for (const o of cola) o.position.z += 1.15; } // nunca se acaba la cola: es el chiste
   }
 
   function actualizar(c, dt, t) {
@@ -189,8 +189,8 @@ window.FENOMENOS.boxeo = (() => {
       if (fi.plano === 'cara') { const p = yo.position;
         return { pos: [p.x + 2.4, ctx.GROUND + LONA + 1.75, p.z + 1.1], mira: [p.x, ctx.GROUND + LONA + 1.5, p.z] }; }
       if (fi.plano === 'cola') { const m = cola.find(o => o.visible);
-        if (!m) return fijo;
-        return { pos: [m.position.x - 3.4, ctx.GROUND + 2.3, m.position.z - 2.2], mira: [m.position.x, ctx.GROUND + 1.2, m.position.z + 2] }; }
+        if (!m) return fijo;                                 // de frente: miran hacia el ring (+z), así que la cámara va por delante
+        return { pos: [m.position.x - 3, ctx.GROUND + 2.9, m.position.z + 3.4], mira: [m.position.x, ctx.GROUND + 1.9, m.position.z - 2] }; }
       return fijo;
     },
     activo: () => tiempo - t0 < 3.5 || !!vuelo || !!onda || reloj.pendientes > 0,
