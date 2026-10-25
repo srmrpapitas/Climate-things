@@ -833,7 +833,7 @@ function audioInit() {
   // mudo (en la gravedad, los últimos 20 s). exportar() carga la narración antes de llamar a start(), así que aquí ya está
   // en vozDur y se suma lo que dura de verdad cada frase; igual que en durFase() y en el estado 'intro'.
   const pasoDur = (f, i) => Math.max(f.dur ?? ESC.ritmo, vozDur[i + 1] ? vozDur[i + 1] + retrasoVoz(i + 1) + PAUSA : 0);
-  const durMax = ESC.ritmo ? Math.min(300, Math.ceil((Math.max(ESC.introDur ?? 2.6, (vozDur[0] ?? 0) + .4)
+  const durMax = ESC.ritmo ? Math.min(320, Math.ceil((Math.max(ESC.introDur ?? 2.6, (vozDur[0] ?? 0) + .4)
     + ESC.fases.reduce((s, f, i) => s + pasoDur(f, i), 0)) * 1.08 + 10)) : 300;
   try { AC = GRABAR ? new OfflineAudioContext(2, 48000 * durMax, 48000) : new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return; }
   if (GRABAR) { const t0 = time; Object.defineProperty(AC, 'currentTime', { get: () => time - t0 }); }
