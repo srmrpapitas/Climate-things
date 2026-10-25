@@ -63,7 +63,7 @@ function montar() {
   let t = 0;
   planos = H_.planos.map((p, i) => {
     const b = buf[i], dVoz = b ? b.duration : p.texto.length / 15;
-    const q = { ...p, i, t0: t, dVoz, dur: Math.max(p.dur || 0, dVoz + PAUSA) };
+    const q = { ...p, i, t0: t, dVoz, dur: Math.max(p.dur || 0, dVoz + (H_.pausa ?? PAUSA)) };
     q.rot = (p.rotulos || []).map(r => ({ ...r, t: cuando(r.en, q) + (r.d || 0) }));
     q.cap = (p.capas || []).map(c => ({ ...c, t: cuando(c.en, q) + (c.d || 0) }));
     t += q.dur; return q;

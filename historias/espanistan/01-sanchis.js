@@ -12,6 +12,7 @@ window.HISTORIA = (() => {
     descripcion: 'Un país inventado, datos públicos y un consejo: piensa antes de votar.',
     voces: 'audio/voz/es/espanistan-01',
     subtitulos: true,
+    pausa: 1.4, // ritmo de documental: deja respirar cada frase
     imagenes: { cueva: D + 'cueva.webp', portada: D + 'portada.webp', despacho: D + 'despacho.webp', coche: D + 'coche.webp', mochila: D + 'mochila.webp',
       llave: D + 'llave.webp', hucha: D + 'hucha.webp', congreso: D + 'congreso.webp', laboratorio: D + 'laboratorio.webp', balanza: D + 'balanza.webp', urna: D + 'urna.webp' },
     planos: [
@@ -89,6 +90,9 @@ window.HISTORIA = (() => {
         rotulos: [cita('@Kant', 'Sapere aude: atrévete a pensar por ti mismo.', 'Kant, «¿Qué es la Ilustración?»', { hasta: '@Aquí' })] }),
       P('portada', 'En el próximo episodio de Españistán: el líder de la oposición. Mismas reglas. Mismas preguntas.', { cam: LEJOS, dur: 6,
         rotulos: [{ en: '@próximo', tipo: 'aviso', texto: 'Fuentes de todos los datos en la descripción', y: .08 }] }),
+      // Viñeta final sin voz: deja sitio a las pantallas finales de YouTube (vídeo sugerido y suscribirse)
+      P('portada', '', { cam: LEJOS, dur: 30,
+        rotulos: [titulo('¿Quieres más Españistán?', { hasta: 30 }), { en: 1, tipo: 'aviso', texto: 'Mira otro episodio · Suscríbete para no perderte el siguiente', y: .9 }] }),
     ],
   };
 })();
