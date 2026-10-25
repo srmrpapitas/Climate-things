@@ -303,7 +303,7 @@ window.COMUN = (() => {
       boca.scale.set(.02 + v * .008, .003 + v * .038, .013); boca.position.y = .036 - v * .016; lengua.position.y = .03 - v * .02; lengua.scale.y = .002 + v * .004;
       labios.position.y = y0l + v * .004; labios.scale.x = .022 - v * .004; barba.position.y = y0b - v * .028; };
     hablar(0);
-    g.userData = { cabeza, boca, hablar, andar(ph, k) { const a = Math.sin(ph) * k;
+    g.userData = { cabeza, boca, hablar, piernas, brazos, andar(ph, k) { const a = Math.sin(ph) * k;
       piernas[0].cad.rotation.x = a * .5; piernas[1].cad.rotation.x = -a * .5;
       piernas[0].rod.rotation.x = Math.max(0, -Math.sin(ph)) * .7 * k; piernas[1].rod.rotation.x = Math.max(0, Math.sin(ph)) * .7 * k;
       brazos[0].hom.rotation.x = -a * .4; brazos[1].hom.rotation.x = a * .4; for (const b of brazos) b.codo.rotation.x = -.25 - .2 * k;

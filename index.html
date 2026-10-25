@@ -908,6 +908,7 @@ const ctx = {
   setShake(v) { shake = v; }, get camDist() { return corte ? corte.p.distanceTo(corte.t) : camDist; }, get corte() { return corte; }, get caidos() { return fallen; }, get total() { return cityTotal; },
   get audio() { return { AC, master }; }, sfx, cama, camSigue, merge: mergeGeometries,
   GLTF: GLTFLoader, pools, get fase() { return phase; },
+  vozDur: n => vozDur[n], retrasoVoz,   // duración de la frase n (si ya está cargada) y lo que espera antes de empezar
 };
 FEN.crear(ctx);
 
