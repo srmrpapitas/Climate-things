@@ -5,7 +5,7 @@
 // Física (ley cuadrado-cubo, Galileo 1638): con el doble de altura pesas 8 veces más (volumen), pero huesos, tendones y
 // músculos solo son 4 veces más gruesos (sección). Cada duplicación, todo lo que te sostiene soporta el DOBLE de presión:
 // para tus huesos, crecer al doble es como vivir con el doble de gravedad.
-// Persona de partida: 1,75 m y 70 kg, misma densidad y proporciones. Cifras de partida (orden de magnitud, varían entre personas):
+// Persona de partida («una persona promedio»): 1,75 m y 70 kg, misma densidad y proporciones. Cifras de partida (orden de magnitud, varían entre personas):
 //  - fémur: ~3,8 cm² de hueso cortical; de pie carga ~1 peso corporal → ~1,8 MPa; al andar, con la flexión, ~25 MPa.
 //    El hueso cortical rompe a ~190 MPa (compresión). Andando: 25 × 2ⁿ > 190 en n = 3 (14 m). Quieto: 1,8 × 2ⁿ > 190 en n = 7 (224 m).
 //  - tendón de Aquiles: ~30 MPa al andar, rompe a ~100 MPa → falla andando en n = 2 (7 m).
@@ -41,9 +41,9 @@ window.ESCENARIOS = window.ESCENARIOS || {};
     paso: T('FASE', 'STAGE'),
     lema: T('EL DOBLE DE ALTO CADA VEZ', 'TWICE AS TALL EVERY TIME'),
     fases: [
-      P(T('TÚ, NORMAL', 'YOU, NORMAL'),
-        T('Uno setenta y cinco, setenta kilos. Al andar, tus huesos aguantan siete veces más de lo que les pides.',
-          'Five foot nine, seventy kilos. When you walk, your bones can take seven times what you ask of them.'),
+      P(T('UNA PERSONA PROMEDIO', 'AN AVERAGE PERSON'),
+        T('Una persona promedio. Al andar, tus huesos aguantan siete veces más de lo que les pides.',
+          'An average person. When you walk, your bones can take seven times what you ask of them.'),
         T('Todo en orden', 'All fine'), T('Hueso', 'Bone')),
       P(T('EL DOBLE', 'DOUBLE'),
         T('Mides el doble, pero pesas ocho veces más: como un caballo. Y tus huesos solo son cuatro veces más gruesos.',
