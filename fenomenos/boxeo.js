@@ -22,8 +22,8 @@ window.FENOMENOS.boxeo = (() => {
   const vista = v => v <= 45 ? v : 45 + 13 * Math.log2(v / 45);
   // sonidos: audio/sfx/bomboclat_anime/*.mp3 y la envolvente de cada uno para mover la boca (boca.json)
   const GRITOS = { corto: { n: 'corto', clat: 1.09 }, carga: { n: 'carga', clat: 3.36 }, final: { n: 'final_carga', clat: 0 }, rival: { n: 'rival' }, nani: { n: 'nani' }, clat: { n: 'final_clat' },
-    // los cortos de cada golpe normal: «¡BOMBO!», «¡CLAT!» o las dos
-    bombo: { n: 'bombo' }, bombo2: { n: 'bombo2' }, clat1: { n: 'clat' }, clat2: { n: 'clat2' } };
+    // el de cada golpe normal: «¡BOMBOCLAT!» de una tirada, el puño llega en el «CLAT»
+    bomboclat: { n: 'bomboclat', clat: .5 } };
   let ctx, T, H, tiempo = 0, ft = 0, fa = 0, dice = 'clat', golpe = 0, E = 150, fActual = {}, tp = .45, lanzar = null, lento = 1, lentoT = 0;
   let yo = null, rival = null, arbitro = null, entrenador = null, cola = [], jueces = [], protector = null;
   let vuelo = null, onda = null, radio = 0, fuera = false, pegando = 0, sacudida = 0, cargando = 0, aura = null, voces = [], envBoca = {};
@@ -373,14 +373,14 @@ window.FENOMENOS.boxeo = (() => {
     retroceso = null; if (vuelo || rival.tirado || !rival.g.visible || Math.abs(rival.g.position.x - RVX) > .01) { vuelo = null; reponer(); }
     if (marcador) marcador.pon(`${EN ? 'PUNCH' : 'GOLPE'} #${n}`, COMUN.grande(valor) + (valor >= 1e6 ? COMUN.DE : ' ') + 'J');
     // cuándo llega el puño: depende del grito
-    // en los golpes sin grito largo también dicen algo: «¡CLAT!» al pegar, «¡BOMBO!» al cargar el brazo, o «BOMBO… CLAT!»
-    dice = f.grito ? 'clat' : f.rival ? 'bombo' : ['clat', 'bombo', 'bomboclat'][n % 3];
+    // en los golpes sin grito largo, «¡BOMBOCLAT!» de una tirada: el puño entra en el «CLAT» y el narrador va justo detrás
+    dice = f.grito ? 'clat' : 'bomboclat';
     // el puño llega enseguida: nada de quedarse parados al empezar el paso (el grito empieza con el paso)
-    tp = f.grito === 'corto' ? GRITOS.corto.clat : f.grito === 'carga' ? .1 + GRITOS.carga.clat : f.grito === 'final' ? 4.75 : dice === 'clat' ? .3 : .64;
-    if (!f.grito) {
-      const rot = (texto, kana, t, y = -.66) => reloj.luego(t, () => ANIME.rotulo({ texto, kana, y, ancho: 1.05, dur: .85, rot: n % 2 ? -.08 : .07 }));
-      if (dice !== 'clat') { gritar(n % 2 ? 'bombo' : 'bombo2', 0); rot('BOMBO!', 'ボンボ！', .05, -.6); }
-      if (dice !== 'bombo') { gritar(n % 2 ? 'clat1' : 'clat2', tp - .08); if (E < 1e6) rot('CLAT!', 'クラット！', tp, -.74); }
+    tp = f.grito === 'corto' ? GRITOS.corto.clat : f.grito === 'carga' ? .1 + GRITOS.carga.clat : f.grito === 'final' ? 4.75 : GRITOS.bomboclat.clat;
+    if (!f.grito) { gritar('bomboclat', 0);
+      // lo que se oye, escrito abajo (no tapa la boca); en los golpes grandes el «CLAAAT!!» del impacto lo remata
+      reloj.luego(.03, () => ANIME.rotulo(E < 1e6 ? { texto: 'BOMBOCLAT!', kana: 'ボンボクラット！', y: -.68, ancho: 1.5, dur: 1.05, rot: n % 2 ? -.08 : .07 }
+        : { texto: 'BOMBO…', kana: 'ボンボ…', y: -.6, ancho: 1.1, dur: .5, rot: n % 2 ? -.08 : .07 }));
     }
     if (f.grito === 'corto') { gritar('corto', 0); reloj.luego(.05, () => ANIME.rotulo({ texto: 'BOMBO…', kana: 'ボンボ…', y: -.66, ancho: 1.2, dur: .95, rot: -.08 })); }
     if (f.grito === 'carga') { gritar('carga', .1); reloj.luego(.25, () => ANIME.rotulo({ texto: 'BOOOOM…', kana: 'ボォォォム…', y: -.7, ancho: 1.3, dur: 1.2, rot: -.06 }));
@@ -417,7 +417,7 @@ window.FENOMENOS.boxeo = (() => {
     if (gran) { ANIME.negativo(n >= 13 ? .1 : .067); ANIME.destello(.7, .25); lento = .06; lentoT = f.grito === 'final' ? .45 : f.grito ? .22 : .12; ANIME.lineas(1); reloj.luego(.5, () => ANIME.lineas(0));
       if (dice !== 'bombo') ANIME.rotulo(f.grito === 'final' ? { texto: 'CLAAAAAT!!', kana: 'クラアアアット！！', estilo: 'rojo', y: -.68, ancho: 1.95, dur: 1.6, rot: -.12, temblor: 2 }
         : { texto: 'CLAAAT!!', kana: 'クラアアット！！', y: -.7, ancho: 1.8, dur: 1.25, rot: -.1, temblor: 1.5 }); }
-    if (f.rival) { gritar('rival', .08, 'rival', .9); reloj.luego(.1, () => ANIME.rotulo({ texto: 'BOMBOCLAAAT!', kana: 'ボンボクラアアット！', estilo: 'azul', y: -.62, ancho: 1.7, dur: 1.4, rot: .08 })); }
+    if (f.rival) { gritar('rival', .25, 'rival', .9); reloj.luego(.45, () => ANIME.rotulo({ texto: 'BOMBOCLAAAT!', kana: 'ボンボクラアアット！', estilo: 'azul', y: -.62, ancho: 1.7, dur: 1.4, rot: .08 })); }
     if (n === 4) { protector.visible = true; protector.position.copy(cab).add(new T.Vector3(.12, -.06, 0)); protector.userData.v = new T.Vector3(9, 3.5, ctx.rr(-.5, .5)); }
     sacudida = Math.min(1.2, .25 + n * .04); animoPub = Math.min(1.5, .8 + n * .03);
     if (destruido < 3) ctx.sfx('ovacion', Math.min(.55, .3 + n * .01), .3, ctx.rr(.94, 1.06));   // la grada responde
@@ -596,6 +596,7 @@ window.FENOMENOS.boxeo = (() => {
   // ---------- el final: estilo One Punch Man ----------
   // golpe en la cara a cámara lentísima, sale disparado hacia la cámara, la atraviesa y la cámara se va detrás de él
   // cada vez más rápido, cielo arriba, hasta el Sol
+  const SOL_T = 7.8;    // segundos de vuelo hasta el Sol: el destello cae al acabar «Directo al Sol» en la frase del último golpe
   function THREE_DIR() { return new T.Vector3(.475, .863, .173).normalize(); }
   function volarFinal(dt, dtReal) {
     const V = vuelo, p = rival.g.position, D = THREE_DIR();
@@ -610,7 +611,7 @@ window.FENOMENOS.boxeo = (() => {
     if (V.t > .5) ANIME.lineas(Math.min(.85, (V.t - .5) * .6), [.5, .55]);
     if (!sol) solNuevo();
     // al llegar al Sol, destello blanco
-    if (V.t > 17.4 && !V.sol) { V.sol = true; ANIME.destello(1, 2.2, 0xfff1c0); ctx.sfx('whoosh', .5); }   // llega al Sol justo al acabar la frase
+    if (V.t > SOL_T && !V.sol) { V.sol = true; ANIME.destello(1, 2.2, 0xfff1c0); ctx.sfx('whoosh', .5); }   // llega al Sol en el «Directo al Sol» de la frase
   }
   function solNuevo() {
     sol = new T.Group(); sol.userData.fenPropio = sol.userData.sobrePlaneta = true;
@@ -696,7 +697,7 @@ window.FENOMENOS.boxeo = (() => {
     const d = Math.hypot(c.pos[0] - c.mira[0], c.pos[1] - c.mira[1], c.pos[2] - c.mira[2]);
     sacudida = Math.max(0, sacudida - dt * 2.2); ctx.setShake(sacudida * Math.min(1.5, d * .012));
     // el sol del final se queda delante, cada vez más grande
-    if (sol && vuelo && vuelo.final) { sol.userData.t += dt; const kk = Math.min(1, Math.max(0, (vuelo.t - 1.5) / 15.5)), ang = .012 + Math.pow(kk, 2.2) * .42, D = THREE_DIR();
+    if (sol && vuelo && vuelo.final) { sol.userData.t += dt; const kk = Math.min(1, Math.max(0, (vuelo.t - 1.5) / (SOL_T - 1.9))), ang = .012 + Math.pow(kk, 2.2) * .42, D = THREE_DIR();
       const dist = 30000; sol.position.copy(ctx.camera.position).addScaledVector(D, dist); sol.scale.setScalar(Math.tan(ang) * dist); }
   }
 
