@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Historias 2D · Si se duplica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@600;800&family=Lora:ital,wght@0,400;0,500;1,500;1,600&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; height: 100%; background: #111; color: #f4efe6; font-family: Inter, sans-serif; }
+  #caja { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
+  canvas { width: min(100vw, 177.78vh); height: min(56.25vw, 100vh); background: #000; display: block; }
+  #menu { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; background: rgba(10,10,14,.82); text-align: center; padding: 16px; }
+  #menu.off { display: none; }
+  #menu h1 { font-family: 'Archivo Black', sans-serif; font-size: clamp(22px, 5vw, 46px); margin: 0; }
+  #menu p { margin: 0; opacity: .75; max-width: 640px; }
+  button { font: 800 17px Inter, sans-serif; padding: 12px 22px; border-radius: 10px; border: 0; background: #f4efe6; color: #111; cursor: pointer; }
+  button.sec { background: #2b2b33; color: #f4efe6; }
+  #estado { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); background: rgba(0,0,0,.75); padding: 10px 16px; border-radius: 10px; font-size: 14px; display: none; }
+  #estado.on { display: block; }
+  #estado .barra { height: 6px; background: #333; border-radius: 3px; margin-top: 8px; overflow: hidden; } #estado .barra i { display: block; height: 100%; width: 0; background: #f2c14e; }
+  #estado .bot button { margin-top: 10px; }
+</style>
+</head>
+<body>
+<div id="caja"><canvas id="lienzo" width="1920" height="1080"></canvas></div>
+<div id="menu">
+  <div style="opacity:.6">@siseduplica · YouTube</div>
+  <h1 id="titulo">…</h1>
+  <p id="desc"></p>
+  <div><button id="ver">▶ Ver</button> <button id="mp4" class="sec">🎬 Descargar MP4 1920×1080</button></div>
+  <p style="font-size:13px">Para exportar, mejor un ordenador con Chrome: tarda más o menos lo que dura el vídeo.</p>
+  <p style="font-size:13px"><a href="index.html" style="color:#f2c14e">← Volver a los vídeos de Instagram</a></p>
+</div>
+<div id="estado"><div class="txt"></div><div class="barra"><i></i></div><div class="bot"></div></div>
+<script src="vendor/mp4-muxer.js"></script>
+<script>
+// Motor de historias 2D (YouTube, 16:9). Cada episodio es un archivo historias/<serie>/<ep>.js que define window.HISTORIA:
+// una lista de planos, cada uno con su frase del narrador (audio en HISTORIA.voces/NN.mp3), su fondo, sus personajes,
+// el movimiento de cámara y los rótulos (datos con su fuente, citas, títulos, frascos, gráficos).
+// Lo que va «en una palabra» se escribe '@palabra': cae cuando el narrador la dice (con la duración real de la frase).
+// Sin dibujos o sin voz también funciona: pinta un hueco con el nombre de la imagen y calcula la frase a 15 letras/s.
+const params = new URLSearchParams(location.search), $ = id => document.getElementById(id);
+const W = 1920, H = 1080, FPS = 30, PAUSA = .35, CRUCE = .4;
+const cv = $('lienzo'), g = cv.getContext('2d');
+const lerp = (a, b, k) => a + (b - a) * k, cl = (v, a, b) => Math.max(a, Math.min(b, v)), suave = k => { k = cl(k, 0, 1); return k * k * (3 - 2 * k); };
+const fuera = k => 1 - Math.pow(1 - cl(k, 0, 1), 3);
+let H_ = null, planos = [], total = 0, img = {}, buf = [], AC = null;
+
+function cargarScript(src) { return new Promise((ok, ko) => { const s = document.createElement('script'); s.src = src; s.onload = ok; s.onerror = ko; document.head.appendChild(s); }); }
+function cargarImg(src) { return new Promise(ok => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => ok(null); i.src = src; }); }
+async function cargarVoz(ctx, url) { try { const r = await fetch(url); if (!r.ok) return null; return await ctx.decodeAudioData(await r.arrayBuffer()); } catch (e) { return null; } }
+
+// ---------- línea de tiempo ----------
+function cuando(w, p) {
+  if (typeof w === 'number') return w;
+  if (!w) return 0;
+  const i = p.texto.toLowerCase().indexOf(w.slice(1).toLowerCase());
+  if (i < 0) console.warn('historia: no encuentro', w, 'en', p.texto);
+  return Math.max(0, i) / p.texto.length * p.dVoz;
+}
+function montar() {
+  let t = 0;
+  planos = H_.planos.map((p, i) => {
+    const b = buf[i], dVoz = b ? b.duration : p.texto.length / 15;
+    const q = { ...p, i, t0: t, dVoz, dur: Math.max(p.dur || 0, dVoz + PAUSA) };
+    q.rot = (p.rotulos || []).map(r => ({ ...r, t: cuando(r.en, q) + (r.d || 0) }));
+    q.cap = (p.capas || []).map(c => ({ ...c, t: cuando(c.en, q) + (c.d || 0) }));
+    t += q.dur; return q;
+  });
+  total = t + 1.5;
+}
+
+// ---------- dibujo ----------
+function fondo(p, k) {
+  const c = p.cam || {}, de = c.de || [.5, .5, 1], a = c.a || [.5, .5, 1.06], e = suave(k);
+  const z = lerp(de[2], a[2], e), cx = lerp(de[0], a[0], e), cy = lerp(de[1], a[1], e);
+  const im = img[p.fondo];
+  g.save(); g.translate(W / 2, H / 2); g.scale(z, z); g.translate(-cx * W, -cy * H);
+  if (im) { const s = Math.max(W / im.width, H / im.height); g.drawImage(im, (W - im.width * s) / 2, (H - im.height * s) / 2, im.width * s, im.height * s); }
+  else { const gr = g.createLinearGradient(0, 0, W, H); gr.addColorStop(0, p.color || '#3a4a5e'); gr.addColorStop(1, '#1b1f27'); g.fillStyle = gr; g.fillRect(-W, -H, W * 3, H * 3);
+    g.fillStyle = 'rgba(255,255,255,.18)'; g.font = '700 46px Inter'; g.textAlign = 'center'; g.fillText('[ ' + (p.fondo || 'fondo') + ' ]', W / 2, H / 2); }
+  return { z, cx, cy };
+}
+function capas(p, lt, cam) {
+  for (const c of p.cap) {
+    const k = lt - c.t; if (k < 0 || (c.hasta != null && lt > cuando(c.hasta, p))) continue;
+    const im = img[c.img], h = (c.h || .7) * H, w = im ? h * im.width / im.height : h * .5;
+    let x = c.x * W, y = c.y * H, rot = 0, sy = 1, al = 1;
+    const ent = fuera(k / .5);
+    if (c.entra === 'izq') x -= (1 - ent) * W * .4; else if (c.entra === 'der') x += (1 - ent) * W * .4; else if (c.entra === 'abajo') y += (1 - ent) * H * .5; else al = ent;
+    if (c.anim === 'respira' || !c.anim) sy = 1 + Math.sin(lt * 2.2 + c.x * 9) * .008;
+    if (c.anim === 'saluda') rot = Math.sin(lt * 5) * .03;
+    if (c.anim === 'flota') y += Math.sin(lt * 1.6) * 10;
+    if (c.anim === 'tiembla') x += Math.sin(lt * 40) * 3;
+    // las capas siguen la cámara a medias (paralaje): las de delante se mueven más
+    const px = c.paralaje ?? .6, z = lerp(1, cam.z, px);
+    g.save(); g.globalAlpha = al; g.translate(W / 2, H / 2); g.scale(z, z); g.translate(-W / 2 + (.5 - cam.cx) * W * px * .5, -H / 2 + (.5 - cam.cy) * H * px * .5);
+    g.translate(x, y); g.rotate(rot); g.scale(c.espejo ? -1 : 1, sy);
+    if (im) g.drawImage(im, -w / 2, -h, w, h);
+    else { g.fillStyle = 'rgba(244,239,230,.25)'; g.fillRect(-w / 2, -h, w, h); g.fillStyle = '#fff'; g.font = '700 30px Inter'; g.textAlign = 'center'; g.fillText(c.img, 0, -h / 2); }
+    g.restore();
+  }
+}
+function tarjeta(x, y, w, h, color = '#f4efe6') {
+  g.save(); g.shadowColor = 'rgba(0,0,0,.35)'; g.shadowBlur = 24; g.shadowOffsetY = 8; g.fillStyle = color;
+  g.beginPath(); g.roundRect(x, y, w, h, 18); g.fill(); g.restore();
+}
+function lineas(txt, maxW, fuente) { g.font = fuente; const out = []; let l = '';
+  for (const p of txt.split(' ')) { const t = l ? l + ' ' + p : p; if (g.measureText(t).width > maxW && l) { out.push(l); l = p; } else l = t; } if (l) out.push(l); return out; }
+function rotulos(p, lt) {
+  for (const r of p.rot) {
+    const k = lt - r.t, fin = r.hasta != null ? cuando(r.hasta, p) : p.dur; if (k < 0 || lt > fin + .3) continue;
+    const a = Math.min(fuera(k / .35), cl((fin + .3 - lt) / .3, 0, 1)), pop = .85 + .15 * fuera(k / .35);
+    g.save(); g.globalAlpha = a; const x = (r.x ?? .5) * W, y = (r.y ?? .2) * H; g.translate(x, y); g.scale(pop, pop);
+    if (r.tipo === 'dato') {
+      g.font = '64px "Archivo Black"'; const w1 = g.measureText(r.valor).width; g.font = '600 30px Inter';
+      const ls = lineas(r.texto, 560, '600 30px Inter'), w = Math.max(w1, 560) + 60, h = 120 + ls.length * 38 + 40;
+      tarjeta(-w / 2, -h / 2, w, h); g.textAlign = 'center'; g.fillStyle = r.color || '#c0392b'; g.font = '64px "Archivo Black"'; g.fillText(r.valor, 0, -h / 2 + 88);
+      g.fillStyle = '#222'; g.font = '600 30px Inter'; ls.forEach((l, i) => g.fillText(l, 0, -h / 2 + 140 + i * 38));
+      g.fillStyle = '#777'; g.font = 'italic 500 22px Lora'; g.fillText('Fuente: ' + r.fuente, 0, h / 2 - 18);
+    } else if (r.tipo === 'cita') {
+      const ls = lineas('«' + r.texto + '»', 1300, 'italic 600 54px Lora'), h = ls.length * 68 + 90;
+      g.fillStyle = 'rgba(12,12,16,.72)'; g.beginPath(); g.roundRect(-760, -h / 2, 1520, h, 22); g.fill();
+      g.textAlign = 'center'; g.fillStyle = '#f4efe6'; g.font = 'italic 600 54px Lora'; ls.forEach((l, i) => g.fillText(l, 0, -h / 2 + 70 + i * 68));
+      g.fillStyle = '#f2c14e'; g.font = '800 30px Inter'; g.fillText('— ' + r.autor, 0, h / 2 - 22);
+    } else if (r.tipo === 'titulo') {
+      g.textAlign = 'center'; g.font = '84px "Archivo Black"'; const w = g.measureText(r.texto).width;
+      g.fillStyle = r.color || '#f2c14e'; g.fillRect(-w / 2 - 20, 22, (w + 40) * fuera(k / .6), 16);
+      g.lineWidth = 10; g.strokeStyle = 'rgba(0,0,0,.6)'; g.strokeText(r.texto, 0, 0); g.fillStyle = '#fff'; g.fillText(r.texto, 0, 0);
+    } else if (r.tipo === 'frasco') frasco(r, k);
+    else if (r.tipo === 'barras') barras(r, k);
+    else if (r.tipo === 'aviso') {
+      g.font = '800 34px Inter'; const w = g.measureText(r.texto).width + 60; g.fillStyle = 'rgba(12,12,16,.8)'; g.beginPath(); g.roundRect(-w / 2, -34, w, 68, 34); g.fill();
+      g.fillStyle = '#fff'; g.textAlign = 'center'; g.fillText(r.texto, 0, 12);
+    }
+    g.restore();
+  }
+}
+// frasco de laboratorio con su etiqueta (para los casos judiciales: el estado exacto de cada uno)
+function frasco(r, k) {
+  const w = 260, h = 340, e = r.estado, c = /^CONDENAD/.test(e) ? '#c0392b' : /^INVESTIGAD/.test(e) ? '#e67e22' : /^A JUICIO/.test(e) ? '#d4a017' : '#7f8c8d';
+  g.save(); g.lineWidth = 6; g.strokeStyle = 'rgba(230,245,255,.9)'; g.fillStyle = 'rgba(180,220,240,.18)';
+  g.beginPath(); g.roundRect(-w / 2, -h, w, h, 30); g.fill(); g.stroke();
+  g.fillStyle = '#5b4636'; g.fillRect(-w / 2 + 20, -h - 40, w - 40, 44);
+  g.fillStyle = c; g.globalAlpha *= .55; g.fillRect(-w / 2 + 8, -h * .45 * fuera(k / 1.2), w - 16, h * .45 * fuera(k / 1.2) - 8); g.globalAlpha /= .55;
+  tarjeta(-w / 2 - 30, -h * .72, w + 60, 150, '#f4efe6');
+  g.textAlign = 'center'; g.fillStyle = '#222'; g.font = '800 30px Inter'; g.fillText(r.quien, 0, -h * .72 + 46);
+  g.fillStyle = c; g.font = '26px "Archivo Black"'; lineas(r.estado, w + 20, '26px "Archivo Black"').forEach((l, i) => g.fillText(l, 0, -h * .72 + 90 + i * 30));
+  g.restore();
+}
+function barras(r, k) {
+  const n = r.datos.length, bw = 120, gap = 50, w = n * bw + (n - 1) * gap, max = Math.max(...r.datos.map(d => d[1])), hmax = 320;
+  tarjeta(-w / 2 - 50, -hmax - 110, w + 100, hmax + 220);
+  r.datos.forEach(([et, v], i) => { const x = -w / 2 + i * (bw + gap), h = hmax * v / max * fuera((k - i * .15) / .8);
+    g.fillStyle = r.colores?.[i] || '#2c6fb7'; g.fillRect(x, -h + 40, bw, h); g.fillStyle = '#222'; g.textAlign = 'center';
+    g.font = '30px "Archivo Black"'; g.fillText(r.fmt ? r.fmt(v) : v, x + bw / 2, -h + 28); g.font = '600 24px Inter'; g.fillText(et, x + bw / 2, 76); });
+  g.fillStyle = '#777'; g.font = 'italic 500 22px Lora'; g.textAlign = 'center'; g.fillText(r.titulo + ' · Fuente: ' + r.fuente, 0, -hmax - 70);
+}
+function subtitulo(p, lt) {
+  if (!H_.subtitulos) return;
+  // la frase que suena ahora (el texto del plano partido por frases, repartido por letras)
+  const fr = p.texto.match(/[^.!?…]+[.!?…»]*/g) || [p.texto]; let acc = 0, cur = fr[0];
+  for (const f of fr) { const d = f.length / p.texto.length * p.dVoz; if (lt < acc + d) { cur = f; break; } acc += d; cur = f; }
+  if (lt > p.dVoz + .2) return;
+  const ls = lineas(cur.trim(), 1500, '600 40px Inter'); g.save(); g.textAlign = 'center'; g.font = '600 40px Inter';
+  ls.forEach((l, i) => { const y = H - 60 - (ls.length - 1 - i) * 52; g.lineWidth = 8; g.strokeStyle = 'rgba(0,0,0,.85)'; g.strokeText(l, W / 2, y); g.fillStyle = '#fff'; g.fillText(l, W / 2, y); });
+  g.restore();
+}
+function plano(p, lt) {
+  const cam = fondo(p, lt / p.dur); capas(p, lt, cam); rotulos(p, lt); subtitulo(p, lt);
+}
+function pintar(t) {
+  g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.fillStyle = '#000'; g.fillRect(0, 0, W, H);
+  let i = planos.findIndex(p => t < p.t0 + p.dur); if (i < 0) i = planos.length - 1;
+  const p = planos[i], lt = t - p.t0;
+  // cruce suave con el plano anterior
+  if (i > 0 && lt < CRUCE && !p.corte) { const a = planos[i - 1]; plano(a, a.dur + lt); g.globalAlpha = suave(lt / CRUCE); }
+  g.save(); plano(p, lt); g.restore(); g.globalAlpha = 1;
+  // viñeta y fundidos de entrada y salida
+  const v = g.createRadialGradient(W / 2, H / 2, H * .45, W / 2, H / 2, H * .95); v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,.35)'); g.fillStyle = v; g.fillRect(0, 0, W, H);
+  const fn = Math.max(cl(1 - t / .8, 0, 1), cl((t - (total - 1.2)) / 1.2, 0, 1)); if (fn > 0) { g.fillStyle = `rgba(0,0,0,${fn})`; g.fillRect(0, 0, W, H); }
+}
+
+// ---------- reproducir ----------
+async function ver() {
+  $('menu').classList.add('off'); await AC.resume(); const t0 = AC.currentTime + .3;
+  planos.forEach((p, i) => { if (!buf[i]) return; const s = AC.createBufferSource(); s.buffer = buf[i]; s.connect(AC.destination); s.start(t0 + p.t0); });
+  const bucle = () => { const t = AC.currentTime - t0; pintar(Math.max(0, t)); if (t < total) requestAnimationFrame(bucle); else $('menu').classList.remove('off'); };
+  bucle();
+}
+
+// ---------- exportar a MP4 (WebCodecs + mp4-muxer, todo en el navegador) ----------
+async function exportar() {
+  const box = $('estado'), txt = box.querySelector('.txt'), barra = box.querySelector('.barra i'); box.classList.add('on'); $('menu').classList.add('off');
+  if (!window.VideoEncoder) { txt.textContent = 'Este navegador no puede exportar vídeo: usa Chrome en un ordenador.'; return; }
+  const BR = 10e6, vcod = (await VideoEncoder.isConfigSupported({ codec: 'avc1.640028', width: W, height: H, bitrate: BR, framerate: FPS })).supported ? 'avc1.640028' : 'avc1.42E028';
+  const aOk = async c => !!window.AudioEncoder && (await AudioEncoder.isConfigSupported({ codec: c, sampleRate: 48000, numberOfChannels: 2, bitrate: 192000 }).catch(() => ({}))).supported;
+  const acod = await aOk('mp4a.40.2') ? 'mp4a.40.2' : await aOk('opus') ? 'opus' : null;
+  const mux = new Mp4Muxer.Muxer({ target: new Mp4Muxer.ArrayBufferTarget(), fastStart: 'in-memory', firstTimestampBehavior: 'offset',
+    video: { codec: 'avc', width: W, height: H, frameRate: FPS }, ...(acod ? { audio: { codec: acod === 'opus' ? 'opus' : 'aac', sampleRate: 48000, numberOfChannels: 2 } } : {}) });
+  let fallo = null; const venc = new VideoEncoder({ output: (c, m) => mux.addVideoChunk(c, m), error: e => fallo = e });
+  venc.configure({ codec: vcod, width: W, height: H, bitrate: BR, framerate: FPS, latencyMode: 'quality' });
+  const N = Math.ceil(total * FPS), t0 = performance.now();
+  for (let n = 0; n < N && !fallo; n++) {
+    pintar(n / FPS); const vf = new VideoFrame(cv, { timestamp: Math.round(n * 1e6 / FPS), duration: Math.round(1e6 / FPS) });
+    venc.encode(vf, { keyFrame: n % (FPS * 2) === 0 }); vf.close();
+    while (venc.encodeQueueSize > 4) await new Promise(r => setTimeout(r, 2));
+    if (n % 15 === 0) { barra.style.width = (n / N * 90) + '%'; const s = (performance.now() - t0) / 1000; txt.textContent = `Renderizando ${(n / FPS).toFixed(0)} / ${total.toFixed(0)} s · quedan ~${Math.round(s / (n + 1) * (N - n))} s`; await new Promise(r => setTimeout(r, 0)); }
+  }
+  await venc.flush(); venc.close();
+  if (acod && !fallo) { txt.textContent = 'Mezclando el audio…';
+    const len = Math.ceil(total * 48000), oc = new OfflineAudioContext(2, len, 48000);
+    planos.forEach((p, i) => { if (!buf[i]) return; const s = oc.createBufferSource(); s.buffer = buf[i]; s.connect(oc.destination); s.start(p.t0); });
+    const ab = await oc.startRendering();
+    const aenc = new AudioEncoder({ output: (c, m) => { if (m && m.decoderConfig && acod !== 'opus') m.decoderConfig.description = new Uint8Array([0x11, 0x90]); mux.addAudioChunk(c, m); }, error: e => fallo = e });
+    aenc.configure({ codec: acod, sampleRate: 48000, numberOfChannels: 2, bitrate: 192000 });
+    for (let i = 0; i < len; i += 4800) { const m = Math.min(4800, len - i), d = new Float32Array(m * 2);
+      for (let c = 0; c < 2; c++) d.set(ab.getChannelData(c).subarray(i, i + m), c * m);
+      const ad = new AudioData({ format: 'f32-planar', sampleRate: 48000, numberOfFrames: m, numberOfChannels: 2, timestamp: Math.round(i / 48 * 1000), data: d }); aenc.encode(ad); ad.close(); }
+    await aenc.flush(); }
+  if (fallo) { txt.textContent = 'Error: ' + fallo.message; return; }
+  mux.finalize(); const blob = new Blob([mux.target.buffer], { type: 'video/mp4' }), url = URL.createObjectURL(blob), nombre = (H_.id || 'historia') + '.mp4';
+  barra.style.width = '100%'; txt.textContent = `Listo: ${total.toFixed(0)} s · ${(blob.size / 1e6).toFixed(0)} MB${acod ? '' : ' · SIN AUDIO (este navegador no codifica audio)'}`;
+  const b = Object.assign(document.createElement('button'), { textContent: 'Descargar' }); b.onclick = () => Object.assign(document.createElement('a'), { href: url, download: nombre }).click();
+  box.querySelector('.bot').append(b); b.click(); window.__mp4 = blob;
+}
+
+// ---------- arranque ----------
+(async () => {
+  const id = params.get('h') || 'espanistan/01-sanchis';
+  await cargarScript(`historias/${id}.js`); H_ = window.HISTORIA;
+  $('titulo').textContent = H_.titulo; $('desc').textContent = H_.descripcion || ''; document.title = H_.titulo;
+  AC = new (window.AudioContext || window.webkitAudioContext)();
+  const [ims, bufs] = await Promise.all([
+    Promise.all(Object.entries(H_.imagenes || {}).map(async ([k, u]) => [k, await cargarImg(u)])),
+    Promise.all(H_.planos.map((p, i) => cargarVoz(AC, `${H_.voces}/${String(i + 1).padStart(2, '0')}.mp3`))),
+    document.fonts.ready]);
+  for (const [k, im] of ims) if (im) img[k] = im;
+  buf = bufs; montar(); pintar(1);
+  $('desc').textContent += ` · ${Math.floor(total / 60)} min ${Math.round(total % 60)} s · narración ${buf.filter(Boolean).length}/${planos.length} · dibujos ${Object.keys(img).length}/${Object.keys(H_.imagenes || {}).length}`;
+  $('ver').onclick = ver; $('mp4').onclick = exportar;
+  if (params.get('t')) { $('menu').classList.add('off'); pintar(+params.get('t')); }   // ?t=segundos: un fotograma (pruebas)
+  window.__h = { pintar, total: () => total, planos: () => planos };
+})();
+</script>
+</body>
+</html>

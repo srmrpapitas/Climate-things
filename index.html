@@ -980,7 +980,8 @@ $('keys').innerHTML = T('Clic o espacio: siguiente fase<br>H: oculta ayuda y cur
   'Click or space: next phase<br>H: hide help and cursor · A: auto mode · R: restart<br>Add ?full to the address for full screen without 9:16');
 $('lang').value = window.LANG; $('lang').onchange = e => { params.set('lang', e.target.value); location.search = params.toString(); };
 for (const k in window.ESCENARIOS) { const o = document.createElement('option'); o.value = k; o.textContent = window.ESCENARIOS[k].titulo; $('esc').appendChild(o); }
-$('esc').value = ESC.id; $('esc').onchange = e => { params.set('e', e.target.value); location.search = params.toString(); };
+{ const og = document.createElement('optgroup'); og.label = 'YouTube 16:9'; for (const [r, t] of window.LISTA.historias || []) og.appendChild(Object.assign(document.createElement('option'), { value: 'h:' + r, textContent: t })); $('esc').appendChild(og); }
+$('esc').value = ESC.id; $('esc').onchange = e => { const v = e.target.value; if (v.startsWith('h:')) { location.href = 'historia.html?h=' + encodeURIComponent(v.slice(2)); return; } params.set('e', v); location.search = params.toString(); };
 $('question').textContent = ESC.pregunta; $('end').querySelector('.a').textContent = ESC.cierre.titulo; $('end').querySelector('.b').textContent = ESC.cierre.pregunta;
 function start() {
   auto = $('auto').checked; $('menu').classList.add('off'); document.body.classList.add('playing'); audioInit();
