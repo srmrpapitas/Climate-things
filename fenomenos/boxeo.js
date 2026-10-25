@@ -741,10 +741,10 @@ window.FENOMENOS.boxeo = (() => {
     },
     danos: () => {
       const v = velocidad(E), kg = kgTNT(E);
+      if (fActual.grito === 'final') return EN ? 'Straight into the Sun · he gets there in two days' : 'Directo al Sol · llega en dos días';
       if (kg >= 2) { const r = 4.7 * Math.cbrt(kg);
         return EN ? `Everything flattened within ${COMUN.num(r, 0)} m · ${COMUN.num(ctx.caidos, 0)} buildings down`
           : `Todo plano en ${COMUN.num(r, 0)} m · ${COMUN.num(ctx.caidos, 0)} edificios caídos`; }
-      if (fActual.grito === 'final') return EN ? 'Straight into the Sun · he gets there in two days' : 'Directo al Sol · llega en dos días';
       if (v >= 11186) return EN ? 'Past escape velocity · he is not coming back' : 'Supera la velocidad de escape · ya no vuelve';
       const a = v * v * Math.sin(2 * .32) / 9.8, d = a < 1000 ? `${COMUN.num(a, a < 10 ? 1 : 0)} m` : `${COMUN.num(a / 1000, 1)} km`;
       return EN ? `He lands ${d} away` : `Cae a ${d} de aquí`;
