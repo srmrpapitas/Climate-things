@@ -31,6 +31,13 @@ window.FENOMENOS.tipo = {
 
 `ctx` da acceso a la escena, la ciudad (`objects`, `inst`, `people`), `derribar(o, vel)`, partículas (`emit`), restos (`addDebris`), cámara (`camTo`, `pushCamera`, `setShake`), cielo (`skyT`), sonido (`boom`, `rumble`, `audio`) y utilidades (`R`, `rr`, `lerp`, `clamp`, `smooth`, `fmt`).
 
+## El puñetazo (boxeo)
+
+- `fenomenos/boxeo.js` monta un pabellón con ~4.000 espectadores, lleva su propia cámara (planos cortos a la altura del ring, definidos en cada paso de `escenarios/punetazo.js` con `planos`) y va rompiendo pared, tejado y gradas según crece el golpe.
+- Los luchadores son modelos de Avaturn con esqueleto de Mixamo: `modelos/nico.glb` (el que pega) y `modelos/leo.glb` (el rival). Se mueven con las animaciones de Mixamo de `modelos/anim/*.json` (convertidas desde FBX: directo, cruzado y golpe en la cabeza). La boca se abre con la voz (`audio/sfx/bomboclat_anime/boca.json`).
+- Gritos de anime en `audio/sfx/bomboclat_anime/` (voces de ElevenLabs: Ryu para el que pega, VALF para el rival). Cada paso puede llevar `grito` ('corto', 'carga', 'final'), `rival: true` (el rival grita al salir volando) y `vozRetraso` (la narración espera a que acabe el grito).
+- `fenomenos/anime.js`: líneas de velocidad, fotograma de impacto en negativo, destellos, rótulos con katakana, aura y rayos. Todo se pinta en la escena 3D, así que sale en el MP4 exportado.
+
 ## Técnica
 
 Three.js 0.160 (incluido en `vendor/`, sin dependencias externas ni paso de compilación). Sonido sintetizado con Web Audio, sin música con derechos.

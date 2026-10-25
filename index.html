@@ -128,6 +128,7 @@ import { RenderPass } from './vendor/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from './vendor/postprocessing/UnrealBloomPass.js';
 import { ShaderPass } from './vendor/postprocessing/ShaderPass.js';
 import { OutputPass } from './vendor/postprocessing/OutputPass.js';
+import { GLTFLoader } from './vendor/GLTFLoader.js';
 
 // carga los fenómenos y escenarios listados en lista.js
 for (const src of [...(window.LISTA?.fenomenos || []), ...(window.LISTA?.escenarios || [])])
@@ -831,7 +832,7 @@ function audioInit() {
   // Cada paso espera a que acabe su frase, así que sumando solo f.dur la mezcla se quedaba corta y el final del vídeo salía
   // mudo (en la gravedad, los últimos 20 s). exportar() carga la narración antes de llamar a start(), así que aquí ya está
   // en vozDur y se suma lo que dura de verdad cada frase; igual que en durFase() y en el estado 'intro'.
-  const pasoDur = (f, i) => Math.max(f.dur ?? ESC.ritmo, vozDur[i + 1] ? vozDur[i + 1] + VOZ_RETRASO + 1.1 : 0);
+  const pasoDur = (f, i) => Math.max(f.dur ?? ESC.ritmo, vozDur[i + 1] ? vozDur[i + 1] + retrasoVoz(i + 1) + 1.1 : 0);
   const durMax = ESC.ritmo ? Math.min(300, Math.ceil((Math.max(ESC.introDur ?? 2.6, (vozDur[0] ?? 0) + .4)
     + ESC.fases.reduce((s, f, i) => s + pasoDur(f, i), 0)) * 1.08 + 10)) : 300;
   try { AC = GRABAR ? new OfflineAudioContext(2, 48000 * durMax, 48000) : new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return; }
@@ -860,6 +861,7 @@ function rumble(v) { if (AC) rumbleG.gain.setTargetAtTime(v, AC.currentTime, .4)
 // ?voz=0 quita la narración.
 // ESC.vozRetraso: segundos que espera la narración de cada paso (p. ej. para no pisar el grito)
 const vozPend = {}; const VOZ = params.get('voz') !== '0', SON = ESC.sonido, VOZ_RETRASO = ESC.vozRetraso ?? 0;
+const retrasoVoz = n => n ? (ESC.fases[n - 1]?.vozRetraso ?? VOZ_RETRASO) : 0;
 const crudo = {}, bufs = {}, camas = {}, vozDur = {};
 const traer = url => crudo[url] ||= fetch(url).then(r => r.ok ? r.arrayBuffer() : null).catch(() => null);
 // decodificar con callbacks además de promesa: algunos Safari (contextos webkit) no devuelven promesa
@@ -886,7 +888,7 @@ function cama(n, gan, tc = 1.2) {
 const nVoz = VOZ ? fetch('audio/voz/lista.json').then(r => r.ok ? r.json() : {}).then(l => l[`${window.LANG}/${ESC.id}`] || 0).catch(() => 0) : Promise.resolve(0);
 // la narración baja los fondos mientras habla
 function voz(n) {
-  if (!AC) return; const cuando = AC.currentTime + .05 + (n ? VOZ_RETRASO : 0); vozPend[n] = time;
+  if (!AC) return; const cuando = AC.currentTime + .05 + retrasoVoz(n); vozPend[n] = time;
   nVoz.then(k => n < k ? cargar(vozUrl(n)) : null).then(b => { delete vozPend[n]; if (!b) return; vozDur[n] ??= b.duration;
     const s = AC.createBufferSource(); s.buffer = b; s.connect(busVoz); const t = Math.max(cuando, AC.currentTime); s.start(t);
     busCama.gain.setTargetAtTime(.45, t, .15); busCama.gain.setTargetAtTime(1, t + b.duration, .4);
@@ -904,6 +906,7 @@ const ctx = {
   C: { glass: C_GLASS, foam: C_FOAM, spray: C_SPRAY, dust: C_DUST }, escenario: ESC,
   setShake(v) { shake = v; }, get camDist() { return corte ? corte.p.distanceTo(corte.t) : camDist; }, get corte() { return corte; }, get caidos() { return fallen; }, get total() { return cityTotal; },
   get audio() { return { AC, master }; }, sfx, cama, camSigue, merge: mergeGeometries,
+  GLTF: GLTFLoader, pools, get fase() { return phase; },
 };
 FEN.crear(ctx);
 
@@ -961,7 +964,7 @@ let phase = 0, state = 'menu', phaseTime = 0, idleT = 0, wasActive = false, ende
 if (RITMO) document.body.classList.add('ritmo');
 // cada paso dura al menos lo que tarda la narración, más una pausa para que se asimile; si la frase aún no ha cargado, espera (hasta 6 s)
 const durPaso = () => vozPend[phase] !== undefined && time - vozPend[phase] < 6 ? Infinity
-  : Math.max(ESC.fases[phase - 1]?.dur ?? RITMO, (vozDur[phase] ? vozDur[phase] + VOZ_RETRASO + 1.1 : 0));
+  : Math.max(ESC.fases[phase - 1]?.dur ?? RITMO, (vozDur[phase] ? vozDur[phase] + retrasoVoz(phase) + 1.1 : 0));
 const AUTO_EXTRA = +(params.get('intervalo') || 1);
 $('auto').checked = auto; $('mtitle').textContent = ESC.pregunta;
 $('autoTxt').textContent = T('Modo auto (avanza solo)', 'Auto mode (advances by itself)');
@@ -974,7 +977,7 @@ $('esc').value = ESC.id; $('esc').onchange = e => { params.set('e', e.target.val
 $('question').textContent = ESC.pregunta; $('end').querySelector('.a').textContent = ESC.cierre.titulo; $('end').querySelector('.b').textContent = ESC.cierre.pregunta;
 function start() {
   auto = $('auto').checked; $('menu').classList.add('off'); document.body.classList.add('playing'); audioInit();
-  state = 'intro'; introT = 0; $('question').classList.add('on'); const ic = ESC.intro || { pos: [-650, 120, -560], mira: [0, 60, 800] }; camTo(ic.pos, ic.mira, 3); voz(0);
+  state = 'intro'; introT = 0; $('question').classList.add('on'); const ic = ESC.intro || { pos: [-650, 120, -560], mira: [0, 60, 800] }; camTo(ic.pos, ic.mira, ic.dur ?? 3); voz(0);
   $('hint').classList.add('on'); espera(() => $('hint').classList.remove('on'), 4000);
 }
 function nextPhase() {
@@ -1039,7 +1042,7 @@ function tick(dt) {
   const sp = seaNearG.attributes.position.array;
   for (let i = 0; i < sp.length; i += 3) sp[i + 1] = Math.sin(seaBase[i] * .02 + time * 1.3) * .35 + Math.cos(seaBase[i + 2] * .025 + time) * .35;
   seaNearG.attributes.position.needsUpdate = true; seaNearG.computeVertexNormals();
-  updateCamera(dt, time); updateSky(dt); updateHUD(dt); updateLabels();
+  updateCamera(dt, time); updateSky(dt); if (FEN.tras) FEN.tras(ctx, dt); updateHUD(dt); updateLabels();
 }
 // ---------- exportar a MP4 en el propio navegador (?grabar=1&exportar=1) ----------
 // Pinta fotograma a fotograma a 1080×1920 y 30 fps con la tarjeta gráfica del equipo, dibuja encima los textos
@@ -1118,7 +1121,7 @@ async function exportar() {
   const mrAac = acod === 'mr' && (mrTipo.includes('mp4a') || !MediaRecorder.isTypeSupported('audio/mp4;codecs=opus'));
   const aCodec = acod === 'opus' || (acod === 'mr' && !mrAac) ? 'opus' : 'aac';
   // todo cargado antes de empezar: fuentes, narración (y su duración) y efectos
-  await document.fonts.ready; const k = await nVoz;
+  await document.fonts.ready; if (FEN.listo) await FEN.listo; const k = await nVoz;
   for (let i = 0; i < 100 && Object.keys(vozDur).length < k; i++) await new Promise(r => setTimeout(r, 100));
   paused = true; $('auto').checked = true; start(); const vozOk = (await Promise.all([...Array(k)].map((_, i) => cargar(vozUrl(i))))).filter(Boolean).length;
   await Promise.all(Object.keys(crudo).filter(u => u.includes('/sfx/')).map(u => cargar(u)));
