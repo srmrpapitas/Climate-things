@@ -196,12 +196,21 @@ async function ver() {
 
 // ---------- exportar a MP4 (WebCodecs + mp4-muxer, todo en el navegador) ----------
 async function exportar() {
+  // Chrome de escritorio: se pide dónde guardar ANTES de nada (necesita el clic) y el MP4 se escribe al disco poco a poco,
+  // sin juntar cientos de MB en memoria. Sin esa API, se monta en memoria y se descarga al final.
+  const nombre = (H_.id || 'historia') + '.mp4';
+  let disco = null;
+  if (window.showSaveFilePicker) try { disco = await (await showSaveFilePicker({ suggestedName: nombre, types: [{ description: 'Vídeo MP4', accept: { 'video/mp4': ['.mp4'] } }] })).createWritable(); }
+    catch (e) { if (e.name === 'AbortError') return; }
+  try { await exportar_(disco, nombre); } catch (e) { $('estado').querySelector('.txt').textContent = 'Error: ' + e.message; console.error(e); }
+}
+async function exportar_(disco, nombre) {
   const box = $('estado'), txt = box.querySelector('.txt'), barra = box.querySelector('.barra i'); box.classList.add('on'); $('menu').classList.add('off');
   if (!window.VideoEncoder) { txt.textContent = 'Este navegador no puede exportar vídeo: usa Chrome en un ordenador.'; return; }
-  const BR = 10e6, vcod = (await VideoEncoder.isConfigSupported({ codec: 'avc1.640028', width: W, height: H, bitrate: BR, framerate: FPS })).supported ? 'avc1.640028' : 'avc1.42E028';
+  const BR = 5e6, vcod = (await VideoEncoder.isConfigSupported({ codec: 'avc1.640028', width: W, height: H, bitrate: BR, framerate: FPS })).supported ? 'avc1.640028' : 'avc1.42E028';
   const aOk = async c => !!window.AudioEncoder && (await AudioEncoder.isConfigSupported({ codec: c, sampleRate: 48000, numberOfChannels: 2, bitrate: 192000 }).catch(() => ({}))).supported;
   const acod = await aOk('mp4a.40.2') ? 'mp4a.40.2' : await aOk('opus') ? 'opus' : null;
-  const mux = new Mp4Muxer.Muxer({ target: new Mp4Muxer.ArrayBufferTarget(), fastStart: 'in-memory', firstTimestampBehavior: 'offset',
+  const mux = new Mp4Muxer.Muxer({ target: disco ? new Mp4Muxer.FileSystemWritableFileStreamTarget(disco) : new Mp4Muxer.ArrayBufferTarget(), fastStart: disco ? false : 'in-memory', firstTimestampBehavior: 'offset',
     video: { codec: 'avc', width: W, height: H, frameRate: FPS }, ...(acod ? { audio: { codec: acod === 'opus' ? 'opus' : 'aac', sampleRate: 48000, numberOfChannels: 2 } } : {}) });
   let fallo = null; const venc = new VideoEncoder({ output: (c, m) => mux.addVideoChunk(c, m), error: e => fallo = e });
   venc.configure({ codec: vcod, width: W, height: H, bitrate: BR, framerate: FPS, latencyMode: 'quality' });
@@ -223,10 +232,12 @@ async function exportar() {
       for (let c = 0; c < 2; c++) d.set(ab.getChannelData(c).subarray(i, i + m), c * m);
       const ad = new AudioData({ format: 'f32-planar', sampleRate: 48000, numberOfFrames: m, numberOfChannels: 2, timestamp: Math.round(i / 48 * 1000), data: d }); aenc.encode(ad); ad.close(); }
     await aenc.flush(); }
-  if (fallo) { txt.textContent = 'Error: ' + fallo.message; return; }
-  mux.finalize(); const blob = new Blob([mux.target.buffer], { type: 'video/mp4' }), url = URL.createObjectURL(blob), nombre = (H_.id || 'historia') + '.mp4';
-  barra.style.width = '100%'; txt.textContent = `Listo: ${total.toFixed(0)} s · ${(blob.size / 1e6).toFixed(0)} MB${acod ? '' : ' · SIN AUDIO (este navegador no codifica audio)'}`;
-  const b = Object.assign(document.createElement('button'), { textContent: 'Descargar' }); b.onclick = () => Object.assign(document.createElement('a'), { href: url, download: nombre }).click();
+  if (fallo) { txt.textContent = 'Error: ' + fallo.message; if (disco) await disco.abort(); return; }
+  mux.finalize(); barra.style.width = '100%'; const sinAudio = acod ? '' : ' · SIN AUDIO (este navegador no codifica audio)';
+  if (disco) { txt.textContent = 'Guardando…'; await disco.close(); txt.textContent = `Listo: ${nombre} guardado (${total.toFixed(0)} s)${sinAudio}`; return; }
+  const blob = new Blob([mux.target.buffer], { type: 'video/mp4' }), url = URL.createObjectURL(blob);
+  txt.textContent = `Listo: ${total.toFixed(0)} s · ${(blob.size / 1e6).toFixed(0)} MB${sinAudio}`;
+  const b = Object.assign(document.createElement('button'), { textContent: 'Descargar' }); b.onclick = () => { const a = Object.assign(document.createElement('a'), { href: url, download: nombre }); document.body.append(a); a.click(); a.remove(); };
   box.querySelector('.bot').append(b); b.click(); window.__mp4 = blob;
 }
 
