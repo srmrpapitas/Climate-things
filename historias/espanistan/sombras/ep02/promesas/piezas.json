@@ -1,0 +1,151 @@
+{
+ "fbrazo": {
+  "caja": [
+   1574,
+   459,
+   210,
+   259
+  ],
+  "tipo": "brazo",
+  "pivote": [
+   1600,
+   697
+  ],
+  "padre": "feijolo"
+ },
+ "iconos": {
+  "caja": [
+   1563,
+   128,
+   507,
+   295
+  ],
+  "tipo": "iconos",
+  "pivote": [
+   1813,
+   400
+  ]
+ },
+ "feijolo_c": {
+  "caja": [
+   1423,
+   553,
+   153,
+   122
+  ],
+  "tipo": "cabeza",
+  "pivote": [
+   1500,
+   673
+  ],
+  "padre": "feijolo"
+ },
+ "feijolo": {
+  "caja": [
+   1369,
+   674,
+   296,
+   247
+  ],
+  "tipo": "figura",
+  "pivote": [
+   1520,
+   920
+  ]
+ },
+ "decano_c": {
+  "caja": [
+   527,
+   527,
+   240,
+   253
+  ],
+  "tipo": "cabeza",
+  "pivote": [
+   653,
+   773
+  ],
+  "padre": "decano"
+ },
+ "dbrazo": {
+  "caja": [
+   657,
+   700,
+   292,
+   251
+  ],
+  "tipo": "brazo",
+  "pivote": [
+   662,
+   866
+  ],
+  "padre": "decano"
+ },
+ "dbaston": {
+  "caja": [
+   53,
+   880,
+   297,
+   365
+  ],
+  "tipo": "baston",
+  "pivote": [
+   297,
+   897
+  ],
+  "padre": "decano"
+ },
+ "dbaston2": {
+  "caja": [
+   470,
+   906,
+   181,
+   455
+  ],
+  "tipo": "baston",
+  "pivote": [
+   524,
+   924
+  ],
+  "padre": "decano"
+ },
+ "decano": {
+  "caja": [
+   146,
+   512,
+   853,
+   849
+  ],
+  "tipo": "figura",
+  "pivote": [
+   400,
+   1353
+  ]
+ },
+ "publico1": {
+  "caja": [
+   1010,
+   973,
+   461,
+   390
+  ],
+  "tipo": "grupo",
+  "pivote": [
+   1240,
+   1360
+  ]
+ },
+ "publico2": {
+  "caja": [
+   2042,
+   960,
+   492,
+   403
+  ],
+  "tipo": "grupo",
+  "pivote": [
+   2288,
+   1360
+  ]
+ }
+}

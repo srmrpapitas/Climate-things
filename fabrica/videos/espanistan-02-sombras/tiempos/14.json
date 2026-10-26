@@ -1,0 +1,466 @@
+[
+ {
+  "texto": "La dana.",
+  "inicio": 0.0,
+  "fin": 1.18,
+  "palabras": [
+   [
+    "La",
+    0.0,
+    0.42
+   ],
+   [
+    "dana.",
+    0.42,
+    1.18
+   ]
+  ]
+ },
+ {
+  "texto": "Unas 230 personas murieron en Valencia en octubre de 2024.",
+  "inicio": 1.62,
+  "fin": 6.66,
+  "palabras": [
+   [
+    "Unas",
+    1.62,
+    1.94
+   ],
+   [
+    "230",
+    1.94,
+    2.84
+   ],
+   [
+    "personas",
+    2.84,
+    3.52
+   ],
+   [
+    "murieron",
+    3.52,
+    3.98
+   ],
+   [
+    "en",
+    3.98,
+    4.16
+   ],
+   [
+    "Valencia",
+    4.16,
+    4.66
+   ],
+   [
+    "en",
+    4.66,
+    4.82
+   ],
+   [
+    "octubre",
+    4.82,
+    5.38
+   ],
+   [
+    "de",
+    5.38,
+    5.7
+   ],
+   [
+    "2024.",
+    5.7,
+    6.66
+   ]
+  ]
+ },
+ {
+  "texto": "El presidente valenciano, Mazón, del PP, dimitió un año después.",
+  "inicio": 8.12,
+  "fin": 12.68,
+  "palabras": [
+   [
+    "El",
+    8.12,
+    8.24
+   ],
+   [
+    "presidente",
+    8.24,
+    8.76
+   ],
+   [
+    "valenciano,",
+    8.76,
+    9.48
+   ],
+   [
+    "Mazón,",
+    9.7,
+    10.22
+   ],
+   [
+    "del",
+    10.28,
+    10.46
+   ],
+   [
+    "PP,",
+    10.46,
+    10.92
+   ],
+   [
+    "dimitió",
+    11.44,
+    11.74
+   ],
+   [
+    "un",
+    11.74,
+    11.94
+   ],
+   [
+    "año",
+    11.94,
+    12.12
+   ],
+   [
+    "después.",
+    12.12,
+    12.68
+   ]
+  ]
+ },
+ {
+  "texto": "El Tribunal Superior valenciano rechazó investigarlo.",
+  "inicio": 13.38,
+  "fin": 16.52,
+  "palabras": [
+   [
+    "El",
+    13.38,
+    13.58
+   ],
+   [
+    "Tribunal",
+    13.58,
+    14.04
+   ],
+   [
+    "Superior",
+    14.04,
+    14.46
+   ],
+   [
+    "valenciano",
+    14.46,
+    15.16
+   ],
+   [
+    "rechazó",
+    15.16,
+    15.68
+   ],
+   [
+    "investigarlo.",
+    15.68,
+    16.52
+   ]
+  ]
+ },
+ {
+  "texto": "No ve delito.",
+  "inicio": 17.52,
+  "fin": 18.32,
+  "palabras": [
+   [
+    "No",
+    17.52,
+    17.64
+   ],
+   [
+    "ve",
+    17.64,
+    17.8
+   ],
+   [
+    "delito.",
+    17.8,
+    18.32
+   ]
+  ]
+ },
+ {
+  "texto": "Lo que no responde una sentencia es la responsabilidad política.",
+  "inicio": 18.96,
+  "fin": 22.66,
+  "palabras": [
+   [
+    "Lo",
+    18.96,
+    19.12
+   ],
+   [
+    "que",
+    19.12,
+    19.22
+   ],
+   [
+    "no",
+    19.22,
+    19.5
+   ],
+   [
+    "responde",
+    19.5,
+    19.86
+   ],
+   [
+    "una",
+    19.86,
+    20.04
+   ],
+   [
+    "sentencia",
+    20.04,
+    20.62
+   ],
+   [
+    "es",
+    20.62,
+    20.86
+   ],
+   [
+    "la",
+    20.86,
+    21.2
+   ],
+   [
+    "responsabilidad",
+    21.2,
+    22.1
+   ],
+   [
+    "política.",
+    22.1,
+    22.66
+   ]
+  ]
+ },
+ {
+  "texto": "Las fotos.",
+  "inicio": 23.44,
+  "fin": 24.2,
+  "palabras": [
+   [
+    "Las",
+    23.44,
+    23.68
+   ],
+   [
+    "fotos.",
+    23.68,
+    24.2
+   ]
+  ]
+ },
+ {
+  "texto": "En 2013 se publicaron fotos de Feijolo.",
+  "inicio": 25.0,
+  "fin": 27.7,
+  "palabras": [
+   [
+    "En",
+    25.0,
+    25.14
+   ],
+   [
+    "2013",
+    25.14,
+    25.78
+   ],
+   [
+    "se",
+    25.78,
+    26.0
+   ],
+   [
+    "publicaron",
+    26.0,
+    26.56
+   ],
+   [
+    "fotos",
+    26.56,
+    26.98
+   ],
+   [
+    "de",
+    26.98,
+    27.2
+   ],
+   [
+    "Feijolo.",
+    27.2,
+    27.7
+   ]
+  ]
+ },
+ {
+  "texto": "En los años 90.",
+  "inicio": 28.1,
+  "fin": 29.26,
+  "palabras": [
+   [
+    "En",
+    28.1,
+    28.3
+   ],
+   [
+    "los",
+    28.3,
+    28.48
+   ],
+   [
+    "años",
+    28.48,
+    28.76
+   ],
+   [
+    "90.",
+    28.76,
+    29.26
+   ]
+  ]
+ },
+ {
+  "texto": "En el barco de un conocido contrabandista.",
+  "inicio": 29.26,
+  "fin": 32.34,
+  "palabras": [
+   [
+    "En",
+    29.26,
+    29.94
+   ],
+   [
+    "el",
+    29.94,
+    30.14
+   ],
+   [
+    "barco",
+    30.14,
+    30.44
+   ],
+   [
+    "de",
+    30.44,
+    30.6
+   ],
+   [
+    "un",
+    30.6,
+    30.84
+   ],
+   [
+    "conocido",
+    30.84,
+    31.32
+   ],
+   [
+    "contrabandista.",
+    31.32,
+    32.34
+   ]
+  ]
+ },
+ {
+  "texto": "No hay causa ni delito.",
+  "inicio": 32.98,
+  "fin": 34.76,
+  "palabras": [
+   [
+    "No",
+    32.98,
+    33.14
+   ],
+   [
+    "hay",
+    33.14,
+    33.36
+   ],
+   [
+    "causa",
+    33.36,
+    33.78
+   ],
+   [
+    "ni",
+    33.78,
+    34.0
+   ],
+   [
+    "delito.",
+    34.0,
+    34.76
+   ]
+  ]
+ },
+ {
+  "texto": "Él dice que entonces no sabía a qué se dedicaba.",
+  "inicio": 35.3,
+  "fin": 38.14,
+  "palabras": [
+   [
+    "Él",
+    35.3,
+    35.44
+   ],
+   [
+    "dice",
+    35.44,
+    35.68
+   ],
+   [
+    "que",
+    35.68,
+    35.94
+   ],
+   [
+    "entonces",
+    35.94,
+    36.38
+   ],
+   [
+    "no",
+    36.38,
+    36.74
+   ],
+   [
+    "sabía",
+    36.74,
+    37.12
+   ],
+   [
+    "a",
+    37.12,
+    37.3
+   ],
+   [
+    "qué",
+    37.3,
+    37.4
+   ],
+   [
+    "se",
+    37.4,
+    37.72
+   ],
+   [
+    "dedicaba.",
+    37.72,
+    38.14
+   ]
+  ]
+ }
+]

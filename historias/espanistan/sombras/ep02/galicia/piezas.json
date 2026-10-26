@@ -1,0 +1,42 @@
+{
+ "feijolo": {
+  "caja": [
+   1029,
+   368,
+   467,
+   344
+  ],
+  "tipo": "figura",
+  "pivote": [
+   1265,
+   712
+  ]
+ },
+ "feijolo_c": {
+  "caja": [
+   1124,
+   248,
+   377,
+   120
+  ],
+  "tipo": "cabeza",
+  "pivote": [
+   1257,
+   368
+  ],
+  "padre": "feijolo"
+ },
+ "olas": {
+  "caja": [
+   0,
+   734,
+   706,
+   490
+  ],
+  "tipo": "objeto",
+  "pivote": [
+   353,
+   1224
+  ]
+ }
+}

@@ -1,0 +1,95 @@
+{
+ "balcon": {
+  "caja": [
+   236,
+   454,
+   248,
+   382
+  ],
+  "tipo": "figura",
+  "pivote": [
+   360,
+   836
+  ]
+ },
+ "balcon_c": {
+  "caja": [
+   321,
+   300,
+   131,
+   154
+  ],
+  "tipo": "cabeza",
+  "pivote": [
+   368,
+   454
+  ],
+  "padre": "balcon"
+ },
+ "recaudador": {
+  "caja": [
+   858,
+   676,
+   352,
+   592
+  ],
+  "tipo": "figura",
+  "pivote": [
+   1034,
+   1268
+  ]
+ },
+ "recaudador_c": {
+  "caja": [
+   1013,
+   547,
+   98,
+   129
+  ],
+  "tipo": "cabeza",
+  "pivote": [
+   1044,
+   676
+  ],
+  "padre": "recaudador"
+ },
+ "palanca": {
+  "caja": [
+   1212,
+   423,
+   378,
+   729
+  ],
+  "tipo": "objeto",
+  "pivote": [
+   1353,
+   1137
+  ]
+ },
+ "mazo": {
+  "caja": [
+   2269,
+   253,
+   214,
+   295
+  ],
+  "tipo": "objeto",
+  "pivote": [
+   2346,
+   518
+  ]
+ },
+ "encapuchados": {
+  "caja": [
+   1698,
+   806,
+   785,
+   462
+  ],
+  "tipo": "grupo",
+  "pivote": [
+   2090,
+   1268
+  ]
+ }
+}

@@ -1,0 +1,82 @@
+{
+ "balanza": {
+  "caja": [
+   1876,
+   561,
+   405,
+   200
+  ],
+  "tipo": "objeto",
+  "pivote": [
+   2058,
+   590
+  ]
+ },
+ "decano": {
+  "caja": [
+   2280,
+   647,
+   275,
+   114
+  ],
+  "tipo": "figura",
+  "pivote": [
+   2414,
+   761
+  ]
+ },
+ "decano_c": {
+  "caja": [
+   2273,
+   339,
+   282,
+   308
+  ],
+  "tipo": "cabeza",
+  "pivote": [
+   2359,
+   647
+  ],
+  "padre": "decano"
+ },
+ "feijolo": {
+  "caja": [
+   1416,
+   475,
+   162,
+   280
+  ],
+  "tipo": "figura",
+  "pivote": [
+   1497,
+   755
+  ]
+ },
+ "feijolo_c": {
+  "caja": [
+   1454,
+   390,
+   98,
+   85
+  ],
+  "tipo": "cabeza",
+  "pivote": [
+   1495,
+   475
+  ],
+  "padre": "feijolo"
+ },
+ "cola": {
+  "caja": [
+   368,
+   519,
+   499,
+   236
+  ],
+  "tipo": "grupo",
+  "pivote": [
+   617,
+   755
+  ]
+ }
+}

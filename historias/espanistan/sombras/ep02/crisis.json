@@ -1,0 +1,36 @@
+{
+ "ref": 889,
+ "umbral": 60,
+ "piezas": [
+  {
+   "nombre": "cola",
+   "caja": [
+    65,
+    272,
+    375,
+    410
+   ],
+   "tipo": "grupo"
+  },
+  {
+   "nombre": "paraguas",
+   "caja": [
+    418,
+    182,
+    528,
+    410
+   ],
+   "cuello": 222
+  },
+  {
+   "nombre": "mochila",
+   "caja": [
+    578,
+    360,
+    725,
+    500
+   ],
+   "cuello": 395
+  }
+ ]
+}

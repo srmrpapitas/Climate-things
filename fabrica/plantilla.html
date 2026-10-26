@@ -49,9 +49,20 @@
   .cursor { position: absolute; width: 0; height: 0; border-left: 26px solid transparent; border-right: 26px solid transparent; border-bottom: 64px solid #fff; transform-origin: 50% 0; filter: drop-shadow(0 4px 6px rgba(0,0,0,.6)); }
   #sub { position: absolute; left: 200px; right: 200px; bottom: 70px; text-align: center; font: 800 56px Inter; color: #fff; -webkit-text-stroke: 10px rgba(0,0,0,.78); paint-order: stroke fill; line-height: 1.2; }
   #sub b { color: var(--oro); font-weight: 800; }
+  #sub.f { color: #f6d58e; font-style: italic; }
+  .pieza { position: absolute; } .pieza > img { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
+  .candil { mix-blend-mode: screen; background: radial-gradient(ellipse at 45% 42%, rgba(255,190,90,.32), rgba(255,170,60,0) 62%); }
+  .cara { position: absolute; left: 0; top: 0; width: 1280px; height: 720px; transform-origin: 640px 360px; filter: url(#hervir) contrast(1.06) sepia(.12); }
+  .cara img { position: absolute; left: 0; top: 60px; width: 1280px; }
+  .banda { position: absolute; left: 0; width: 1280px; height: 55px; background: #000; }
+  .nota { top: 150px; width: 560px; padding: 30px 34px 26px; background: #efe1c0; border: 3px solid #5a3d1e; border-radius: 6px; box-shadow: 0 12px 30px rgba(0,0,0,.55); transform-origin: 50% 0; }
+  .nota::before { content: ''; position: absolute; left: 50%; top: -14px; width: 26px; height: 26px; margin-left: -13px; border-radius: 50%; background: #9c2a1e; box-shadow: 0 3px 6px rgba(0,0,0,.5); }
+  .nota h3 { font: 52px 'Archivo Black'; color: #2b1d12; } .nota .s { font: italic 500 34px/1.25 Lora; color: #5a3d1e; margin-top: 8px; }
+  .nota .d { font: 800 38px/1.25 Inter; color: #9c2a1e; margin-top: 14px; }
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute"><filter id="hervir"><feTurbulence id="turb" type="fractalNoise" baseFrequency=".02" numOctaves="2" seed="1" /><feDisplacementMap in="SourceGraphic" scale="2.2" /></filter></svg>
 <div id="root" data-composition-id="main" data-start="0" data-duration="__TOTAL__" data-width="1920" data-height="1080">
   <div id="planos" style="position:absolute;inset:0;z-index:0"></div>
   <div id="vineta"></div>
@@ -69,7 +80,22 @@ const COLOR = { rojo: 'var(--rojo)', ambar: 'var(--ambar)', gris: 'var(--gris)',
 D.PLANOS.forEach((p, i) => {
   const m = el('div', 'mundo', null, $('planos')); p.el = m; m.style.zIndex = i;
   const fondo = p.tipo === 'marioneta' ? (p.fondo || 'escenario') : p.tipo === 'decano' ? 'portada' : p.tipo === 'cueva' ? 'cueva' : p.fondo;
-  el('img', null, null, m).src = `assets/${fondo}.webp`;
+  if (p.tipo === 'teatro') {                 // teatro de sombras: fondo + piezas (sombras.py) con su pivote; las hijas van dentro del padre
+    el('img', null, null, m).src = `assets/sombras/${p.escena}/fondo.jpg`;
+    const k = W / p.ancho; p.E = {};
+    const crea = (n, padre) => { const q = p.piezas[n], [x, y, w, h] = q.caja, [ox, oy] = padre ? p.piezas[q.padre].caja : [0, 0];
+      const d = el('div', 'pieza', null, padre || m); Object.assign(d.style, { left: (x - ox) * k + 'px', top: (y - oy) * k + 'px', width: w * k + 'px', height: h * k + 'px',
+        transformOrigin: `${(q.pivote[0] - x) * k}px ${(q.pivote[1] - y) * k}px` });
+      el('img', null, null, d).src = `assets/sombras/${p.escena}/${n}.png`; p.E[n] = d;
+      Object.keys(p.piezas).filter(c => p.piezas[c].padre === n).forEach(c => crea(c, d)); };
+    Object.keys(p.piezas).filter(n => !p.piezas[n].padre).forEach(n => crea(n));
+    p.candil = el('div', 'capa candil', null, m);
+    (p.acciones || []).forEach(a => { a.n = ['asiente', 'niega'].includes(a.hace) && p.piezas[a.pieza + '_c'] ? a.pieza + '_c' : a.pieza; });
+  } else if (p.tipo === 'retrato') {         // primer plano a lápiz, bandas negras; habla alternando boca cerrada/abierta
+    m.style.background = '#eceae4'; p.cara = el('div', 'cara', null, m);
+    el('img', null, null, p.cara).src = `assets/${p.img}_cerrada.webp`; p.ab = el('img', null, null, p.cara); p.ab.src = `assets/${p.img}_abierta.webp`;
+    el('div', 'banda', null, m).style.top = 0; el('div', 'banda', null, m).style.bottom = 0; p.cam = p.cam2 = [640, 360, 1];
+  } else el('img', null, null, m).src = `assets/${fondo}.webp`;
   if (p.tipo === 'cueva') p.brillo = el('div', 'capa brillo', null, m);
   if (p.tipo === 'marioneta') {
     const tt = el('div', 'titere', null, m); p.titere = tt;
@@ -124,6 +150,7 @@ D.PLANOS.forEach(p => (p.capas || []).forEach(c => {
       `</div><div class="anios">${[1982, 1996, 2004, 2011, 2018, 2026].map(a => `<span style="left:${(a - 1982) / .44}%">${a}</span>`).join('')}</div><div class="fuente">Fuente: La Moncloa</div>`, $('capas'));
     c.anim = [...e.querySelectorAll('.tramo')];
   }
+  if (c.tipo === 'nota') e = el('div', `c nota ${c.pos || 'der'}`, `<h3>${c.texto}</h3>${c.sub ? `<div class="s">${c.sub}</div>` : ''}${c.dato ? `<div class="d">${c.dato}</div>` : ''}`, $('capas'));
   if (c.tipo === 'sello') e = el('div', 'c sello', `<span>${c.texto}</span>`, $('capas'));
   if (c.tipo === 'titulo') e = el('div', 'c titulo', `<h1>${c.h1}</h1><h2>${c.h2 || ''}</h2><p>${c.p || ''}</p>`, $('capas'));
   if (c.tipo === 'suscribete') { e = el('div', 'c susc', '<div class="like">👍</div><div class="btn">SUSCRIBIRSE</div><div class="bell">🔔</div>', $('capas'));
@@ -139,10 +166,46 @@ function camara(p, t) {
   for (const [t0, x, y, z, d] of p.zooms || []) { const q = suave(clamp((t - t0) / (d || .8))); if (t >= t0) c = c.map((v, i) => v + ([x, y, z][i] - v) * q); }
   return c;
 }
+// marionetas del teatro: vaivén suave según el tipo de pieza + lo que el guion les pide (acciones)
+const r01 = (t, a, b) => suave(clamp((t - a) / (b - a))), ven = (t, a, b, f = .5) => r01(t, a, a + f) * (1 - r01(t, b - f, b));
+function mueve(p, t) {
+  for (const n in p.E) {
+    const q = p.piezas[n], f = n.length * 1.7 + n.charCodeAt(0); let rot = 0, dx = 0, dy = 0, sc = 1, op = 1;
+    if (q.tipo === 'figura') { rot = .7 * Math.sin(t * 1.2 + f); dy = 1.5 * Math.sin(t * 2.1 + f); }
+    else if (q.tipo === 'cabeza') rot = 1.5 * Math.sin(t * 1.1 + f);
+    else if (q.tipo === 'brazo') rot = 3 * Math.sin(t * 1.6 + f);
+    else if (q.tipo === 'baston') rot = 2 * Math.sin(t * 1.6 + f);
+    else if (q.tipo === 'grupo') dy = -2.5 * (.5 + .5 * Math.sin(t * 2.3 + f));
+    else if (q.tipo === 'iconos') { dy = -10 * Math.sin(t * .9 + f); rot = 1.2 * Math.sin(t * .7 + f); }
+    else rot = .5 * Math.sin(t * .9 + f);
+    for (const a of p.acciones || []) { if (a.n !== n) continue;
+      const fija = a.hace === 'aparece' || a.hace === 'desaparece', e = fija ? r01(t, a.ini, a.ini + .8) : ven(t, a.ini, a.fin), g = v => a.g != null ? a.g : v;
+      if (a.hace === 'asiente') rot += g(7) * (.5 + .5 * Math.sin(t * 3.6)) * e;
+      if (a.hace === 'niega') rot += g(6) * Math.sin(t * 4.2) * e;
+      if (a.hace === 'alza') rot -= g(20) * e;
+      if (a.hace === 'saluda') rot += (-g(18) + 7 * Math.sin(t * 5)) * e;
+      if (a.hace === 'salta') dy -= g(10) * Math.abs(Math.sin(t * 4.5)) * e;
+      if (a.hace === 'tiembla') dx += g(2.5) * Math.sin(t * 31) * e;
+      if (a.hace === 'inclina') rot += g(6) * e;
+      if (a.hace === 'golpea') rot -= g(25) * Math.max(0, Math.sin(t * 5)) * e;
+      if (a.hace === 'balancea') rot += g(5) * Math.sin(t * 1.6) * e;
+      if (a.hace === 'crece') sc *= 1 + g(.2) * e;
+      if (a.hace === 'avanza') dx += g(40) * e;
+      if (a.hace === 'desaparece') op *= 1 - e;
+      if (a.hace === 'aparece') op *= e; }
+    p.E[n].style.transform = `translate(${dx}px, ${dy}px) rotate(${rot}deg) scale(${sc})`; p.E[n].style.opacity = op;
+  }
+  p.candil.style.opacity = .7 + .2 * Math.sin(t * 5.3) + .1 * Math.sin(t * 9.1);
+}
 function pinta(t) {
+  $('turb').setAttribute('seed', Math.floor(t * 12) % 7 + 1);
   for (const p of D.PLANOS) {
     const vis = t >= p.ini && t < p.fin + .3; p.el.style.visibility = vis ? 'visible' : 'hidden'; if (!vis) continue;
-    p.el.style.opacity = p.ini === 0 ? 1 : clamp((t - p.ini) / .3);
+    p.el.style.opacity = p.ini === 0 || p.tipo === 'retrato' ? 1 : clamp((t - p.ini) / .3);
+    if (p.E) mueve(p, t);
+    if (p.cara) { const k = suave(clamp((t - p.ini) / (p.fin - p.ini))), z = p.z || [1, 1.06];
+      p.cara.style.transform = `scaleX(${p.lado || 1}) translateY(${(p.y || 0) * k}px) scale(${z[0] + (z[1] - z[0]) * k})`;
+      p.ab.style.opacity = clamp(((D.BOCA_F[Math.floor(t * 30)] || 0) - .25) / .2); }
     const [x, y, z] = camara(p, t), s = ESC * z, tx = Math.min(0, Math.max(1920 - W * s, 960 - x * s)), ty = Math.min(0, Math.max(1080 - H * s, 540 - y * s));
     p.el.style.transform = `translate(${tx}px, ${ty}px) scale(${s})`;
     const parpadea = (t % 3.7) < .13;
@@ -169,7 +232,7 @@ function pinta(t) {
       const q = clamp((t - t0) / .4); if (x.classList.contains('b') || x.classList.contains('tramo')) x.style.transform = `scaleX(${suave(q)})`; else x.style.opacity = q; });
   }
   const f = D.FRASES.find(f => t >= f.ini && t < f.fin), html = f ? f.txt : '';
-  if ($('sub').dataset.h !== html) { $('sub').innerHTML = html; $('sub').dataset.h = html; }
+  if ($('sub').dataset.h !== html) { $('sub').innerHTML = html; $('sub').dataset.h = html; $('sub').className = f && f.q ? 'f' : ''; }
 }
 const est = { t: 0 };
 const tl = gsap.timeline({ paused: true, onUpdate: () => pinta(est.t) });

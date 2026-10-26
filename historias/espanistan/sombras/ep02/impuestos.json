@@ -1,0 +1,62 @@
+{
+ "ref": 889,
+ "umbral": 60,
+ "piezas": [
+  {
+   "nombre": "balcon",
+   "caja": [
+    82,
+    98,
+    168,
+    290
+   ],
+   "cuello": 158
+  },
+  {
+   "nombre": "recaudador",
+   "caja": [
+    298,
+    190,
+    420,
+    440
+   ],
+   "cuello": 235
+  },
+  {
+   "nombre": "palanca",
+   "caja": [
+    421,
+    140,
+    552,
+    400
+   ],
+   "pivote": [
+    470,
+    395
+   ]
+  },
+  {
+   "nombre": "mazo",
+   "caja": [
+    788,
+    88,
+    862,
+    190
+   ],
+   "pivote": [
+    815,
+    180
+   ]
+  },
+  {
+   "nombre": "encapuchados",
+   "caja": [
+    590,
+    280,
+    862,
+    440
+   ],
+   "tipo": "grupo"
+  }
+ ]
+}

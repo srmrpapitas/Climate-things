@@ -1,0 +1,67 @@
+# Españistán · cómo hacer el capítulo siguiente (pegar esto en una conversación nueva)
+
+> **Para Claude:** estás en el repo `srmrpapitas/Climate-things`, rama `claude/quirky-thompson-xa9rrz`. Lee este archivo y
+> `fabrica/manual/COMO-HACER-UN-VIDEO.md`. El modelo a copiar es el **ep. 2**: `fabrica/videos/espanistan-02-sombras/`
+> (`escenas.json` + `hacer_escenas.py`). No cambies el estilo: ya está aprobado. Trabaja con Sonnet si puedes.
+> Antes de empezar: `sh fabrica/instalar_todo.sh` (Whisper) (instala Whisper y OpenCV en `/home/user/qw`).
+
+## La serie
+- 15 vídeos. Ep. 1 Sanchís (hecho), ep. 2 Feijolo y el PP (hecho), **ep. 3 Abascal (Vox)**, ep. 4 el bipartidismo…
+- País ficticio con **datos reales y fuentes**; la palabra **exacta** de cada sentencia (presunción de inocencia: nadie es culpable sin sentencia).
+- **Nunca** decir a quién votar. Lo bueno también se cuenta.
+- El **Decano** (profesor platónico, pelo loco, gafas redondas, candil y lupa) guía; **un filósofo por bloque** con su frase.
+- Conclusiones con efecto de sonido; música según el tema (silencio en los temas graves); final con la CTA propia («dale a like, suscríbete y activa la campana»).
+
+## El estilo (aprobado el 26-10-2026, «casi una película de Disney»)
+1. **Escenas base = teatro de sombras animado**: siluetas negras articuladas sobre pergamino ámbar con luz de candil.
+   - Las marionetas **actúan lo que cuenta el narrador**: asienten, niegan, alzan, saludan, saltan, tiemblan, se inclinan…
+   - Movimientos **suaves y con lógica**, más zooms de cámara a quien reacciona.
+2. **Primeros planos = retratos de perfil a lápiz y tinta** (Batman DC + trazo de Harry Potter) sobre papel blanco sombreado a grafito.
+   - Bandas negras finas arriba y abajo.
+   - **Una frase = un plano**, alternando la mirada derecha/izquierda.
+   - Se reutilizan las mismas parejas de boca cerrada/abierta en distinto orden y con distinto zoom.
+3. **Reparto** (norma del usuario):
+   - **El protagonista solo habla en su primer plano**, con **su propia voz**.
+   - Los secundarios **no hablan**: si la cámara se acerca, aparece una **nota** (`nota`) con quién es y lo que le afecta.
+   - El narrador puede dejar caer «X dice que…» y entonces entra el primer plano de X.
+4. **Personaje-protagonista satírico**: vendehúmos que promete; frases de sátira sobre promesas y hechos documentados. **Nunca** atribuirle delitos sin sentencia.
+
+## Pasos (≈ 2–3 h de trabajo de Claude por capítulo)
+1. **Guion** `historias/espanistan/NN-tema.md` (datos + fuentes) → `fabrica/herramientas/guion_espanistan-NN.txt`.
+   - Una frase por línea, números en letra.
+   - Deja una línea partida donde vaya a entrar el protagonista («…Abascal dice que…» / siguiente línea).
+2. **Voz del narrador**: ElevenLabs, voz D `EZDj5TBPpANsOzwaukxI`, `eleven_multilingual_v2`, `speed 0.88`, `stability 0.7`.
+   - Por bloques; normalizar con el `ffmpeg` del manual.
+   - Si sale rápida: `atempo=0.92`.
+3. **Voz del protagonista**: buscar en `creative_list_voices` (`es`, acento `peninsular`, `characters_animation`).
+   - Feijolo = «Johnny The Rogue» `HMCmDsbKeaSZp5LMOYKR` (`eleven_v3`, etiquetas `[confident]` `[sly]` `[chuckles]`).
+   - **Todas sus frases en una sola llamada**, separadas por líneas en blanco.
+   - Cortar con Whisper (`fabrica/manual/herramientas/tiempos.py`) y `ffmpeg`, como en `audio/voz/es/espanistan-02/feijolo/`.
+4. **Retratos del protagonista**: 1 imagen Seedream 5 lite 2×2 (≈212 cr.) con perfil estricto, parejas boca cerrada/abierta, papel blanco a grafito.
+   - Prompt en `historias/espanistan/retratos/feijolo/` (ver el de `perfil_lapiz`).
+   - Recortar y alinear con ECC (`p1_*`, `p2_*`).
+5. **Escenarios**: 5–7 imágenes de teatro de sombras (Seedream 5 lite, 16:9 2K, ≈212 cr. cada una).
+   - Prompt base en `historias/espanistan/sombras/ep02/` (copiar el párrafo de estilo).
+   - Pedir «figures clearly separated, not overlapping».
+6. **Piezas**: por escena, un JSON con cajas (medidas sobre la imagen a 889 px de ancho, `"ref": 889`): `caja`, `cuello` (separa la cabeza), `pivote`, `tipo` (`figura|grupo|objeto|brazo|baston|iconos`), `padre`.
+   - Recortar con `/home/user/qw/bin/python -I fabrica/manual/herramientas/sombras.py ESCENA.webp ESCENA.json ESCENA --ancho 2560`.
+   - Mirar `ESCENA/previa.jpg`.
+7. **Montaje**: copiar `fabrica/videos/espanistan-02-sombras/hacer_escenas.py` y adaptarlo (voces, planos, acciones, capas de datos).
+   - Generar con `/home/user/qw/bin/python -I fabrica/generar.py fabrica/videos/espanistan-NN-sombras/escenas.json`.
+8. **Revisar**: `npx hyperframes@0.8.204 check`; **una** tanda de capturas con `snapshot --at t1,t2,…`; luego `render` en segundo plano (≈ 4,4 × la duración).
+9. **Subir** al repo (commit + push); el `.mp4` va en `out/` (no se sube); pasárselo al usuario.
+
+## Tipos de plano del generador
+- `teatro` (`escena`, `cam`/`cam2` [x, y, zoom] en 1280×720, `zooms`, `acciones`).
+- `retrato` (`img`, `lado`, `z`, `y`).
+- `decano`, `cueva`, `imagen`.
+- Capas: `dato` · `cita` · `frasco` · `nota` · `barras` · `lista` · `comparacion` · `linea` · `pines` · `sello` · `titulo` · `suscribete`.
+- Acciones: `asiente` · `niega` · `alza` · `saluda` · `salta` · `tiembla` · `inclina` · `golpea` · `balancea` · `crece` · `avanza` · `aparece` · `desaparece` (con `g` = cuánto).
+
+## Presupuesto por capítulo (créditos ElevenLabs; ver `PLAN-10-SEMANA.md`)
+- Narrador ≈ 7.000 (o ≈ 3.500 con `eleven_flash_v2_5`).
+- Protagonista ≈ 700.
+- Escenarios ≈ 1.300–1.500.
+- Retratos ≈ 212.
+- **Total ≈ 9.400** (≈ 5.900 con flash).
+- Claude: guion + montaje en una sesión, una sola hoja de capturas por revisión.

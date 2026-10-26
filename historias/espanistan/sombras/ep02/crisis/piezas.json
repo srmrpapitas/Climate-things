@@ -1,0 +1,69 @@
+{
+ "cola": {
+  "caja": [
+   198,
+   783,
+   874,
+   398
+  ],
+  "tipo": "grupo",
+  "pivote": [
+   635,
+   1181
+  ]
+ },
+ "paraguas": {
+  "caja": [
+   1208,
+   639,
+   313,
+   542
+  ],
+  "tipo": "figura",
+  "pivote": [
+   1364,
+   1181
+  ]
+ },
+ "paraguas_c": {
+  "caja": [
+   1216,
+   531,
+   287,
+   108
+  ],
+  "tipo": "cabeza",
+  "pivote": [
+   1359,
+   639
+  ],
+  "padre": "paraguas"
+ },
+ "mochila": {
+  "caja": [
+   1686,
+   1137,
+   402,
+   303
+  ],
+  "tipo": "figura",
+  "pivote": [
+   1887,
+   1440
+  ]
+ },
+ "mochila_c": {
+  "caja": [
+   1689,
+   1036,
+   399,
+   101
+  ],
+  "tipo": "cabeza",
+  "pivote": [
+   1862,
+   1137
+  ],
+  "padre": "mochila"
+ }
+}

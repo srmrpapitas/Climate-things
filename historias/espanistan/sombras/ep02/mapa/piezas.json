@@ -1,0 +1,56 @@
+{
+ "decano": {
+  "caja": [
+   993,
+   734,
+   315,
+   606
+  ],
+  "tipo": "figura",
+  "pivote": [
+   1150,
+   1340
+  ]
+ },
+ "decano_c": {
+  "caja": [
+   993,
+   556,
+   202,
+   178
+  ],
+  "tipo": "cabeza",
+  "pivote": [
+   1083,
+   734
+  ],
+  "padre": "decano"
+ },
+ "pastor": {
+  "caja": [
+   1506,
+   619,
+   418,
+   654
+  ],
+  "tipo": "figura",
+  "pivote": [
+   1715,
+   1273
+  ]
+ },
+ "pastor_c": {
+  "caja": [
+   1514,
+   466,
+   399,
+   153
+  ],
+  "tipo": "cabeza",
+  "pivote": [
+   1755,
+   619
+  ],
+  "padre": "pastor"
+ }
+}

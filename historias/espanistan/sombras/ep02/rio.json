@@ -1,0 +1,49 @@
+{
+ "ref": 889,
+ "umbral": 60,
+ "piezas": [
+  {
+   "nombre": "balanza",
+   "caja": [
+    630,
+    195,
+    792,
+    264
+   ],
+   "pivote": [
+    715,
+    205
+   ]
+  },
+  {
+   "nombre": "decano",
+   "caja": [
+    778,
+    118,
+    887,
+    264
+   ],
+   "cuello": 225
+  },
+  {
+   "nombre": "feijolo",
+   "caja": [
+    492,
+    123,
+    562,
+    262
+   ],
+   "cuello": 165
+  },
+  {
+   "nombre": "cola",
+   "caja": [
+    128,
+    92,
+    302,
+    262
+   ],
+   "tipo": "grupo"
+  }
+ ]
+}

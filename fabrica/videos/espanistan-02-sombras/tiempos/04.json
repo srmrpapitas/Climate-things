@@ -1,0 +1,73 @@
+[
+ {
+  "texto": "¡Españistaníes!",
+  "inicio": 0.0,
+  "fin": 1.4,
+  "palabras": [
+   [
+    "¡Españistaníes!",
+    0.0,
+    1.4
+   ]
+  ]
+ },
+ {
+  "texto": "Lo mío es gestión.",
+  "inicio": 1.7,
+  "fin": 3.6,
+  "palabras": [
+   [
+    "Lo",
+    1.7,
+    1.92
+   ],
+   [
+    "mío",
+    1.92,
+    2.24
+   ],
+   [
+    "es",
+    2.24,
+    2.64
+   ],
+   [
+    "gestión.",
+    2.64,
+    3.6
+   ]
+  ]
+ },
+ {
+  "texto": "Gestión, gestión, y más gestión.",
+  "inicio": 4.18,
+  "fin": 8.12,
+  "palabras": [
+   [
+    "Gestión,",
+    4.18,
+    4.98
+   ],
+   [
+    "gestión,",
+    5.48,
+    6.14
+   ],
+   [
+    "y",
+    7.14,
+    7.22
+   ],
+   [
+    "más",
+    7.22,
+    7.5
+   ],
+   [
+    "gestión.",
+    7.5,
+    8.12
+   ]
+  ]
+ }
+]

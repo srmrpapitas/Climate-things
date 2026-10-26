@@ -1,0 +1,25 @@
+{
+ "ref": 889,
+ "umbral": 60,
+ "piezas": [
+  {
+   "nombre": "feijolo",
+   "caja": [
+    340,
+    80,
+    545,
+    247
+   ],
+   "cuello": 128
+  },
+  {
+   "nombre": "olas",
+   "caja": [
+    0,
+    255,
+    245,
+    425
+   ]
+  }
+ ]
+}

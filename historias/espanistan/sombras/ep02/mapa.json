@@ -1,0 +1,26 @@
+{
+ "ref": 889,
+ "umbral": 60,
+ "piezas": [
+  {
+   "nombre": "decano",
+   "caja": [
+    345,
+    185,
+    458,
+    465
+   ],
+   "cuello": 255
+  },
+  {
+   "nombre": "pastor",
+   "caja": [
+    523,
+    155,
+    668,
+    442
+   ],
+   "cuello": 215
+  }
+ ]
+}

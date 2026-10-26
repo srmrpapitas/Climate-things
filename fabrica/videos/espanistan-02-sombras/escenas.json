@@ -1,0 +1,1681 @@
+{
+ "titulo": "Españistán 2 · Feijolo y el PP",
+ "guion": "fabrica/herramientas/guion_espanistan-02b.txt",
+ "sombras": "historias/espanistan/sombras/ep02",
+ "pausa": 0.6,
+ "voces": [
+  {
+   "archivo": "audio/voz/es/espanistan-02/lento/01.mp3",
+   "pausa": 1.0,
+   "lineas": "1"
+  },
+  {
+   "archivo": "audio/voz/es/espanistan-02/lento/02.mp3",
+   "pausa": 1.0,
+   "lineas": "2"
+  },
+  {
+   "archivo": "audio/voz/es/espanistan-02/lento/03.mp3",
+   "pausa": 0.5,
+   "lineas": "3"
+  },
+  {
+   "archivo": "audio/voz/es/espanistan-02/feijolo/f1_gestion.mp3",
+   "pausa": 0.5,
+   "texto": "¡Españistaníes! Lo mío es gestión. Gestión, gestión… y más gestión.",
+   "quien": "feijolo"
+  },
+  {
+   "archivo": "audio/voz/es/espanistan-02/lento/04.mp3",
+   "pausa": 1.0,
+   "lineas": "4"
+  },
+  {
+   "archivo": "audio/voz/es/espanistan-02/lento/b1.mp3",
+   "pausa": 0.5,
+   "lineas": "5-8"
+  },
+  {
+   "archivo": "audio/voz/es/espanistan-02/feijolo/f2_detalle.mp3",
+   "pausa": 0.5,
+   "texto": "Yo gané las elecciones. Que los demás sumaran más… eso es un detalle técnico.",
+   "quien": "feijolo"
+  },
+  {
+   "archivo": "audio/voz/es/espanistan-02/lento/b2.mp3",
+   "pausa": 1.0,
+   "lineas": "9-11"
+  },
+  {
+   "archivo": "audio/voz/es/espanistan-02/lento/b3.mp3",
+   "pausa": 1.0,
+   "lineas": "12-14"
+  },
+  {
+   "archivo": "audio/voz/es/espanistan-02/lento/b4.mp3",
+   "pausa": 1.0,
+   "lineas": "15-19"
+  },
+  {
+   "archivo": "audio/voz/es/espanistan-02/lento/b5.mp3",
+   "pausa": 1.0,
+   "lineas": "20-23"
+  },
+  {
+   "archivo": "audio/voz/es/espanistan-02/lento/b6a.mp3",
+   "pausa": 0.5,
+   "lineas": "24-32"
+  },
+  {
+   "archivo": "audio/voz/es/espanistan-02/feijolo/f6_aguapasada.mp3",
+   "pausa": 0.5,
+   "texto": "¿Los escándalos de mi partido? Agua pasada… de anteayer, pero pasada.",
+   "quien": "feijolo"
+  },
+  {
+   "archivo": "audio/voz/es/espanistan-02/lento/b6b.mp3",
+   "pausa": 0.5,
+   "lineas": "33-34"
+  },
+  {
+   "archivo": "audio/voz/es/espanistan-02/feijolo/f3_nosabia.mp3",
+   "pausa": 0.5,
+   "texto": "¿Yo? En aquella época yo no sabía a qué se dedicaba.",
+   "quien": "feijolo"
+  },
+  {
+   "archivo": "audio/voz/es/espanistan-02/lento/b6c.mp3",
+   "pausa": 0.5,
+   "lineas": "35"
+  },
+  {
+   "archivo": "audio/voz/es/espanistan-02/feijolo/f4_rio.mp3",
+   "pausa": 0.5,
+   "texto": "Este es otro PP. Un río nuevo. Limpito. El cauce… mejor no lo miréis.",
+   "quien": "feijolo"
+  },
+  {
+   "archivo": "audio/voz/es/espanistan-02/lento/b6d.mp3",
+   "pausa": 1.0,
+   "lineas": "36"
+  },
+  {
+   "archivo": "audio/voz/es/espanistan-02/lento/b7a.mp3",
+   "pausa": 0.5,
+   "lineas": "37"
+  },
+  {
+   "archivo": "audio/voz/es/espanistan-02/feijolo/f5_promesas.mp3",
+   "pausa": 0.5,
+   "texto": "Bajaré los impuestos, subiré las pensiones y os daré una casa a cada uno. ¿Cómo? Eso es un detalle técnico.",
+   "quien": "feijolo"
+  },
+  {
+   "archivo": "audio/voz/es/espanistan-02/lento/b7b.mp3",
+   "pausa": 1.0,
+   "lineas": "38"
+  },
+  {
+   "archivo": "audio/voz/es/espanistan-02/lento/b8.mp3",
+   "pausa": 1.0,
+   "lineas": "39-45"
+  },
+  {
+   "archivo": "audio/voz/es/espanistan-02/lento/b9.mp3",
+   "pausa": 1.0,
+   "lineas": "46"
+  }
+ ],
+ "negrita": [
+  "Feijolo",
+  "el PP",
+  "Santayana",
+  "condenado a repetirlo",
+  "todo un partido",
+  "turnado el poder",
+  "datos públicos",
+  "palabra exacta",
+  "lo bueno",
+  "cuatro mayorías absolutas",
+  "ganar no es gobernar",
+  "Gobierna quien suma",
+  "plena crisis",
+  "veintiséis coma nueve",
+  "dieciséis coma siete",
+  "letra pequeña",
+  "sesenta mil millones",
+  "noventa y ocho",
+  "quién la va a cargar",
+  "no subir los impuestos",
+  "subió el IRPF",
+  "amnistía fiscal",
+  "inconstitucional y nula",
+  "cui bono",
+  "tres mil setecientos cuarenta y tres",
+  "Andalucía",
+  "Comunidad Valenciana",
+  "Galicia",
+  "cuarenta coma cinco",
+  "treinta y ocho coma tres",
+  "un solo color",
+  "anillo de Giges",
+  "etiqueta exacta",
+  "caja B",
+  "moción de censura",
+  "dinero negro",
+  "falta la sentencia",
+  "investigado",
+  "condenado",
+  "Ha recurrido",
+  "no ve delito",
+  "responsabilidad política",
+  "No hay causa",
+  "mismo río",
+  "con hechos",
+  "bajar impuestos",
+  "ciento uno por ciento",
+  "pregúntalo",
+  "lo decides tú",
+  "a las pruebas",
+  "votes pensando",
+  "el tercer partido",
+  "dale a like",
+  "suscríbete",
+  "la campana"
+ ],
+ "planos": [
+  {
+   "en": 0,
+   "tipo": "cueva",
+   "cam": [
+    640,
+    300,
+    1.15
+   ],
+   "cam2": [
+    450,
+    210,
+    1.9
+   ],
+   "musica": "misterio"
+  },
+  {
+   "en": "2:El filósofo",
+   "tipo": "decano",
+   "cam": [
+    870,
+    245,
+    2.6
+   ],
+   "cam2": [
+    860,
+    250,
+    2.2
+   ],
+   "musica": "misterio",
+   "zooms": [
+    [
+     "2:Miramos a todo",
+     640,
+     360,
+     1.05,
+     1.2
+    ]
+   ],
+   "capas": [
+    {
+     "tipo": "cita",
+     "autor": "GEORGE SANTAYANA · 1905",
+     "texto": "Quien no recuerda su pasado está condenado a repetirlo.",
+     "en": "2:escribió",
+     "hasta": "2:Por eso"
+    },
+    {
+     "tipo": "sello",
+     "texto": "TODO UN PARTIDO",
+     "en": "2:todo un partido"
+    }
+   ]
+  },
+  {
+   "en": "3:Este es Feijolo",
+   "tipo": "teatro",
+   "escena": "promesas",
+   "cam": [
+    760,
+    330,
+    2.0
+   ],
+   "cam2": [
+    640,
+    360,
+    1.0
+   ],
+   "capas": [
+    {
+     "tipo": "dato",
+     "valor": "FEIJOLO",
+     "texto": "Líder de la oposición",
+     "en": "3:Feijolo",
+     "hasta": "3:Y este",
+     "color": "rojo"
+    },
+    {
+     "tipo": "dato",
+     "valor": "PP",
+     "texto": "Su partido",
+     "color": "pp",
+     "en": "3:el PP",
+     "hasta": "3:uno de los dos"
+    },
+    {
+     "tipo": "linea",
+     "titulo": "Quién ha gobernado Españistán",
+     "en": "3:uno de los dos"
+    }
+   ],
+   "acciones": [
+    {
+     "pieza": "fbrazo",
+     "hace": "saluda",
+     "en": "3:Este es Feijolo"
+    },
+    {
+     "pieza": "publico1",
+     "hace": "salta",
+     "en": "3:el PP"
+    },
+    {
+     "pieza": "publico2",
+     "hace": "salta",
+     "en": "3:el PP"
+    }
+   ]
+  },
+  {
+   "en": "4:Españistaníes",
+   "tipo": "retrato",
+   "img": "p1",
+   "lado": 1,
+   "z": [
+    1,
+    1.06
+   ],
+   "y": 0,
+   "musica": "neutro"
+  },
+  {
+   "en": "5:Mismas reglas",
+   "tipo": "teatro",
+   "escena": "tribunal",
+   "cam": [
+    780,
+    200,
+    1.5
+   ],
+   "cam2": [
+    700,
+    330,
+    1.15
+   ],
+   "capas": [
+    {
+     "tipo": "lista",
+     "titulo": "Mismas reglas",
+     "items": [
+      {
+       "texto": "Datos públicos",
+       "en": "5:datos públicos"
+      },
+      {
+       "texto": "La palabra exacta de cada sentencia",
+       "en": "5:la palabra exacta"
+      },
+      {
+       "texto": "Lo bueno también se cuenta",
+       "en": "5:lo bueno"
+      }
+     ]
+    }
+   ],
+   "acciones": [
+    {
+     "pieza": "balanza",
+     "hace": "balancea",
+     "en": "5:Mismas reglas",
+     "hasta": "5:lo bueno",
+     "g": 4
+    }
+   ]
+  },
+  {
+   "en": "6:Feijolo presidió",
+   "tipo": "teatro",
+   "escena": "galicia",
+   "cam": [
+    634,
+    300,
+    1.7
+   ],
+   "cam2": [
+    640,
+    360,
+    1.05
+   ],
+   "capas": [
+    {
+     "tipo": "dato",
+     "valor": "4",
+     "texto": "mayorías absolutas en Galicia (2009-2022)",
+     "fuente": "Xunta de Galicia",
+     "en": "6:cuatro mayorías",
+     "hasta": "6:En dos mil veintidós pasó"
+    },
+    {
+     "tipo": "dato",
+     "valor": "137",
+     "texto": "escaños en 2023: el más votado",
+     "fuente": "Ministerio del Interior",
+     "en": "6:ciento treinta y siete"
+    }
+   ],
+   "acciones": [
+    {
+     "pieza": "feijolo_c",
+     "hace": "saluda",
+     "en": "6:cuatro mayorías",
+     "g": 4
+    },
+    {
+     "pieza": "olas",
+     "hace": "balancea",
+     "en": "6:Feijolo presidió",
+     "hasta": "6:Pero no gobernó",
+     "g": 2
+    }
+   ]
+  },
+  {
+   "en": "6:Pero no gobernó",
+   "tipo": "teatro",
+   "escena": "galicia",
+   "cam": [
+    900,
+    430,
+    1.6
+   ],
+   "cam2": [
+    1000,
+    450,
+    2.0
+   ],
+   "capas": [
+    {
+     "tipo": "dato",
+     "valor": "172 de 176",
+     "texto": "votos que sacó en su investidura",
+     "fuente": "Congreso, 27-9-2023",
+     "color": "rojo",
+     "en": "6:ciento setenta y dos",
+     "hasta": "6:Primera lección"
+    },
+    {
+     "tipo": "sello",
+     "texto": "GANAR ≠ GOBERNAR",
+     "en": "6:ganar no es gobernar"
+    }
+   ],
+   "sfx": [
+    [
+     "impacto",
+     "6:Gobierna quien suma",
+     0.35
+    ]
+   ],
+   "acciones": [
+    {
+     "pieza": "feijolo",
+     "hace": "inclina",
+     "en": "6:Pero no gobernó",
+     "g": -4,
+     "hasta": "6:Primera lección"
+    }
+   ]
+  },
+  {
+   "en": "7:Yo gané",
+   "tipo": "retrato",
+   "img": "p2",
+   "lado": -1,
+   "z": [
+    1,
+    1.06
+   ],
+   "y": 0,
+   "musica": "neutro"
+  },
+  {
+   "en": "8:El último gobierno",
+   "tipo": "teatro",
+   "escena": "crisis",
+   "cam": [
+    681,
+    400,
+    2.1
+   ],
+   "cam2": [
+    681,
+    380,
+    1.7
+   ],
+   "musica": "esperanza",
+   "capas": [
+    {
+     "tipo": "nota",
+     "texto": "Mariano Rajoy",
+     "sub": "Presidente del Gobierno, 2011–2018",
+     "dato": "Llegó en plena crisis",
+     "pos": "izq",
+     "en": "8:Mariano Rajoy",
+     "hasta": "8:El paro llegó"
+    }
+   ],
+   "acciones": [
+    {
+     "pieza": "paraguas",
+     "hace": "tiembla",
+     "en": "8:plena crisis",
+     "g": 1.5
+    }
+   ]
+  },
+  {
+   "en": "8:El paro llegó",
+   "tipo": "teatro",
+   "escena": "crisis",
+   "cam": [
+    320,
+    470,
+    1.6
+   ],
+   "cam2": [
+    480,
+    420,
+    1.15
+   ],
+   "musica": "esperanza",
+   "capas": [
+    {
+     "tipo": "dato",
+     "valor": "26,9 %",
+     "texto": "paro máximo (1.er trim. 2013)",
+     "fuente": "INE, EPA",
+     "color": "rojo",
+     "en": "8:veintiséis",
+     "hasta": "8:Cuando Rajoy"
+    },
+    {
+     "tipo": "dato",
+     "valor": "16,7 %",
+     "texto": "paro cuando se fue (1.er trim. 2018)",
+     "fuente": "INE, EPA",
+     "color": "verde",
+     "en": "8:dieciséis",
+     "hasta": "8:evitó un rescate"
+    },
+    {
+     "tipo": "sello",
+     "texto": "SIN RESCATE TOTAL",
+     "en": "8:evitó un rescate"
+    }
+   ],
+   "acciones": [
+    {
+     "pieza": "cola",
+     "hace": "tiembla",
+     "en": "8:veintiséis",
+     "g": 1.5
+    },
+    {
+     "pieza": "cola",
+     "hace": "avanza",
+     "en": "8:Cuando Rajoy",
+     "g": -30
+    }
+   ]
+  },
+  {
+   "en": "9:Ahora, la letra",
+   "tipo": "teatro",
+   "escena": "crisis",
+   "cam": [
+    980,
+    420,
+    1.7
+   ],
+   "cam2": [
+    960,
+    400,
+    1.4
+   ],
+   "musica": "misterio",
+   "capas": [
+    {
+     "tipo": "dato",
+     "valor": "≈ 60.000 M€",
+     "texto": "para salvar a los bancos; la mayor parte no se recuperará",
+     "fuente": "Banco de España",
+     "color": "rojo",
+     "en": "9:sesenta mil"
+    }
+   ],
+   "acciones": [
+    {
+     "pieza": "mochila",
+     "hace": "avanza",
+     "en": "9:Ahora, la letra",
+     "g": -15
+    }
+   ]
+  },
+  {
+   "en": "9:La deuda pública",
+   "tipo": "teatro",
+   "escena": "crisis",
+   "cam": [
+    930,
+    580,
+    2.1
+   ],
+   "cam2": [
+    900,
+    540,
+    1.7
+   ],
+   "musica": "misterio",
+   "capas": [
+    {
+     "tipo": "dato",
+     "valor": "69 % → 98 %",
+     "texto": "deuda pública sobre el PIB (2011 → 2017)",
+     "fuente": "Eurostat",
+     "color": "rojo",
+     "en": "9:sesenta y nueve"
+    }
+   ],
+   "acciones": [
+    {
+     "pieza": "mochila",
+     "hace": "tiembla",
+     "en": "9:La deuda",
+     "g": 2
+    },
+    {
+     "pieza": "mochila",
+     "hace": "inclina",
+     "en": "9:noventa y ocho",
+     "g": 5
+    }
+   ]
+  },
+  {
+   "en": "9:Pregunta del Decano",
+   "tipo": "decano",
+   "cam": [
+    870,
+    245,
+    2.3
+   ],
+   "cam2": [
+    870,
+    250,
+    2.6
+   ],
+   "musica": "misterio",
+   "sfx": [
+    [
+     "impacto",
+     "9:quién la va a cargar",
+     0.3
+    ]
+   ]
+  },
+  {
+   "en": "10:En la campaña",
+   "tipo": "teatro",
+   "escena": "impuestos",
+   "cam": [
+    260,
+    330,
+    1.8
+   ],
+   "cam2": [
+    420,
+    380,
+    1.3
+   ],
+   "capas": [
+    {
+     "tipo": "comparacion",
+     "izq": {
+      "titulo": "PROMETIÓ (2011)",
+      "texto": "No subir los impuestos."
+     },
+     "der": {
+      "titulo": "HIZO",
+      "texto": "Subió el IRPF y el IBI (dic. 2011) y el IVA del 18 al 21 % (2012).",
+      "en": "10:Un mes después"
+     },
+     "hasta": "10:En dos mil doce aprobó"
+    }
+   ],
+   "acciones": [
+    {
+     "pieza": "balcon",
+     "hace": "saluda",
+     "en": "10:prometió",
+     "g": 6
+    },
+    {
+     "pieza": "palanca",
+     "hace": "alza",
+     "en": "10:Un mes después",
+     "hasta": "10:Él dijo",
+     "g": 12
+    },
+    {
+     "pieza": "recaudador",
+     "hace": "inclina",
+     "en": "10:Un mes después",
+     "g": 4
+    }
+   ]
+  },
+  {
+   "en": "10:En dos mil doce aprobó",
+   "tipo": "teatro",
+   "escena": "impuestos",
+   "cam": [
+    1044,
+    518,
+    1.8
+   ],
+   "cam2": [
+    1044,
+    500,
+    1.5
+   ],
+   "musica": "misterio",
+   "capas": [
+    {
+     "tipo": "dato",
+     "valor": "Amnistía fiscal",
+     "texto": "2012: regularizar dinero escondido pagando muy poco",
+     "color": "rojo",
+     "en": "10:amnistía fiscal",
+     "hasta": "10:En dos mil diecisiete"
+    },
+    {
+     "tipo": "sello",
+     "texto": "INCONSTITUCIONAL",
+     "en": "10:inconstitucional y nula",
+     "hasta": "10:Pero el dinero"
+    },
+    {
+     "tipo": "dato",
+     "valor": "STC 73/2017",
+     "texto": "Nula, pero el dinero ya estaba regularizado",
+     "fuente": "Tribunal Constitucional",
+     "en": "10:Pero el dinero"
+    }
+   ],
+   "zooms": [
+    [
+     "10:En dos mil diecisiete",
+     1073,
+     240,
+     1.7,
+     1.0
+    ]
+   ],
+   "acciones": [
+    {
+     "pieza": "encapuchados",
+     "hace": "tiembla",
+     "en": "10:amnistía fiscal",
+     "g": 1.2
+    },
+    {
+     "pieza": "mazo",
+     "hace": "golpea",
+     "en": "10:inconstitucional y nula",
+     "g": 25
+    }
+   ]
+  },
+  {
+   "en": "10:Cicerón",
+   "tipo": "decano",
+   "cam": [
+    860,
+    250,
+    2.4
+   ],
+   "cam2": [
+    760,
+    260,
+    2.1
+   ],
+   "capas": [
+    {
+     "tipo": "cita",
+     "autor": "CICERÓN",
+     "texto": "¿Cui bono? ¿A quién beneficia?",
+     "en": "10:cui bono"
+    }
+   ],
+   "sfx": [
+    [
+     "impacto",
+     "10:de este partido y de todos",
+     0.3
+    ]
+   ]
+  },
+  {
+   "en": "11:El Decano saca",
+   "tipo": "teatro",
+   "escena": "mapa",
+   "cam": [
+    470,
+    360,
+    1.45
+   ],
+   "cam2": [
+    450,
+    340,
+    1.3
+   ],
+   "musica": "tension",
+   "capas": [
+    {
+     "tipo": "dato",
+     "pos": "der",
+     "valor": "3.743",
+     "texto": "casos de corrupción en 20 años: uno cada dos días",
+     "fuente": "Abreu, IREA-UB 2022",
+     "color": "rojo",
+     "en": "11:tres mil setecientos",
+     "hasta": "11:Galicia"
+    },
+    {
+     "tipo": "pines",
+     "en": "11:Por comunidades",
+     "pines": [
+      [
+       420,
+       470,
+       "Andalucía",
+       "1.028",
+       "11:Andalucía"
+      ],
+      [
+       560,
+       360,
+       "C. Valenciana",
+       "455",
+       "11:La Comunidad Valenciana"
+      ],
+      [
+       300,
+       190,
+       "Galicia",
+       "338",
+       "11:Galicia"
+      ]
+     ]
+    }
+   ],
+   "acciones": [
+    {
+     "pieza": "decano",
+     "hace": "inclina",
+     "en": "11:El Decano saca",
+     "g": -3
+    },
+    {
+     "pieza": "decano",
+     "hace": "asiente",
+     "en": "11:Entre las tres"
+    }
+   ]
+  },
+  {
+   "en": "11:Y por partidos",
+   "tipo": "teatro",
+   "escena": "mapa",
+   "cam": [
+    440,
+    340,
+    1.2
+   ],
+   "cam2": [
+    440,
+    340,
+    1.1
+   ],
+   "musica": "tension",
+   "capas": [
+    {
+     "tipo": "barras",
+     "titulo": "Casos de corrupción por partido (2000-2020)",
+     "max": 45,
+     "filas": [
+      [
+       "PP",
+       40.5,
+       "pp"
+      ],
+      [
+       "PSOE",
+       38.3,
+       "psoe"
+      ],
+      [
+       "Otros",
+       21.2,
+       "gris"
+      ]
+     ],
+     "fuente": "Abreu, IREA-UB 2022",
+     "en": "11:el PP tiene"
+    }
+   ]
+  },
+  {
+   "en": "11:Lección del Decano",
+   "tipo": "decano",
+   "cam": [
+    870,
+    245,
+    2.5
+   ],
+   "cam2": [
+    800,
+    260,
+    2.1
+   ],
+   "capas": [
+    {
+     "tipo": "dato",
+     "pos": "der",
+     "valor": "Ni rojo ni azul",
+     "texto": "La corrupción va con el tiempo y el poder",
+     "en": "11:no tiene un solo color"
+    }
+   ],
+   "sfx": [
+    [
+     "impacto",
+     "11:mirar al de enfrente",
+     0.3
+    ]
+   ]
+  },
+  {
+   "en": "12:Platón contó",
+   "tipo": "teatro",
+   "escena": "mapa",
+   "cam": [
+    857,
+    400,
+    1.9
+   ],
+   "cam2": [
+    857,
+    380,
+    1.5
+   ],
+   "musica": "misterio",
+   "capas": [
+    {
+     "tipo": "cita",
+     "autor": "PLATÓN · EL ANILLO DE GIGES",
+     "texto": "¿Serías honrado si nadie te viera?",
+     "en": "12:Serías honrado"
+    }
+   ],
+   "acciones": [
+    {
+     "pieza": "pastor",
+     "hace": "alza",
+     "en": "12:encuentra un anillo",
+     "g": 4,
+     "hasta": "12:lo hace invisible"
+    },
+    {
+     "pieza": "pastor",
+     "hace": "desaparece",
+     "en": "12:lo hace invisible"
+    },
+    {
+     "pieza": "pastor_c",
+     "hace": "desaparece",
+     "en": "12:lo hace invisible"
+    }
+   ]
+  },
+  {
+   "en": "12:Mismas reglas",
+   "tipo": "teatro",
+   "escena": "tribunal",
+   "cam": [
+    260,
+    380,
+    1.6
+   ],
+   "cam2": [
+    300,
+    380,
+    1.4
+   ],
+   "musica": "tension",
+   "capas": [
+    {
+     "tipo": "sello",
+     "texto": "PRESUNCIÓN DE INOCENCIA",
+     "en": "12:nadie es culpable",
+     "hasta": "12:Gürtel"
+    }
+   ],
+   "acciones": [
+    {
+     "pieza": "decano",
+     "hace": "asiente",
+     "en": "12:nadie es culpable"
+    }
+   ]
+  },
+  {
+   "en": "12:Gürtel",
+   "tipo": "teatro",
+   "escena": "tribunal",
+   "cam": [
+    700,
+    300,
+    1.25
+   ],
+   "cam2": [
+    700,
+    330,
+    1.15
+   ],
+   "musica": "tension",
+   "capas": [
+    {
+     "tipo": "frasco",
+     "nombre": "Gürtel",
+     "corto": "Gürtel",
+     "texto": "2018: el PP, condenado como partícipe a título lucrativo; devolvió 245.492 €. Caja B probada. El Supremo lo confirmó.",
+     "etiqueta": "CONDENADO",
+     "color": "rojo",
+     "fuente": "Audiencia Nacional · Supremo",
+     "en": "12:Gürtel",
+     "hasta": "12:La sede"
+    },
+    {
+     "tipo": "frasco",
+     "nombre": "La sede",
+     "corto": "Sede",
+     "texto": "Obras pagadas en parte con dinero negro: casi 1 millón. La caja B era del partido.",
+     "etiqueta": "PROBADO",
+     "color": "rojo",
+     "fuente": "Supremo, nov. 2024",
+     "en": "12:La sede",
+     "hasta": "12:Kitchen"
+    },
+    {
+     "tipo": "frasco",
+     "nombre": "Kitchen",
+     "corto": "Kitchen",
+     "texto": "El ministro del Interior y su n.º 2, juzgados por espiar al extesorero con dinero público. Fiscalía: 15 años.",
+     "etiqueta": "A JUICIO · PRESUNTOS INOCENTES",
+     "color": "ambar",
+     "fuente": "Audiencia Nacional",
+     "en": "12:Kitchen",
+     "hasta": "12:Montoro"
+    },
+    {
+     "tipo": "frasco",
+     "nombre": "Montoro",
+     "corto": "Montoro",
+     "texto": "Exministro de Hacienda: investigado por cambiar leyes a favor de clientes de su antiguo despacho. Lo niega.",
+     "etiqueta": "INVESTIGADO",
+     "color": "ambar",
+     "fuente": "Juzgado de Tarragona",
+     "en": "12:Montoro",
+     "hasta": "12:Rato"
+    },
+    {
+     "tipo": "frasco",
+     "nombre": "Rato",
+     "corto": "Rato",
+     "texto": "Vicepresidente de Aznar: 4 años y medio, firme (tarjetas black). 2024: condenado otra vez en 1.ª instancia; ha recurrido.",
+     "etiqueta": "CONDENADO",
+     "color": "rojo",
+     "fuente": "Supremo · Audiencia de Madrid",
+     "en": "12:Rato",
+     "hasta": "12:Zaplana"
+    },
+    {
+     "tipo": "frasco",
+     "nombre": "Zaplana",
+     "corto": "Zaplana",
+     "texto": "Expresidente valenciano: 10 años y 5 meses por cohecho y blanqueo. Recurrido al Supremo.",
+     "etiqueta": "CONDENADO (1.ª INST.)",
+     "color": "rojo",
+     "fuente": "Audiencia de Valencia",
+     "en": "12:Zaplana",
+     "hasta": "12:Granados"
+    },
+    {
+     "tipo": "frasco",
+     "nombre": "Granados",
+     "corto": "Granados",
+     "texto": "Exconsejero madrileño: 2 años y medio (Púnica, julio 2026). Otros juicios pendientes.",
+     "etiqueta": "CONDENADO",
+     "color": "rojo",
+     "fuente": "Audiencia Nacional",
+     "en": "12:Granados"
+    }
+   ],
+   "sfx": [
+    [
+     "impacto",
+     "12:moción de censura",
+     0.35
+    ]
+   ],
+   "zooms": [
+    [
+     "12:La sede",
+     610,
+     360,
+     1.15,
+     1.0
+    ],
+    [
+     "12:Kitchen",
+     605,
+     470,
+     1.8,
+     1.0
+    ],
+    [
+     "12:Montoro",
+     870,
+     470,
+     1.8,
+     1.0
+    ],
+    [
+     "12:Rato",
+     1015,
+     470,
+     1.8,
+     1.0
+    ],
+    [
+     "12:Zaplana",
+     1150,
+     460,
+     1.8,
+     1.0
+    ],
+    [
+     "12:Granados",
+     1270,
+     460,
+     1.8,
+     1.0
+    ]
+   ],
+   "acciones": [
+    {
+     "pieza": "balanza",
+     "hace": "inclina",
+     "en": "12:condenó al PP",
+     "g": 7,
+     "hasta": "12:La sede"
+    },
+    {
+     "pieza": "r1",
+     "hace": "inclina",
+     "en": "12:Kitchen",
+     "g": 3
+    },
+    {
+     "pieza": "r3",
+     "hace": "niega",
+     "en": "12:Él lo niega"
+    },
+    {
+     "pieza": "r4",
+     "hace": "inclina",
+     "en": "12:condenado de forma firme",
+     "g": 4
+    },
+    {
+     "pieza": "r5",
+     "hace": "inclina",
+     "en": "12:diez años",
+     "g": 4
+    },
+    {
+     "pieza": "r6",
+     "hace": "inclina",
+     "en": "12:dos años y medio",
+     "g": 4
+    }
+   ]
+  },
+  {
+   "en": "13:escándalos",
+   "tipo": "retrato",
+   "img": "p1",
+   "lado": 1,
+   "z": [
+    1.2,
+    1.3
+   ],
+   "y": 40,
+   "musica": "neutro"
+  },
+  {
+   "en": "14:La dana",
+   "tipo": "teatro",
+   "escena": "dana",
+   "cam": [
+    500,
+    330,
+    1.6
+   ],
+   "cam2": [
+    560,
+    360,
+    1.15
+   ],
+   "musica": "silencio",
+   "capas": [
+    {
+     "tipo": "frasco",
+     "nombre": "La DANA",
+     "corto": "DANA",
+     "texto": "Unas 230 muertes en Valencia (oct. 2024). Mazón dimitió un año después. El TSJCV rechazó investigarlo.",
+     "etiqueta": "NO INVESTIGADO",
+     "color": "gris",
+     "fuente": "TSJCV, marzo 2026",
+     "en": "14:La dana",
+     "hasta": "14:Las fotos"
+    }
+   ],
+   "acciones": [
+    {
+     "pieza": "ola",
+     "hace": "balancea",
+     "en": "14:La dana",
+     "hasta": "14:Las fotos",
+     "g": 3
+    },
+    {
+     "pieza": "cargo",
+     "hace": "inclina",
+     "en": "14:dimitió",
+     "g": 5
+    }
+   ]
+  },
+  {
+   "en": "14:Las fotos",
+   "tipo": "teatro",
+   "escena": "dana",
+   "cam": [
+    900,
+    470,
+    1.8
+   ],
+   "cam2": [
+    900,
+    460,
+    1.4
+   ],
+   "musica": "misterio",
+   "capas": [
+    {
+     "tipo": "frasco",
+     "nombre": "Las fotos",
+     "corto": "Fotos",
+     "texto": "Fotos de los años 90 en el barco de un contrabandista (publicadas en 2013). Dice que no sabía a qué se dedicaba.",
+     "etiqueta": "SIN CAUSA",
+     "color": "gris",
+     "en": "14:Las fotos"
+    }
+   ],
+   "acciones": [
+    {
+     "pieza": "barca",
+     "hace": "balancea",
+     "en": "14:Las fotos",
+     "hasta": "15:Yo",
+     "g": 2.5
+    }
+   ]
+  },
+  {
+   "en": "15:Yo",
+   "tipo": "retrato",
+   "img": "p2",
+   "lado": -1,
+   "z": [
+    1,
+    1.06
+   ],
+   "y": 0,
+   "musica": "neutro"
+  },
+  {
+   "en": "16:Heráclito",
+   "tipo": "teatro",
+   "escena": "rio",
+   "cam": [
+    740,
+    330,
+    1.6
+   ],
+   "cam2": [
+    700,
+    340,
+    1.3
+   ],
+   "musica": "misterio",
+   "capas": [
+    {
+     "tipo": "cita",
+     "autor": "HERÁCLITO",
+     "texto": "Nadie se baña dos veces en el mismo río.",
+     "en": "16:nadie se baña",
+     "hasta": "18:La pregunta del Decano"
+    }
+   ],
+   "acciones": [
+    {
+     "pieza": "feijolo",
+     "hace": "saluda",
+     "en": "16:Feijolo dice",
+     "g": 5
+    }
+   ]
+  },
+  {
+   "en": "17:Este es otro",
+   "tipo": "retrato",
+   "img": "p1",
+   "lado": 1,
+   "z": [
+    1,
+    1.06
+   ],
+   "y": 0,
+   "musica": "neutro"
+  },
+  {
+   "en": "18:Pero el cauce",
+   "tipo": "teatro",
+   "escena": "rio",
+   "cam": [
+    1150,
+    330,
+    1.9
+   ],
+   "cam2": [
+    1100,
+    340,
+    1.5
+   ],
+   "musica": "misterio",
+   "sfx": [
+    [
+     "impacto",
+     "18:no con palabras",
+     0.3
+    ]
+   ],
+   "acciones": [
+    {
+     "pieza": "decano",
+     "hace": "niega",
+     "en": "18:Pero el cauce"
+    },
+    {
+     "pieza": "decano",
+     "hace": "asiente",
+     "en": "18:Pídeselo"
+    }
+   ]
+  },
+  {
+   "en": "19:Para el veintinueve",
+   "tipo": "teatro",
+   "escena": "promesas",
+   "cam": [
+    820,
+    280,
+    1.7
+   ],
+   "cam2": [
+    760,
+    330,
+    1.3
+   ],
+   "capas": [
+    {
+     "tipo": "dato",
+     "valor": "0 % de IVA",
+     "texto": "para autónomos que facturen menos de 85.000 € al año",
+     "fuente": "Precampaña del PP, 2026",
+     "color": "verde",
+     "en": "19:autónomos"
+    }
+   ],
+   "acciones": [
+    {
+     "pieza": "fbrazo",
+     "hace": "alza",
+     "en": "19:Feijolo promete",
+     "g": 18
+    },
+    {
+     "pieza": "iconos",
+     "hace": "crece",
+     "en": "19:bajar impuestos",
+     "hasta": "20:Bajaré",
+     "g": 0.15
+    }
+   ]
+  },
+  {
+   "en": "20:Bajaré",
+   "tipo": "retrato",
+   "img": "p2",
+   "lado": -1,
+   "z": [
+    1,
+    1.06
+   ],
+   "y": 0,
+   "musica": "neutro"
+  },
+  {
+   "en": "21:Bajar impuestos",
+   "tipo": "teatro",
+   "escena": "promesas",
+   "cam": [
+    380,
+    460,
+    1.6
+   ],
+   "cam2": [
+    640,
+    360,
+    1.05
+   ],
+   "capas": [
+    {
+     "tipo": "dato",
+     "valor": "101 %",
+     "texto": "deuda pública sobre el PIB hoy",
+     "fuente": "Banco de España, 2.º trim. 2026",
+     "color": "rojo",
+     "en": "21:ciento uno"
+    }
+   ],
+   "sfx": [
+    [
+     "impacto",
+     "21:pregúntalo",
+     0.3
+    ]
+   ],
+   "acciones": [
+    {
+     "pieza": "iconos",
+     "hace": "desaparece",
+     "en": "21:acuérdate de la mochila"
+    },
+    {
+     "pieza": "decano",
+     "hace": "niega",
+     "en": "21:Qué gasto se recorta"
+    },
+    {
+     "pieza": "dbrazo",
+     "hace": "alza",
+     "en": "21:Bajar impuestos",
+     "g": 14
+    }
+   ]
+  },
+  {
+   "en": "22:Balance",
+   "tipo": "teatro",
+   "escena": "rio",
+   "cam": [
+    1020,
+    330,
+    1.7
+   ],
+   "cam2": [
+    960,
+    360,
+    1.2
+   ],
+   "capas": [
+    {
+     "tipo": "comparacion",
+     "izq": {
+      "titulo": "EN UN PLATO",
+      "texto": "4 mayorías en Galicia · sacó al país de la peor crisis del paro · promete bajar impuestos"
+     },
+     "der": {
+      "titulo": "EN EL OTRO",
+      "texto": "Promesas incumplidas · amnistía fiscal inconstitucional · caja B probada · una estantería de frascos",
+      "en": "22:En el otro"
+     },
+     "hasta": "22:Cuál pesa más"
+    },
+    {
+     "tipo": "sello",
+     "texto": "LO DECIDES TÚ",
+     "en": "22:Eso lo decides tú"
+    }
+   ],
+   "sfx": [
+    [
+     "impacto",
+     "22:Eso lo decides tú",
+     0.35
+    ]
+   ],
+   "acciones": [
+    {
+     "pieza": "balanza",
+     "hace": "balancea",
+     "en": "22:Balance",
+     "hasta": "22:En el otro",
+     "g": 4
+    },
+    {
+     "pieza": "balanza",
+     "hace": "balancea",
+     "en": "22:En el otro",
+     "hasta": "22:Eso lo decides",
+     "g": 7
+    },
+    {
+     "pieza": "decano",
+     "hace": "asiente",
+     "en": "22:Eso lo decides"
+    }
+   ]
+  },
+  {
+   "en": "22:Hume",
+   "tipo": "decano",
+   "cam": [
+    860,
+    250,
+    2.4
+   ],
+   "cam2": [
+    760,
+    260,
+    2.1
+   ],
+   "capas": [
+    {
+     "tipo": "cita",
+     "autor": "DAVID HUME",
+     "texto": "El sabio ajusta lo que cree a las pruebas.",
+     "en": "22:el sabio"
+    }
+   ]
+  },
+  {
+   "en": "22:Las tres preguntas",
+   "tipo": "teatro",
+   "escena": "rio",
+   "cam": [
+    320,
+    330,
+    1.5
+   ],
+   "cam2": [
+    400,
+    340,
+    1.2
+   ],
+   "capas": [
+    {
+     "tipo": "lista",
+     "titulo": "Tres preguntas, con este partido y con todos",
+     "marca": "?",
+     "items": [
+      {
+       "texto": "¿Qué prometieron y qué cumplieron?",
+       "en": "22:qué prometieron"
+      },
+      {
+       "texto": "¿Son euros o porcentajes?",
+       "en": "22:Son euros"
+      },
+      {
+       "texto": "¿Me fío de la gente de la que se rodean?",
+       "en": "22:Me fío"
+      }
+     ],
+     "hasta": "22:Aquí no te decimos"
+    },
+    {
+     "tipo": "sello",
+     "texto": "VOTA PENSANDO",
+     "en": "22:votes pensando"
+    }
+   ],
+   "sfx": [
+    [
+     "impacto",
+     "22:votes pensando",
+     0.35
+    ]
+   ],
+   "acciones": [
+    {
+     "pieza": "cola",
+     "hace": "avanza",
+     "en": "22:Aquí no te decimos",
+     "g": -25
+    }
+   ]
+  },
+  {
+   "en": "22:En el próximo episodio",
+   "tipo": "cueva",
+   "cam": [
+    640,
+    360,
+    1.05
+   ],
+   "cam2": [
+    640,
+    330,
+    1.2
+   ],
+   "musica": "misterio",
+   "capas": [
+    {
+     "tipo": "titulo",
+     "h1": "ESPAÑISTÁN",
+     "h2": "Próximo episodio: el tercer partido",
+     "p": "Mismas reglas. Mismas preguntas.",
+     "en": "22:En el próximo episodio"
+    }
+   ]
+  },
+  {
+   "en": "23:Y no te olvides",
+   "tipo": "teatro",
+   "escena": "promesas",
+   "cam": [
+    640,
+    360,
+    1.05
+   ],
+   "cam2": [
+    640,
+    360,
+    1.12
+   ],
+   "capas": [
+    {
+     "tipo": "suscribete",
+     "en": "23:dale a like",
+     "hasta": "23:próximo episodio"
+    },
+    {
+     "tipo": "titulo",
+     "h1": "ESPAÑISTÁN",
+     "h2": "Episodio 2 · Feijolo y el PP",
+     "p": "Fuentes en la descripción",
+     "en": "23:próximo episodio"
+    }
+   ],
+   "acciones": [
+    {
+     "pieza": "publico1",
+     "hace": "salta",
+     "en": "23:dale a like"
+    },
+    {
+     "pieza": "publico2",
+     "hace": "salta",
+     "en": "23:suscríbete"
+    },
+    {
+     "pieza": "decano",
+     "hace": "asiente",
+     "en": "23:la campana"
+    }
+   ]
+  }
+ ]
+}

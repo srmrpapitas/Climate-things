@@ -1,5 +1,8 @@
 # Cómo hacer un vídeo (con el generador) — leer esto con Sonnet
 
+> **Desde el ep. 2 (estilo teatro de sombras): seguir `fabrica/manual/CAPITULO-SIGUIENTE.md`** — es el procedimiento actual; lo de abajo es la base del generador.
+> Costes y ritmo para 10 vídeos/semana: `fabrica/manual/PLAN-10-SEMANA.md`.
+
 1. **Preparar la sesión**: `sh fabrica/instalar_todo.sh` (Whisper). La voz es ElevenLabs, voz D `EZDj5TBPpANsOzwaukxI`, modelo `eleven_multilingual_v2`, 1 toma.
 2. **Guion**: `historias/espanistan/NN-tema.md` (con fuentes) + `fabrica/herramientas/guion_espanistan-NN.txt` (una frase por línea, números en letra). Última línea: la de «dale a like, suscríbete y activa la campana».
 3. **Voz por bloques** (una llamada por sección, no por frase): guardar en `audio/voz/es/espanistan-NN/bNN.mp3`, normalizado con
@@ -34,3 +37,9 @@
 - Voz ElevenLabs: ≈ 7.000 créditos (1 crédito por letra; ~8 min de vídeo).
 - Dibujos nuevos: 3 imágenes de Feijolo ≈ 1.300 créditos (en adelante: 0, se reutilizan y recortan).
 - Música, efectos, animación y render: 0 €.
+
+## Reparto (26-10-2026, el usuario)
+- El protagonista **solo habla en su primer plano** (con su voz); sus retratos se reutilizan en distinto orden y zoom.
+- Los secundarios **no hablan**: al acercarse la cámara sale una **nota** (`nota`) con quién es y lo que le afecta.
+- El narrador puede dejar caer «X dice que…» para dar paso al primer plano de X.
+- Generador: planos `teatro` y `retrato`, voces de personaje `{"archivo", "texto", "quien"}`; ver cabecera de `fabrica/generar.py`.

@@ -5,9 +5,10 @@
 set -e
 if [ ! -x /home/user/qw/bin/python ]; then
   python3 -m venv /home/user/qw
-  /home/user/qw/bin/pip install -q faster-whisper soundfile numpy
+  /home/user/qw/bin/pip install -q faster-whisper soundfile numpy opencv-python-headless
 fi
-echo "Whisper listo: /home/user/qw/bin/python"
+/home/user/qw/bin/python -c "import cv2" 2>/dev/null || /home/user/qw/bin/pip install -q opencv-python-headless   # sombras.py y recortes
+echo "Whisper + OpenCV listos: /home/user/qw/bin/python"
 [ "$1" = "--cosyvoice" ] || exit 0
 
 VS=/home/user/VoiceStudio
