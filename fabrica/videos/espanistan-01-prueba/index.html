@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="es" data-resolution="landscape">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1920, height=1080" />
+<!-- Españistán · prueba del sistema nuevo: un plano del ep. 1 (despacho, «29-N») animado con HyperFrames.
+     El dibujo es el mismo .webp de siempre; el movimiento sale de su mapa de profundidad (herramientas/profundidad.py),
+     la cámara, los párpados, el calendario y los rótulos. Tiempos de la voz en tiempos.json. -->
+<script src="assets/gsap.min.js"></script>
+<style>
+  @font-face { font-family: 'Archivo Black'; src: url(assets/fuentes/archivo-black-latin-400-normal.woff2); }
+  @font-face { font-family: 'Inter'; font-weight: 600; src: url(assets/fuentes/inter-latin-600-normal.woff2); }
+  @font-face { font-family: 'Inter'; font-weight: 800; src: url(assets/fuentes/inter-latin-800-normal.woff2); }
+  @font-face { font-family: 'Lora'; font-style: italic; font-weight: 500; src: url(assets/fuentes/lora-latin-500-italic.woff2); }
+  :root { --papel: #f4efe6; --tinta: #222; --rojo: #c0392b; --azul: #1f4e8c; --oro: #f2c14e; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1920px; height: 1080px; overflow: hidden; background: #111; }
+  #root { position: relative; width: 1920px; height: 1080px; overflow: hidden; }
+  /* el mundo se dibuja en coordenadas del dibujo (1280×720) y la cámara lo mueve entero */
+  #mundo { position: absolute; left: 0; top: 0; width: 1280px; height: 720px; transform-origin: 0 0; }
+  #lienzo, #capa { position: absolute; left: 0; top: 0; width: 1280px; height: 720px; }
+  #ojos { mix-blend-mode: normal; }
+  #luz { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen;
+    background: linear-gradient(115deg, rgba(255,236,190,.38) 0%, rgba(255,236,190,.1) 22%, rgba(255,236,190,0) 40%); }
+  .polvo { position: absolute; width: 4px; height: 4px; border-radius: 50%; background: #fff6dc; }
+  #vineta { position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(ellipse at 50% 45%, rgba(0,0,0,0) 55%, rgba(0,0,0,.45) 100%); }
+  .tarjeta { position: absolute; background: var(--papel); border-radius: 18px; box-shadow: 0 8px 24px rgba(0,0,0,.35); text-align: center; }
+  #dato { left: 1300px; top: 210px; width: 560px; padding: 26px 30px 22px; }
+  #dato .valor { font: 96px 'Archivo Black'; color: var(--azul); line-height: 1; }
+  #dato .texto { font: 600 34px Inter; color: var(--tinta); margin-top: 12px; }
+  #dato .fuente { font: italic 500 26px Lora; color: #777; margin-top: 14px; }
+  .decreto { top: 300px; width: 330px; height: 430px; padding: 34px 28px; text-align: left; }
+  .decreto h3 { font: 34px 'Archivo Black'; color: var(--tinta); line-height: 1.05; }
+  .decreto p { font: 600 22px Inter; color: #666; margin-top: 10px; }
+  .decreto i { display: block; height: 12px; margin-top: 18px; background: #d9d1c3; border-radius: 6px; }
+  .sello { position: absolute; left: 30px; top: 210px; padding: 8px 18px; border: 7px solid var(--rojo); border-radius: 12px;
+    font: 52px 'Archivo Black'; color: var(--rojo); transform: rotate(-14deg); background: rgba(244,239,230,.6); }
+  #sub { position: absolute; left: 160px; right: 160px; bottom: 70px; text-align: center; font: 800 54px Inter; color: #fff;
+    -webkit-text-stroke: 10px rgba(0,0,0,.75); paint-order: stroke fill; line-height: 1.2; }
+  #sub b { color: var(--oro); font-weight: 800; }
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-duration="10" data-width="1920" data-height="1080">
+  <div id="mundo">
+    <canvas id="lienzo" width="1920" height="1080"></canvas>
+    <svg id="capa" viewBox="0 0 1280 720">
+      <!-- calendario: el plano del calendario está inclinado, cada celda se calcula con sus 4 esquinas -->
+      <g id="cal"><g id="cruces" stroke="#c0392b" stroke-width="3.2" stroke-linecap="round" fill="none"></g>
+        <ellipse id="circulo" cx="680" cy="190" rx="23" ry="27" fill="none" stroke="#d62020" stroke-width="5" transform="rotate(-8 680 190)" />
+        <text id="mes" x="0" y="0" font-family="Archivo Black" font-size="18" fill="#fff" transform="translate(604 92) rotate(-10)">NOVIEMBRE</text></g>
+      <!-- párpados: color de piel del dibujo, con la raya del ojo cerrado -->
+      <g id="ojos">
+        <g id="parpadoI"><ellipse cx="326" cy="205.5" rx="11.5" ry="7" fill="#e3915b" /><path d="M314.5 205 Q326 210 337.5 205" fill="none" stroke="#3a1d10" stroke-width="2.2" stroke-linecap="round" /></g>
+        <g id="parpadoD"><ellipse cx="367" cy="212" rx="9.5" ry="5.5" fill="#e3915b" /><path d="M357.5 211.5 Q367 216 376.5 211.5" fill="none" stroke="#3a1d10" stroke-width="2" stroke-linecap="round" /></g>
+      </g>
+    </svg>
+    <div id="luz"></div>
+    <div id="motas"></div>
+  </div>
+  <div id="vineta"></div>
+  <div id="dato" class="tarjeta"><div class="valor">29-N</div><div class="texto">Elecciones generales</div><div class="fuente">Fuente: BOE, Real Decreto 806/2026</div></div>
+  <div id="dec1" class="tarjeta decreto" style="left:1110px"><h3>DECRETO DE VIVIENDA</h3><p>Nº 1</p><i></i><i style="width:80%"></i><i></i><i style="width:60%"></i><div class="sello" data-layout-allow-occlusion>TUMBADO</div></div>
+  <div id="dec2" class="tarjeta decreto" style="left:1480px"><h3>DECRETO DE VIVIENDA</h3><p>Nº 2</p><i></i><i style="width:70%"></i><i></i><i style="width:85%"></i><div class="sello" data-layout-allow-occlusion>TUMBADO</div></div>
+  <div id="sub"></div>
+
+  <audio id="voz" src="assets/voz.mp3" data-start="0" data-duration="10" data-volume="1"></audio>
+  <audio id="sfx-whoosh-1" src="assets/sfx/whoosh.mp3" data-start="2.45" data-duration="1.2" data-volume="0.35"></audio>
+  <audio id="sfx-golpe-29n" src="assets/sfx/golpe.mp3" data-start="5.0" data-duration="1.2" data-volume="0.45"></audio>
+  <audio id="sfx-whoosh-2" src="assets/sfx/whoosh.mp3" data-start="6.3" data-duration="1.2" data-volume="0.3"></audio>
+  <audio id="sfx-sello-1" src="assets/sfx/golpe.mp3" data-start="8.05" data-duration="1.2" data-volume="0.5"></audio>
+  <audio id="sfx-sello-2" src="assets/sfx/golpe.mp3" data-start="8.85" data-duration="1.1" data-volume="0.5"></audio>
+</div>
+<script>
+// ---------- tiempos (de tiempos.json) y textos ----------
+const FRASES = [
+  { ini: .3,   fin: 2.29, txt: 'Españistán lo gobierna <b>Sanchís</b>.' },
+  { ini: 2.64, fin: 6.23, txt: 'El cinco de octubre convocó elecciones para el <b>veintinueve de noviembre</b>,' },
+  { ini: 6.43, fin: 9.79, txt: 'después de que el Congreso le tumbara <b>dos decretos</b> de vivienda.' },
+];
+const W = 1280, H = 720, ESC = 1920 / W;
+
+// ---------- profundidad: WebGL desplaza cada píxel según lo cerca que está ----------
+const cv = document.getElementById('lienzo'), gl = cv.getContext('webgl', { preserveDrawingBuffer: true });
+const VS = 'attribute vec2 p; varying vec2 uv; void main(){ uv = vec2(p.x*.5+.5, .5-p.y*.5); gl_Position = vec4(p,0,1); }';
+const FS = `precision mediump float; varying vec2 uv; uniform sampler2D img, prof; uniform vec2 off; uniform float foco, t;
+  void main(){
+    float d = texture2D(prof, uv).r;
+    vec2 q = uv - off * (d - foco);
+    // la bandera ondea (zona de la bandera del despacho)
+    float b = smoothstep(.325,.34,q.x) * (1.-smoothstep(.385,.40,q.x)) * (1.-smoothstep(.36,.42,q.y));
+    q.x += b * .0022 * sin(q.y*38. - t*3.2);
+    gl_FragColor = texture2D(img, clamp(q, .001, .999));
+  }`;
+function sh(tipo, src) { const s = gl.createShader(tipo); gl.shaderSource(s, src); gl.compileShader(s); return s; }
+const pr = gl.createProgram(); gl.attachShader(pr, sh(gl.VERTEX_SHADER, VS)); gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, FS)); gl.linkProgram(pr); gl.useProgram(pr);
+gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer()); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+const ap = gl.getAttribLocation(pr, 'p'); gl.enableVertexAttribArray(ap); gl.vertexAttribPointer(ap, 2, gl.FLOAT, false, 0, 0);
+const U = n => gl.getUniformLocation(pr, n);
+function textura(unidad, img) { gl.activeTexture(gl.TEXTURE0 + unidad); const tx = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, tx);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+  for (const [k, v] of [[gl.TEXTURE_MIN_FILTER, gl.LINEAR], [gl.TEXTURE_MAG_FILTER, gl.LINEAR], [gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE]]) gl.texParameteri(gl.TEXTURE_2D, k, v); }
+let listo = 0;
+function carga(src, unidad, nombre) { const im = new Image(); im.onload = () => { textura(unidad, im); gl.uniform1i(U(nombre), unidad); listo++; pinta(); }; im.src = src; }
+carga('assets/despacho.webp', 0, 'img'); carga('assets/despacho_prof.png', 1, 'prof');
+
+// ---------- calendario: celdas por interpolación de las 4 esquinas de la cuadrícula ----------
+const ESQ = { ti: [577, 105], td: [768, 72], bi: [577, 295], bd: [768, 287] }, COLS = 6, FILAS = 5;
+function celda(c, f) { const u = (c + .5) / COLS, v = (f + .5) / FILAS, L = (a, b, k) => a + (b - a) * k;
+  const arr = [L(ESQ.ti[0], ESQ.td[0], u), L(ESQ.ti[1], ESQ.td[1], u)], ab = [L(ESQ.bi[0], ESQ.bd[0], u), L(ESQ.bi[1], ESQ.bd[1], u)];
+  return [L(arr[0], ab[0], v), L(arr[1], ab[1], v)]; }
+const NS = 'http://www.w3.org/2000/svg', cruces = document.getElementById('cruces'), listaCruces = [];
+for (let i = 0; i < 14; i++) { const [x, y] = celda(i % COLS, Math.floor(i / COLS)), r = 9;
+  const p = document.createElementNS(NS, 'path'); p.setAttribute('d', `M${x - r} ${y - r} L${x + r} ${y + r} M${x + r} ${y - r} L${x - r} ${y + r}`);
+  p.setAttribute('pathLength', 1); p.setAttribute('stroke-dasharray', 1); p.setAttribute('stroke-dashoffset', 1); cruces.appendChild(p); listaCruces.push(p); }
+const circulo = document.getElementById('circulo'); circulo.setAttribute('pathLength', 1); circulo.setAttribute('stroke-dasharray', 1);
+
+// ---------- motas de polvo en la luz de la ventana (posiciones fijas, sin azar: siempre sale igual) ----------
+const motas = document.getElementById('motas'), MOTAS = [];
+for (let i = 0; i < 26; i++) { const m = document.createElement('div'); m.className = 'polvo'; motas.appendChild(m);
+  MOTAS.push({ el: m, x: 30 + (i * 97) % 330, y: 40 + (i * 53) % 420, f: .4 + (i % 5) * .13, a: .25 + (i % 4) * .12 }); }
+
+// ---------- estado animado (GSAP lo mueve; pinta() lo dibuja en cada fotograma) ----------
+const cam = { x: 640, y: 360, z: 1 }, par = { x: 0, y: 0 }, est = { parp: 0, circ: 1, t: 0 };
+function pinta() {
+  const t = est.t;
+  // cámara: centra el punto (x, y) del dibujo sin enseñar los bordes
+  const s = ESC * cam.z, tx = Math.min(0, Math.max(1920 - W * s, 960 - cam.x * s)), ty = Math.min(0, Math.max(1080 - H * s, 540 - cam.y * s));
+  document.getElementById('mundo').style.transform = `translate(${tx}px, ${ty}px) scale(${s})`;
+  // paralaje: el foco (la cara) queda quieto y lo demás se mueve según su profundidad
+  const ox = par.x + .004 * Math.sin(t * .9), oy = par.y + .003 * Math.sin(t * .7 + 1), foco = .6;
+  if (listo === 2) { gl.viewport(0, 0, cv.width, cv.height); gl.uniform2f(U('off'), ox, oy); gl.uniform1f(U('foco'), foco); gl.uniform1f(U('t'), t); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); }
+  // lo que va pegado al dibujo se mueve igual que su píxel (ojos ≈ 0.62, calendario ≈ 0.26)
+  const mueve = (id, d) => document.getElementById(id).setAttribute('transform', `translate(${ox * (d - foco) * W} ${oy * (d - foco) * H})`);
+  mueve('ojos', .62); mueve('cal', .26);
+  // párpado: baja desde arriba del ojo (escala vertical anclada en el borde superior)
+  for (const [id, cx, top] of [['parpadoI', 326, 198.5], ['parpadoD', 367, 206.5]]) { const e = document.getElementById(id);
+    e.style.opacity = est.parp > .02 ? 1 : 0; e.setAttribute('transform', `translate(0 ${top}) scale(1 ${Math.max(est.parp, .01)}) translate(0 ${-top})`); }
+  circulo.setAttribute('stroke-dashoffset', est.circ);
+  for (const m of MOTAS) { const k = (t * m.f * 18) % 460; m.el.style.transform = `translate(${m.x + 14 * Math.sin(t * m.f + m.y)}px, ${m.y + k * .3 - 60}px)`;
+    m.el.style.opacity = m.a * (.5 + .5 * Math.sin(t * 1.3 + m.x)); }
+  // subtítulo de la frase que suena
+  const f = FRASES.find(f => t >= f.ini - .1 && t <= f.fin + .25); const sub = document.getElementById('sub'), html = f ? f.txt : '';
+  if (sub.dataset.h !== html) { sub.innerHTML = html; sub.dataset.h = html; }
+}
+
+const tl = gsap.timeline({ paused: true, onUpdate: pinta });
+tl.to(est, { t: 10, duration: 10, ease: 'none' }, 0);
+// 1 · «Españistán lo gobierna Sanchís»: entrada hacia la cara
+tl.fromTo(cam, { x: 560, y: 330, z: 1.02 }, { x: 380, y: 250, z: 1.55, duration: 2.4, ease: 'power2.inOut' }, 0);
+tl.fromTo(par, { x: -.012, y: 0 }, { x: .01, y: -.004, duration: 2.4, ease: 'sine.inOut' }, 0);
+// parpadeos
+for (const k of [1.1, 4.1, 7.6]) tl.to(est, { parp: 1, duration: .07, yoyo: true, repeat: 1, ease: 'power1.in' }, k);
+// 2 · «El cinco de octubre convocó elecciones…»: barrido al calendario, cruces día a día y círculo en el 29
+tl.to(cam, { x: 670, y: 185, z: 2.05, duration: .8, ease: 'power3.inOut' }, 2.5);
+tl.to(par, { x: -.008, y: .004, duration: 3, ease: 'sine.inOut' }, 2.5);
+tl.fromTo('#mes', { opacity: 0 }, { opacity: 1, duration: .3 }, 3.0);
+listaCruces.forEach((p, i) => tl.to(p, { attr: { 'stroke-dashoffset': 0 }, duration: .1, ease: 'none' }, 3.25 + i * .12));
+tl.fromTo(est, { circ: 1 }, { circ: 0, duration: .45, ease: 'power2.out', immediateRender: false }, 4.95);
+tl.fromTo('#dato', { opacity: 0, scale: .7, rotation: -6 }, { opacity: 1, scale: 1, rotation: 0, duration: .45, ease: 'back.out(2)' }, 5.0);
+tl.to('#dato', { opacity: 0, x: 60, duration: .3, ease: 'power2.in' }, 6.75);
+// 3 · «…después de que el Congreso le tumbara dos decretos de vivienda»: plano abierto y los dos decretos sellados
+tl.to(cam, { x: 520, y: 330, z: 1.12, duration: .9, ease: 'power3.inOut' }, 6.3);
+tl.fromTo(['#dec1', '#dec2'], { opacity: 0, y: 140, rotation: 8 }, { opacity: 1, y: 0, rotation: (i) => i ? 3 : -4, duration: .5, ease: 'back.out(1.6)', stagger: .25 }, 6.95);
+tl.fromTo('#dec1 .sello', { opacity: 0, scale: 2.4 }, { opacity: 1, scale: 1, duration: .18, ease: 'power4.in' }, 8.05);
+tl.fromTo('#dec2 .sello', { opacity: 0, scale: 2.4 }, { opacity: 1, scale: 1, duration: .18, ease: 'power4.in' }, 8.85);
+[8.2, 9.0].forEach((k, i) => tl.fromTo('#root', { x: -9, y: 5 }, { x: 0, y: 0, duration: .25, ease: 'elastic.out(1, .3)', immediateRender: !i }, k));
+tl.to(cam, { z: 1.2, duration: 1.4, ease: 'sine.out' }, 8.6);
+
+window.__timelines = window.__timelines || {};
+window.__timelines['main'] = tl;
+tl.seek(0);
+</script>
+</body>
+</html>
