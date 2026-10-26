@@ -51,3 +51,10 @@ Red necesaria: `pypi.org`, `huggingface.co`, `*.hf.co` (si da 403, el usuario lo
 - Sin GPU, 4 núcleos, 15 GB de RAM: **no cargar dos modelos de voz a la vez**.
 - Rama de trabajo indicada en cada sesión; subir siempre lo generado (`git add`, `commit`, `push`).
 - Hablar con el usuario en español, corto y sin tecnicismos.
+
+## 6. Lecciones (lo que el usuario pidió cambiar)
+- Intro ep. 1 (`fabrica/videos/espanistan-01-intro/`): aprobada. Es el **esqueleto** para los siguientes: copiar la carpeta y cambiar dibujos, FRASES y tiempos.
+- Al acercar la cámara a personas, **menos efectos** (whoosh + cadenas sobraban): un solo sonido suave o ninguno.
+- Más **marioneta**: personajes recortados por partes (brazo, cabeza, boca) que se mueven un poco (saludo, cabeceo, boca con la voz).
+- Skills instaladas con skills.sh (`npx skills add …`): hyperframes, hyperframes-cli, hyperframes-registry, media-use, voicestudio. Leer la skill antes de usar la herramienta, sin buscar a ciegas.
+- VoiceStudio (gratis, local): `/home/user/VoiceStudio`, arrancar con `bun scripts/dev-backend.mjs` → `http://localhost:3900`. OmniVoice es **no comercial**.
