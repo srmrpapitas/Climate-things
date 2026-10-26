@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="es" data-resolution="landscape">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1920, height=1080" />
+<!-- Españistán · ep. 1 · intro (frases 1–3, voz D original). Dos planos: la cueva de Platón y la portada.
+     Mismo esqueleto que espanistan-01-prueba: el dibujo en coordenadas 1280×720, una cámara que lo mueve entero,
+     capas SVG pegadas al dibujo y subtítulos de FRASES. Tiempos de Whisper (voz1 +0,2 s, voz2 +11,6 s, voz3 +20,3 s). -->
+<script src="assets/gsap.min.js"></script>
+<style>
+  @font-face { font-family: 'Archivo Black'; src: url(assets/fuentes/archivo-black-latin-400-normal.woff2); }
+  @font-face { font-family: 'Inter'; font-weight: 600; src: url(assets/fuentes/inter-latin-600-normal.woff2); }
+  @font-face { font-family: 'Inter'; font-weight: 800; src: url(assets/fuentes/inter-latin-800-normal.woff2); }
+  @font-face { font-family: 'Lora'; font-style: italic; font-weight: 500; src: url(assets/fuentes/lora-latin-500-italic.woff2); }
+  :root { --papel: #f4efe6; --tinta: #222; --rojo: #c0392b; --azul: #1f4e8c; --oro: #f2c14e; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1920px; height: 1080px; overflow: hidden; background: #111; }
+  #root { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #111; }
+  .mundo { position: absolute; left: 0; top: 0; width: 1280px; height: 720px; transform-origin: 0 0; }
+  .mundo > img, .mundo > svg, .mundo > .capa { position: absolute; left: 0; top: 0; width: 1280px; height: 720px; }
+  /* luz del fuego: se suma (screen) y la pared se oscurece (multiply) cuando la llama baja */
+  #brillo { mix-blend-mode: screen; background: radial-gradient(circle at 968px 470px, rgba(255,170,60,.75) 0, rgba(255,140,40,.3) 160px, rgba(255,120,30,0) 520px); }
+  #sombra { mix-blend-mode: multiply; background: radial-gradient(circle at 968px 470px, rgba(255,255,255,1) 0, rgba(255,255,255,1) 200px, rgba(60,40,30,1) 900px); }
+  .chispa { position: absolute; width: 5px; height: 5px; border-radius: 50%; background: #ffd27a; box-shadow: 0 0 8px #ff9a2a; }
+  #vineta { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 45%, rgba(0,0,0,0) 50%, rgba(0,0,0,.55) 100%); }
+  #flash { position: absolute; inset: 0; background: #fffaf0; opacity: 0; }
+  .tarjeta { position: absolute; background: var(--papel); border-radius: 18px; box-shadow: 0 10px 30px rgba(0,0,0,.45); text-align: center; }
+  #platon { left: 110px; top: 110px; width: 520px; padding: 24px 30px 22px; }
+  #platon .anio { font: 600 30px Inter; color: #8a6d3b; letter-spacing: 2px; }
+  #platon .nombre { font: 84px 'Archivo Black'; color: var(--tinta); line-height: 1.05; margin-top: 4px; }
+  #platon .fuente { font: italic 500 28px Lora; color: #777; margin-top: 8px; }
+  .num { top: 250px; width: 400px; padding: 26px 20px 20px; }
+  .num .valor { font: 84px 'Archivo Black'; color: var(--azul); line-height: 1; }
+  .num .texto { font: 600 30px Inter; color: var(--tinta); margin-top: 12px; }
+  .num .fuente { font: italic 500 24px Lora; color: #777; margin-top: 8px; }
+  #pais { position: absolute; left: 1250px; top: 600px; padding: 8px 22px; border: 8px solid var(--rojo); border-radius: 14px;
+    font: 60px 'Archivo Black'; color: var(--rojo); background: rgba(244,239,230,.82); transform: rotate(-10deg); opacity: 0; }
+  #final { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0;
+    background: radial-gradient(ellipse at 50% 50%, rgba(10,10,10,.55) 0%, rgba(10,10,10,.85) 70%); }
+  #final h1 { font: 170px 'Archivo Black'; color: var(--oro); letter-spacing: 6px; -webkit-text-stroke: 4px #3a2a10; paint-order: stroke fill; }
+  #final h2 { font: 800 54px Inter; color: #fff; margin-top: 6px; }
+  #final p { font: italic 500 36px Lora; color: #e9e1d2; margin-top: 34px; }
+  #sub { position: absolute; left: 200px; right: 200px; bottom: 70px; text-align: center; font: 800 56px Inter; color: #fff;
+    -webkit-text-stroke: 10px rgba(0,0,0,.78); paint-order: stroke fill; line-height: 1.2; }
+  #sub b { color: var(--oro); font-weight: 800; }
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-duration="30.5" data-width="1920" data-height="1080">
+  <!-- plano 1: la cueva -->
+  <div id="cueva" class="mundo">
+    <img src="assets/cueva.webp" alt="" />
+    <div id="sombra" class="capa"></div>
+    <div id="brillo" class="capa"></div>
+    <svg viewBox="0 0 1280 720">
+      <!-- sellos «TITULAR» sobre cada sombra -->
+      <g id="sellos" font-family="Archivo Black" font-size="34" fill="#c0392b" text-anchor="middle">
+        <g transform="translate(185 180) rotate(-12)"><g class="sello"><rect x="-105" y="-30" width="210" height="58" rx="8" fill="rgba(244,239,230,.85)" stroke="#c0392b" stroke-width="6" /><text y="13">TITULAR</text></g></g>
+        <g transform="translate(448 232) rotate(8)"><g class="sello"><rect x="-105" y="-30" width="210" height="58" rx="8" fill="rgba(244,239,230,.85)" stroke="#c0392b" stroke-width="6" /><text y="13">TITULAR</text></g></g>
+        <g transform="translate(655 236) rotate(-6)"><g class="sello"><rect x="-105" y="-30" width="210" height="58" rx="8" fill="rgba(244,239,230,.85)" stroke="#c0392b" stroke-width="6" /><text y="13">TITULAR</text></g></g>
+        <g transform="translate(845 262) rotate(10)"><g class="sello"><rect x="-105" y="-30" width="210" height="58" rx="8" fill="rgba(244,239,230,.85)" stroke="#c0392b" stroke-width="6" /><text y="13">TITULAR</text></g></g>
+      </g>
+    </svg>
+    <div id="chispas" class="capa"></div>
+  </div>
+  <!-- plano 2: la portada (Sanchís y el profesor sobre el mapa) -->
+  <div id="portada" class="mundo" style="visibility:hidden">
+    <img src="assets/portada.webp" alt="" />
+    <svg viewBox="0 0 1280 720">
+      <defs><linearGradient id="brilloG" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0" /><stop offset=".5" stop-color="#fff6c8" stop-opacity=".85" /><stop offset="1" stop-color="#fff" stop-opacity="0" /></linearGradient>
+        <clipPath id="tituloC"><rect x="488" y="492" width="335" height="50" /></clipPath></defs>
+      <rect id="barrido" x="380" y="485" width="90" height="64" fill="url(#brilloG)" clip-path="url(#tituloC)" style="mix-blend-mode:screen" />
+      <!-- reflejo en la lupa del profesor -->
+      <ellipse id="lupa" cx="808" cy="292" rx="36" ry="38" fill="none" stroke="#fff" stroke-width="5" stroke-dasharray="30 400" opacity="0" />
+    </svg>
+  </div>
+  <div id="vineta"></div>
+
+  <div id="platon" class="tarjeta"><div class="anio">HACE 2.400 AÑOS</div><div class="nombre">PLATÓN</div><div class="fuente">«La República», libro VII</div></div>
+  <div id="n1" class="tarjeta num" style="left:100px"><div class="valor">2,6 %</div><div class="texto">crece la economía</div><div class="fuente">INE, 2025</div></div>
+  <div id="n2" class="tarjeta num" style="left:540px"><div class="valor">9,87 %</div><div class="texto">de paro</div><div class="fuente">INE, EPA</div></div>
+  <div id="n3" class="tarjeta num" style="left:980px"><div class="valor">1.221 €</div><div class="texto">salario mínimo</div><div class="fuente">BOE</div></div>
+  <div id="n4" class="tarjeta num" style="left:1420px"><div class="valor">101 %</div><div class="texto">deuda sobre el PIB</div><div class="fuente">Banco de España</div></div>
+  <div id="pais">PAÍS INVENTADO</div>
+  <div id="final"><h1>ESPAÑISTÁN</h1><h2>Episodio 1 · Sanchís</h2><p>Datos públicos. Aquí no te decimos a quién votar.</p></div>
+  <div id="flash"></div>
+  <div id="sub"></div>
+
+  <audio id="voz1" src="assets/voz1.mp3" data-start="0.2" data-duration="11.2" data-volume="1"></audio>
+  <audio id="voz2" src="assets/voz2.mp3" data-start="11.6" data-duration="7.95" data-volume="1"></audio>
+  <audio id="voz3" src="assets/voz3.mp3" data-start="20.3" data-duration="7.2" data-volume="1"></audio>
+  <audio id="musica" src="assets/musica.mp3" data-start="0" data-duration="30.5" data-volume="1"></audio>
+  <audio id="sfx-fuego" src="assets/sfx/fuego_cueva.mp3" data-start="0" data-duration="20.3" data-volume="0.35"></audio>
+  <audio id="sfx-trazo-platon" src="assets/sfx/trazo.mp3" data-start="2.35" data-duration="0.2" data-volume="0.6"></audio>
+  <audio id="sfx-whoosh-presos" src="assets/sfx/whoosh.mp3" data-start="3.75" data-duration="1.2" data-volume="0.35"></audio>
+  <audio id="sfx-cadenas" src="assets/sfx/cadenas.mp3" data-start="4.62" data-duration="1.2" data-volume="0.4"></audio>
+  <audio id="sfx-whoosh-pared" src="assets/sfx/whoosh.mp3" data-start="7.2" data-duration="1.2" data-volume="0.3"></audio>
+  <audio id="sfx-golpe-mundo" src="assets/sfx/golpe.mp3" data-start="10.85" data-duration="1.2" data-volume="0.35"></audio>
+  <audio id="sfx-sello-1" src="assets/sfx/golpe.mp3" data-start="13.3" data-duration="1.2" data-volume="0.45"></audio>
+  <audio id="sfx-sello-2" src="assets/sfx/golpe.mp3" data-start="13.55" data-duration="1.2" data-volume="0.4"></audio>
+  <audio id="sfx-sello-3" src="assets/sfx/golpe.mp3" data-start="13.8" data-duration="1.2" data-volume="0.4"></audio>
+  <audio id="sfx-sello-4" src="assets/sfx/golpe.mp3" data-start="14.05" data-duration="1.2" data-volume="0.45"></audio>
+  <audio id="sfx-riser-salir" src="assets/sfx/riser.mp3" data-start="14.6" data-duration="2.6" data-volume="0.4"></audio>
+  <audio id="sfx-trazo-n1" src="assets/sfx/trazo.mp3" data-start="17.6" data-duration="0.2" data-volume="0.6"></audio>
+  <audio id="sfx-trazo-n2" src="assets/sfx/trazo.mp3" data-start="17.8" data-duration="0.2" data-volume="0.6"></audio>
+  <audio id="sfx-trazo-n3" src="assets/sfx/trazo.mp3" data-start="18.0" data-duration="0.2" data-volume="0.6"></audio>
+  <audio id="sfx-trazo-n4" src="assets/sfx/trazo.mp3" data-start="18.2" data-duration="0.2" data-volume="0.6"></audio>
+  <audio id="sfx-whoosh-sombras" src="assets/sfx/whoosh.mp3" data-start="18.9" data-duration="1.2" data-volume="0.35"></audio>
+  <audio id="sfx-whoosh-portada" src="assets/sfx/whoosh.mp3" data-start="19.75" data-duration="1.2" data-volume="0.45"></audio>
+  <audio id="sfx-impacto-titulo" src="assets/sfx/impacto.mp3" data-start="21.15" data-duration="2" data-volume="0.4"></audio>
+  <audio id="sfx-sello-pais" src="assets/sfx/golpe.mp3" data-start="22.85" data-duration="1.2" data-volume="0.5"></audio>
+  <audio id="sfx-whoosh-lupa" src="assets/sfx/whoosh.mp3" data-start="23.75" data-duration="1.2" data-volume="0.3"></audio>
+  <audio id="sfx-whoosh-sanchis" src="assets/sfx/whoosh.mp3" data-start="26.05" data-duration="1.2" data-volume="0.4"></audio>
+  <audio id="sfx-golpe-remate" src="assets/sfx/golpe.mp3" data-start="27.05" data-duration="1.2" data-volume="0.55"></audio>
+  <audio id="sfx-impacto-final" src="assets/sfx/impacto.mp3" data-start="27.75" data-duration="2.5" data-volume="0.45"></audio>
+</div>
+<script>
+// ---------- subtítulos (texto del guion, tiempos de Whisper) ----------
+const FRASES = [
+  { ini: .2,    fin: 2.3,   txt: 'Hace <b>2.400 años</b>,' },
+  { ini: 2.3,   fin: 4.55,  txt: '<b>Platón</b> contó la historia de unos prisioneros' },
+  { ini: 4.55,  fin: 6.7,   txt: '<b>encadenados</b> en una cueva.' },
+  { ini: 6.9,   fin: 9.25,  txt: 'Solo veían <b>sombras</b> en la pared,' },
+  { ini: 9.25,  fin: 11.3,  txt: 'y creían que eso era <b>el mundo</b>.' },
+  { ini: 11.6,  fin: 14.55, txt: 'Hoy, las sombras se llaman <b>titulares</b>.' },
+  { ini: 14.65, fin: 16.8,  txt: 'Este vídeo va de <b>salir de la cueva</b>:' },
+  { ini: 16.9,  fin: 18.6,  txt: 'vamos a mirar <b>los números</b>,' },
+  { ini: 18.6,  fin: 19.7,  txt: 'no las <b>sombras</b>.' },
+  { ini: 20.3,  fin: 22.3,  txt: 'Bienvenidos a <b>Españistán</b>,' },
+  { ini: 22.3,  fin: 23.75, txt: 'un país <b>inventado</b>.' },
+  { ini: 23.9,  fin: 25.9,  txt: 'Cualquier parecido con la realidad…' },
+  { ini: 25.9,  fin: 27.7,  txt: '…es culpa de <b>la realidad</b>.' },
+];
+const W = 1280, H = 720, ESC = 1920 / W;
+
+// ---------- chispas del fuego (posiciones fijas, sin azar: siempre sale igual) ----------
+const chispas = document.getElementById('chispas'), CHISPAS = [];
+for (let i = 0; i < 22; i++) { const c = document.createElement('div'); c.className = 'chispa'; chispas.appendChild(c);
+  CHISPAS.push({ el: c, x: 940 + (i * 37) % 60, fase: (i * .61) % 1, vel: .55 + (i % 4) * .15, amp: 8 + (i % 3) * 7 }); }
+
+// ---------- estado animado (GSAP lo mueve; pinta() lo dibuja en cada fotograma) ----------
+const camA = { x: 960, y: 450, z: 2.6 }, camB = { x: 660, y: 515, z: 1.9 }, est = { t: 0, luz: .35, desenfoque: 0, plano: 0, barr: 380 };
+function camara(el, cam) { const s = ESC * cam.z, tx = Math.min(0, Math.max(1920 - W * s, 960 - cam.x * s)), ty = Math.min(0, Math.max(1080 - H * s, 540 - cam.y * s));
+  el.style.transform = `translate(${tx}px, ${ty}px) scale(${s})`; }
+const elA = document.getElementById('cueva'), elB = document.getElementById('portada');
+function pinta() {
+  const t = est.t;
+  camara(elA, camA); camara(elB, camB);
+  elA.style.visibility = est.plano ? 'hidden' : 'visible'; elB.style.visibility = est.plano ? 'visible' : 'hidden';
+  // la llama late con tres senos: el brillo sube y baja y la pared respira con él
+  const llama = .5 + .22 * Math.sin(t * 7.3) + .16 * Math.sin(t * 13.1 + 1) + .12 * Math.sin(t * 3.7 + 2);
+  document.getElementById('brillo').style.opacity = (.35 + .45 * llama) * est.luz / .9;
+  document.getElementById('sombra').style.opacity = .55 - .25 * llama;
+  elA.style.filter = `brightness(${.45 + .6 * est.luz}) blur(${est.desenfoque}px)`;
+  for (const c of CHISPAS) { const k = (t * c.vel + c.fase) % 1;
+    c.el.style.transform = `translate(${c.x + c.amp * Math.sin(t * 2 + c.fase * 9)}px, ${470 - k * 260}px)`; c.el.style.opacity = (1 - k) * .9; }
+  document.getElementById('barrido').setAttribute('x', est.barr);
+  // subtítulo de la frase que suena
+  const f = FRASES.find(f => t >= f.ini && t < f.fin); const sub = document.getElementById('sub'), html = f ? f.txt : '';
+  if (sub.dataset.h !== html) { sub.innerHTML = html; sub.dataset.h = html; }
+}
+
+const tl = gsap.timeline({ paused: true, onUpdate: pinta });
+tl.to(est, { t: 30.5, duration: 30.5, ease: 'none' }, 0);
+const golpe = (k, f = 9) => tl.fromTo('#root', { x: -f, y: f * .6 }, { x: 0, y: 0, duration: .25, ease: 'elastic.out(1, .3)', immediateRender: false }, k);
+
+// ===== frase 1 · la cueva =====
+// «Hace dos mil cuatrocientos años»: del fuego hacia atrás, la cueva se enciende
+tl.to(est, { luz: .9, duration: 2, ease: 'power1.out' }, 0);
+tl.to(camA, { x: 760, y: 330, z: 1.35, duration: 3.6, ease: 'power2.inOut' }, 0);
+// «Platón contó la historia…»: tarjeta de la fuente
+tl.fromTo('#platon', { opacity: 0, scale: .7, rotation: -5 }, { opacity: 1, scale: 1, rotation: 0, duration: .45, ease: 'back.out(2)' }, 2.35);
+tl.to('#platon', { opacity: 0, x: -80, duration: .3, ease: 'power2.in' }, 4.1);
+// «…unos prisioneros encadenados»: a los presos y las cadenas suenan
+tl.to(camA, { x: 430, y: 500, z: 1.75, duration: .9, ease: 'power3.inOut' }, 3.8);
+golpe(4.65, 6);
+// «…en una cueva»: plano general
+tl.to(camA, { x: 640, y: 360, z: 1.02, duration: 1.2, ease: 'power2.inOut' }, 5.6);
+// «Solo veían sombras en la pared»: subimos a la pared y la recorremos
+tl.to(camA, { x: 330, y: 210, z: 1.6, duration: .8, ease: 'power3.inOut' }, 7.2);
+tl.to(camA, { x: 760, y: 215, z: 1.6, duration: 1.5, ease: 'sine.inOut' }, 8.1);
+// «…y creían que eso era el mundo»: se cierra sobre la sombra del móvil
+tl.to(camA, { x: 655, y: 230, z: 2.3, duration: 1.4, ease: 'power2.in' }, 9.6);
+golpe(10.9, 7);
+
+// ===== frase 2 · titulares y salida =====
+// «Hoy, las sombras se llaman titulares»: toda la pared y un sello en cada sombra
+tl.to(camA, { x: 520, y: 230, z: 1.22, duration: .5, ease: 'power3.out' }, 11.55);
+gsap.utils.toArray('.sello').forEach((s, i) => tl.fromTo(s, { opacity: 0, scale: 2.6 }, { opacity: 1, scale: 1, duration: .16, ease: 'power4.in', transformOrigin: '50% 50%' }, 13.15 + i * .25));
+golpe(13.32); golpe(14.07);
+// «Este vídeo va de salir de la cueva»: la cámara se aleja y entra la luz de fuera
+tl.to(camA, { x: 640, y: 360, z: 1.0, duration: 2.2, ease: 'power2.inOut' }, 14.65);
+tl.to('#flash', { opacity: .55, duration: 2.1, ease: 'power2.in' }, 14.9);
+// «vamos a mirar los números»: la cueva se desenfoca y aparecen los datos
+tl.to('#flash', { opacity: 0, duration: .4 }, 17.05);
+tl.to(est, { desenfoque: 7, luz: .25, duration: .5 }, 17.05);
+['#n1', '#n2', '#n3', '#n4'].forEach((id, i) => tl.fromTo(id, { opacity: 0, y: 80, scale: .8 }, { opacity: 1, y: 0, scale: 1, duration: .35, ease: 'back.out(2)' }, 17.55 + i * .2));
+// «…no las sombras»: los datos suben y se quedan (los sellos ya se apagaron con la cueva)
+tl.to('.sello', { opacity: 0, duration: .3 }, 17.05);
+tl.to(['#n1', '#n2', '#n3', '#n4'], { y: -40, duration: 1, ease: 'sine.out' }, 18.7);
+// salida a la luz: destello blanco y cambio a la portada
+tl.to('#flash', { opacity: 1, duration: .35, ease: 'power2.in' }, 19.6);
+tl.set(['#n1', '#n2', '#n3', '#n4'], { opacity: 0 }, 19.95);
+tl.set(est, { plano: 1 }, 19.95);
+
+// ===== frase 3 · la portada =====
+// «Bienvenidos a Españistán»: desde arriba del mapa hasta el nombre, con un brillo que lo cruza
+tl.fromTo(camB, { x: 640, y: 360, z: 1.0 }, { x: 655, y: 515, z: 2.1, duration: 1.3, ease: 'power2.inOut', immediateRender: false }, 20.0);
+tl.to('#flash', { opacity: 0, duration: .6, ease: 'power2.out' }, 19.95);
+tl.fromTo(est, { barr: 380 }, { barr: 840, duration: .8, ease: 'power1.inOut', immediateRender: false }, 21.15);
+golpe(21.2, 8);
+// «…un país inventado»: sello
+tl.fromTo('#pais', { opacity: 0, scale: 2.6 }, { opacity: 1, scale: 1, duration: .16, ease: 'power4.in' }, 22.7);
+golpe(22.88);
+tl.to('#pais', { opacity: 0, duration: .25 }, 23.7);
+// «Cualquier parecido con la realidad…»: al profesor de la lupa, que examina el mapa
+tl.to(camB, { x: 870, y: 270, z: 2.0, duration: .7, ease: 'power3.inOut' }, 23.75);
+tl.set('#lupa', { opacity: .8 }, 24.4);
+tl.fromTo('#lupa', { attr: { 'stroke-dashoffset': 0 } }, { attr: { 'stroke-dashoffset': -430 }, duration: 1.2, ease: 'power1.inOut', immediateRender: false }, 24.4);
+tl.set('#lupa', { opacity: 0 }, 25.6);
+tl.to(camB, { z: 2.25, duration: 1.6, ease: 'sine.inOut' }, 24.45);
+// «…es culpa de la realidad»: barrido a Sanchís saludando y golpe de remate
+tl.to(camB, { x: 260, y: 230, z: 1.9, duration: .45, ease: 'power4.inOut' }, 26.1);
+tl.to(camB, { z: 2.3, duration: .12, ease: 'power2.out' }, 27.05);
+golpe(27.08, 12);
+// cierre: plano general y el título del episodio
+tl.to(camB, { x: 640, y: 360, z: 1.0, duration: 1.2, ease: 'power2.inOut' }, 27.6);
+tl.fromTo('#final', { opacity: 0 }, { opacity: 1, duration: .5 }, 27.8);
+tl.fromTo('#final h1', { scale: 1.6 }, { scale: 1, duration: .6, ease: 'power3.out' }, 27.8);
+tl.fromTo(['#final h2', '#final p'], { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: .4, stagger: .25 }, 28.3);
+
+window.__timelines = window.__timelines || {};
+window.__timelines['main'] = tl;
+tl.seek(0);
+</script>
+</body>
+</html>
