@@ -32,7 +32,7 @@ Un vídeo es un cuadro por capas. Las primeras ya están pintadas y se reutiliza
 |---|---|---|
 | Voz CosyVoice3 | ~2,5 min por frase de ~10 s | 45–55 frases ≈ **2–2,5 h** de máquina, gratis |
 | Tiempos (Whisper) | ~20 s por frase | ≈ 15 min, gratis |
-| Render HyperFrames | __RENDER__ | ≈ __RENDER10__, gratis |
+| Render HyperFrames | 41,5 s de vídeo en 181 s (≈ 4,4× la duración) | ≈ 35–45 min, gratis |
 | Dibujos nuevos | ElevenLabs ≈ 430 créditos por imagen (≈ 0,09 $) | **0**: se reutilizan los dibujos y se recortan en piezas (decisión del 26-10-2026) |
 | Música y efectos | propios | 0 |
 | **Total en dinero** | | **0 €** (solo el tiempo de máquina y de Claude) |
