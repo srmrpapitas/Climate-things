@@ -14,6 +14,12 @@
 7. **Render** en segundo plano: `npx hyperframes@0.8.204 render -o out/espanistan-NN.mp4` (~4,4× la duración).
 8. Cambios del usuario: **editar `escenas.json`** y volver al paso 5. Nunca editar `index.html` a mano.
 
+## Regla del esqueleto (26-10-2026, el usuario)
+- **El esqueleto es la estructura** (generador, cámara, tarjetas, frascos, música, subtítulos), **no los dibujos**. Cada episodio lleva **escenarios nuevos con su propio estilo** y los personajes que se nombran **salen en pantalla y se mueven**.
+- Solo se repite lo que es de la serie: el Decano, la cueva del inicio y la portada.
+- Dibujos baratos: **Seedream 5 lite**, una imagen 2×2 = 4 escenarios por ≈ 212 créditos (≈ 53 cada uno); se cortan en 4 con Python. Personajes: una hoja con 6 caricaturas por ≈ 212 créditos → `marioneta.py`.
+- Voz del narrador **calmada**: más lenta y con pausas (no la velocidad por defecto).
+
 ## Coste real del ep. 2 (26-10-2026)
 - Voz ElevenLabs: ≈ 7.000 créditos (1 crédito por letra; ~8 min de vídeo).
 - Dibujos nuevos: 3 imágenes de Feijolo ≈ 1.300 créditos (en adelante: 0, se reutilizan y recortan).
