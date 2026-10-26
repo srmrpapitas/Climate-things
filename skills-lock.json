@@ -31,6 +31,12 @@
       "skillPath": "skills/media-use/SKILL.md",
       "computedHash": "372fda62380e0d70f540c4d413af8bc2d89b03c99d85cb557e0e1f0e3e7d79b5"
     },
+    "painted-animation": {
+      "source": "tuzhechen2005/opus-video-skills",
+      "sourceType": "github",
+      "skillPath": "skills/painted-animation/SKILL.md",
+      "computedHash": "0faccef669be5de7322a4ac4824b80124e609f08726de77ade9bc252434d9645"
+    },
     "photocraft": {
       "source": "ai-2070/claude-storytold-skills",
       "sourceType": "github",
