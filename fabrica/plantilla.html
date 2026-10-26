@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="es" data-resolution="landscape">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1920, height=1080" />
+<!-- Generado por fabrica/generar.py a partir de escenas.json. No editar a mano: cambiar escenas.json y volver a generar. -->
+<script src="assets/gsap.min.js"></script>
+<style>
+  @font-face { font-family: 'Archivo Black'; src: url(assets/fuentes/archivo-black-latin-400-normal.woff2); }
+  @font-face { font-family: 'Inter'; font-weight: 600; src: url(assets/fuentes/inter-latin-600-normal.woff2); }
+  @font-face { font-family: 'Inter'; font-weight: 800; src: url(assets/fuentes/inter-latin-800-normal.woff2); }
+  @font-face { font-family: 'Lora'; font-style: italic; font-weight: 500; src: url(assets/fuentes/lora-latin-500-italic.woff2); }
+  :root { --papel: #f4efe6; --tinta: #222; --rojo: #c0392b; --ambar: #d68910; --gris: #6b6b6b; --verde: #1e8449; --azul: #1f4e8c; --oro: #f2c14e; --psoe: #d23b33; --pp: #2a6bc4; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1920px; height: 1080px; overflow: hidden; background: #111; }
+  #root { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #111; }
+  .mundo { position: absolute; left: 0; top: 0; width: 1280px; height: 720px; transform-origin: 0 0; visibility: hidden; }
+  .mundo > img, .mundo > svg, .mundo > .capa, .titere, .titere img { position: absolute; left: 0; top: 0; width: 1280px; height: 720px; }
+  .brillo { mix-blend-mode: screen; background: radial-gradient(circle at 968px 470px, rgba(255,170,60,.75) 0, rgba(255,140,40,.3) 160px, rgba(255,120,30,0) 520px); }
+  .titere { transform-origin: 630px 700px; } .fCabeza { transform-origin: 630px 150px; } .fMano { transform-origin: 494px 308px; }
+  #vineta { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 45%, rgba(0,0,0,0) 50%, rgba(0,0,0,.5) 100%); }
+  .c { position: absolute; opacity: 0; }
+  .tarjeta { background: var(--papel); border-radius: 18px; box-shadow: 0 10px 30px rgba(0,0,0,.45); padding: 26px 34px 22px; }
+  .dato { top: 170px; width: 620px; text-align: center; } .der { right: 110px; } .izq { left: 110px; } .centro { left: 650px; }
+  .dato .v { font: 104px 'Archivo Black'; color: var(--azul); line-height: 1; } .dato .t { font: 600 36px Inter; color: var(--tinta); margin-top: 12px; }
+  .fuente { font: italic 500 28px Lora; color: #777; margin-top: 10px; }
+  .cita { left: 1000px; top: 140px; width: 800px; } .cita .a { font: 600 30px Inter; color: #8a6d3b; letter-spacing: 2px; } .cita .t { font: italic 500 50px/1.2 Lora; color: var(--tinta); margin-top: 12px; }
+  .frasco { right: 110px; top: 190px; width: 760px; } .frasco h2 { font: 64px 'Archivo Black'; color: var(--tinta); } .frasco p { font: 600 34px/1.3 Inter; color: #444; margin-top: 10px; }
+  .etq { display: inline-block; margin-top: 18px; padding: 8px 20px; border: 7px solid; border-radius: 12px; font: 40px 'Archivo Black'; transform: rotate(-4deg); }
+  .estante { left: 90px; top: 70px; display: flex; gap: 14px; }
+  .bote { width: 74px; height: 96px; border-radius: 14px 14px 20px 20px; background: rgba(210,235,240,.85); border: 4px solid #3a4a50; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 8px; font: 800 18px Inter; color: #fff; text-align: center; }
+  .barras { left: 260px; top: 200px; width: 1400px; } .barras h3, .lista h3, .comp h3 { font: 800 44px Inter; color: var(--tinta); margin-bottom: 18px; }
+  .fila { display: flex; align-items: center; gap: 22px; margin: 16px 0; font: 800 40px Inter; } .fila .n { width: 240px; } .fila .b { height: 66px; border-radius: 10px; transform-origin: 0 50%; }
+  .lista { left: 300px; top: 210px; width: 1320px; } .item { font: 800 52px Inter; color: var(--tinta); margin: 18px 0; display: flex; gap: 26px; align-items: center; }
+  .item i { font-style: normal; width: 70px; height: 70px; border: 7px solid var(--rojo); border-radius: 12px; color: var(--rojo); font: 52px 'Archivo Black'; display: flex; align-items: center; justify-content: center; flex: none; }
+  .comp { left: 160px; top: 200px; width: 1600px; display: flex; gap: 40px; } .comp > div { flex: 1; } .comp p { font: 600 40px/1.3 Inter; color: #333; }
+  .linea { left: 150px; top: 560px; width: 1620px; } .linea h3 { font: 800 34px Inter; }
+  .barrasG { position: relative; height: 70px; margin-top: 16px; border-radius: 10px; overflow: hidden; background: #ddd5c6; }
+  .tramo { position: absolute; top: 0; bottom: 0; transform-origin: 0 50%; color: #fff; font: 800 28px Inter; display: flex; align-items: center; justify-content: center; }
+  .anios { position: relative; height: 38px; font: 600 28px Inter; color: #555; } .anios span { position: absolute; transform: translateX(-50%); top: 6px; }
+  .sello { left: 0; right: 0; top: 330px; text-align: center; } .sello span { display: inline-block; padding: 14px 40px; border: 10px solid var(--rojo); border-radius: 18px; font: 96px 'Archivo Black'; color: var(--rojo); background: rgba(244,239,230,.9); transform: rotate(-6deg); }
+  .titulo { inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(ellipse at 50% 50%, rgba(10,10,10,.55) 0%, rgba(10,10,10,.88) 70%); }
+  .titulo h1 { font: 170px 'Archivo Black'; color: var(--oro); letter-spacing: 6px; -webkit-text-stroke: 4px #3a2a10; paint-order: stroke fill; }
+  .titulo h2 { font: 800 54px Inter; color: #fff; margin-top: 6px; } .titulo p { font: italic 500 36px Lora; color: #e9e1d2; margin-top: 34px; }
+  .susc { left: 0; right: 0; top: 330px; display: flex; justify-content: center; align-items: center; gap: 46px; }
+  .susc .like { width: 150px; height: 150px; border-radius: 50%; background: #f4efe6; display: flex; align-items: center; justify-content: center; font-size: 84px; box-shadow: 0 10px 30px rgba(0,0,0,.45); }
+  .susc .btn { padding: 34px 60px; border-radius: 22px; background: #cc0000; color: #fff; font: 800 64px Inter; box-shadow: 0 10px 30px rgba(0,0,0,.45); }
+  .susc .bell { width: 150px; height: 150px; border-radius: 50%; background: #f4efe6; display: flex; align-items: center; justify-content: center; font-size: 84px; box-shadow: 0 10px 30px rgba(0,0,0,.45); transform-origin: 50% 20%; }
+  .cursor { position: absolute; width: 0; height: 0; border-left: 26px solid transparent; border-right: 26px solid transparent; border-bottom: 64px solid #fff; transform-origin: 50% 0; filter: drop-shadow(0 4px 6px rgba(0,0,0,.6)); }
+  #sub { position: absolute; left: 200px; right: 200px; bottom: 70px; text-align: center; font: 800 56px Inter; color: #fff; -webkit-text-stroke: 10px rgba(0,0,0,.78); paint-order: stroke fill; line-height: 1.2; }
+  #sub b { color: var(--oro); font-weight: 800; }
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-duration="__TOTAL__" data-width="1920" data-height="1080">
+  <div id="planos"></div>
+  <div id="vineta"></div>
+  <div id="capas"></div>
+  <div id="sub"></div>
+__AUDIOS__</div>
+<script>
+const D = __DATOS__;
+const W = 1280, H = 720, ESC = 1920 / W, $ = id => document.getElementById(id);
+const el = (tag, cls, html, padre) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; (padre || document.body).appendChild(e); return e; };
+const NS = 'http://www.w3.org/2000/svg', clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x)), suave = x => x * x * (3 - 2 * x);
+const COLOR = { rojo: 'var(--rojo)', ambar: 'var(--ambar)', gris: 'var(--gris)', verde: 'var(--verde)', azul: 'var(--azul)', pp: 'var(--pp)', psoe: 'var(--psoe)' };
+
+// ---------- construir planos ----------
+D.PLANOS.forEach((p, i) => {
+  const m = el('div', 'mundo', null, $('planos')); p.el = m; m.style.zIndex = i;
+  const fondo = p.tipo === 'marioneta' ? (p.fondo || 'escenario') : p.tipo === 'decano' ? 'portada' : p.tipo === 'cueva' ? 'cueva' : p.fondo;
+  el('img', null, null, m).src = `assets/${fondo}.webp`;
+  if (p.tipo === 'cueva') p.brillo = el('div', 'capa brillo', null, m);
+  if (p.tipo === 'marioneta') {
+    const tt = el('div', 'titere', null, m); p.titere = tt;
+    el('img', null, null, tt).src = 'assets/cuerpo.webp'; p.mano = el('img', 'fMano', null, tt); p.mano.src = 'assets/mano.webp';
+    p.cabeza = el('img', 'fCabeza', null, tt); p.cabeza.src = 'assets/cabeza.webp';
+    tt.insertAdjacentHTML('beforeend', '<svg viewBox="0 0 1280 720"><g class="parp" fill="#e9a47e" opacity="0"><ellipse cx="618" cy="80" rx="8" ry="5"/><ellipse cx="655" cy="80" rx="8" ry="5"/></g></svg>');
+    p.parp = tt.querySelector('.parp');
+  }
+  if (p.tipo === 'decano') {
+    m.insertAdjacentHTML('beforeend', '<svg viewBox="0 0 1280 720"><g class="parp" fill="#eeb08c" stroke="#2a1608" stroke-width="2" opacity="0"><ellipse cx="866" cy="212" rx="15" ry="15"/><ellipse cx="830" cy="227" rx="11" ry="11"/></g>' +
+      '<ellipse class="boca" cx="878" cy="273" rx="13" ry="1" fill="#3a1a12" stroke="#1d0b06" stroke-width="2"/></svg>');
+    p.parp = m.querySelector('.parp'); p.boca = m.querySelector('.boca');
+  }
+  // pines sobre el dibujo (coordenadas 1280×720): [x, y, nombre, valor, t]
+  (p.capas || []).filter(c => c.tipo === 'pines').forEach(c => {
+    const s = document.createElementNS(NS, 'svg'); s.setAttribute('viewBox', '0 0 1280 720'); m.appendChild(s); c.svgs = [];
+    c.pines.forEach(([x, y, n, v, t]) => { const g = document.createElementNS(NS, 'g'); g.setAttribute('transform', `translate(${x} ${y})`);
+      g.innerHTML = `<circle r="9" fill="#c0392b" stroke="#fff" stroke-width="3"/><rect x="14" y="-44" rx="8" width="${24 + 15 * Math.max(n.length, v.length)}" height="62" fill="#f4efe6" stroke="#222" stroke-width="2"/>` +
+        `<text x="26" y="-20" font-family="Inter" font-weight="800" font-size="20" fill="#222">${n}</text><text x="26" y="6" font-family="Archivo Black" font-size="24" fill="#c0392b">${v}</text>`;
+      g.style.opacity = 0; s.appendChild(g); c.svgs.push([g, t]); });
+  });
+});
+
+// ---------- construir capas (pantalla 1920×1080) ----------
+const LINEA = [['PSOE', 1982, 1996], ['PP', 1996, 2004], ['PSOE', 2004, 2011], ['PP', 2011, 2018], ['PSOE', 2018, 2026]];
+const CAPAS = [];
+D.PLANOS.forEach(p => (p.capas || []).forEach(c => {
+  let e = null;
+  if (c.tipo === 'dato') e = el('div', `c tarjeta dato ${c.pos || 'der'}`, `<div class="v" style="color:${COLOR[c.color] || 'var(--azul)'}">${c.valor}</div><div class="t">${c.texto || ''}</div>${c.fuente ? `<div class="fuente">${c.fuente}</div>` : ''}`, $('capas'));
+  if (c.tipo === 'cita') e = el('div', 'c tarjeta cita', `<div class="a">${c.autor}</div><div class="t">«${c.texto}»</div>`, $('capas'));
+  if (c.tipo === 'frasco') {
+    const col = COLOR[c.color] || 'var(--rojo)';
+    e = el('div', 'c tarjeta frasco', `<h2>${c.nombre}</h2><p>${c.texto}</p><div class="etq" style="color:${col};border-color:${col}">${c.etiqueta}</div>${c.fuente ? `<div class="fuente">${c.fuente}</div>` : ''}`, $('capas'));
+    if (!p.estante) { p.estante = el('div', 'c estante', '', $('capas')); CAPAS.push({ e: p.estante, ini: c.ini, fin: p.fin - .1, fijo: 1 }); }
+    const b = el('div', 'bote', c.corto || c.nombre.slice(0, 6), p.estante); b.style.background = col; b.style.opacity = 0; CAPAS.push({ e: b, ini: c.ini, fin: p.fin - .1, fijo: 1, solo: 1 });
+  }
+  if (c.tipo === 'barras') {
+    const mx = c.max || Math.max(...c.filas.map(f => f[1]));
+    e = el('div', 'c tarjeta barras', `<h3>${c.titulo}</h3>` + c.filas.map(([n, v, col]) => `<div class="fila"><div class="n">${n}</div><div class="b" style="width:${900 * v / mx}px;background:${COLOR[col] || col}"></div><div>${String(v).replace('.', ',')} %</div></div>`).join('') + (c.fuente ? `<div class="fuente">${c.fuente}</div>` : ''), $('capas'));
+    c.anim = [...e.querySelectorAll('.b')];
+  }
+  if (c.tipo === 'lista') {
+    e = el('div', 'c tarjeta lista', (c.titulo ? `<h3>${c.titulo}</h3>` : '') + c.items.map(it => `<div class="item"><i>${c.marca || '✓'}</i>${it.texto}</div>`).join(''), $('capas'));
+    c.anim = [...e.querySelectorAll('.item')];
+  }
+  if (c.tipo === 'comparacion') {
+    e = el('div', 'c comp', `<div class="tarjeta"><h3>${c.izq.titulo}</h3><p>${c.izq.texto}</p></div><div class="tarjeta"><h3 style="color:var(--rojo)">${c.der.titulo}</h3><p>${c.der.texto}</p></div>`, $('capas'));
+    c.anim = [e.children[1]];
+  }
+  if (c.tipo === 'linea') {
+    e = el('div', 'c tarjeta linea', `<h3>${c.titulo || 'Quién ha gobernado'}</h3><div class="barrasG">` + LINEA.map(([n, a, b]) => `<div class="tramo" style="left:${(a - 1982) / .44}%;width:${(b - a) / .44}%;background:${n === 'PP' ? 'var(--pp)' : 'var(--psoe)'}">${n}</div>`).join('') +
+      `</div><div class="anios">${[1982, 1996, 2004, 2011, 2018, 2026].map(a => `<span style="left:${(a - 1982) / .44}%">${a}</span>`).join('')}</div><div class="fuente">Fuente: La Moncloa</div>`, $('capas'));
+    c.anim = [...e.querySelectorAll('.tramo')];
+  }
+  if (c.tipo === 'sello') e = el('div', 'c sello', `<span>${c.texto}</span>`, $('capas'));
+  if (c.tipo === 'titulo') e = el('div', 'c titulo', `<h1>${c.h1}</h1><h2>${c.h2 || ''}</h2><p>${c.p || ''}</p>`, $('capas'));
+  if (c.tipo === 'suscribete') { e = el('div', 'c susc', '<div class="like">👍</div><div class="btn">SUSCRIBIRSE</div><div class="bell">🔔</div>', $('capas'));
+    c.cursor = el('div', 'cursor', '', $('capas')); c.cursor.style.opacity = 0; }
+  if (c.tipo === 'pines') { CAPAS.push({ pines: c }); return; }
+  if (e) CAPAS.push({ e, ini: c.ini, fin: c.fin, c });
+}));
+
+// ---------- cámara: cam al empezar, cam2 al acabar, y zooms [t, x, y, z, duración] ----------
+function camara(p, t) {
+  const a = p.cam || [640, 360, 1.05], b = p.cam2 || [a[0], a[1], a[2] * 1.08], k = suave(clamp((t - p.ini) / Math.max(1, p.fin - p.ini)));
+  let c = a.map((x, i) => x + (b[i] - x) * k);
+  for (const [t0, x, y, z, d] of p.zooms || []) { const q = suave(clamp((t - t0) / (d || .8))); if (t >= t0) c = c.map((v, i) => v + ([x, y, z][i] - v) * q); }
+  return c;
+}
+function pinta(t) {
+  for (const p of D.PLANOS) {
+    const vis = t >= p.ini && t < p.fin + .3; p.el.style.visibility = vis ? 'visible' : 'hidden'; if (!vis) continue;
+    p.el.style.opacity = clamp((t - p.ini) / .3);
+    const [x, y, z] = camara(p, t), s = ESC * z, tx = Math.min(0, Math.max(1920 - W * s, 960 - x * s)), ty = Math.min(0, Math.max(1080 - H * s, 540 - y * s));
+    p.el.style.transform = `translate(${tx}px, ${ty}px) scale(${s})`;
+    const parpadea = (t % 3.7) < .13;
+    if (p.brillo) p.brillo.style.opacity = .35 + .45 * (.5 + .22 * Math.sin(t * 7.3) + .16 * Math.sin(t * 13.1 + 1) + .12 * Math.sin(t * 3.7 + 2));
+    if (p.titere) { p.titere.style.transform = `scale(${1 + .004 * Math.sin(t * 2.2)}, ${1 + .007 * Math.sin(t * 2.2)})`;
+      p.cabeza.style.transform = `rotate(${1.6 * Math.sin(t * 1.3) + .8 * Math.sin(t * 3.1)}deg)`; p.mano.style.transform = `rotate(${-3 + 4 * Math.sin(t * 2.4)}deg)`; }
+    if (p.parp) p.parp.setAttribute('opacity', parpadea ? 1 : 0);
+    if (p.boca) { const b = D.BOCA[Math.floor(t * 30)] || 0; p.boca.setAttribute('ry', 1 + 6 * b); p.boca.setAttribute('rx', 13 - 2 * b); }
+  }
+  for (const k of CAPAS) {
+    if (k.pines) { for (const [g, t0] of k.pines.svgs) g.style.opacity = clamp((t - t0) / .3) * clamp((k.pines.fin - t) / .3); continue; }
+    const a = clamp((t - k.ini) / .35), o = clamp((k.fin - t) / .3), vis = t >= k.ini - .01 && t <= k.fin;
+    k.e.style.opacity = vis ? Math.min(a, o) : 0;
+    if (!k.fijo) k.e.style.transform = `scale(${.85 + .15 * suave(a)})`;
+    if (k.c && k.c.tipo === 'suscribete') { const u = t - k.ini, cur = k.c.cursor, [lk, bt, bl] = k.e.children;
+      const pts = [[700, 640], [790, 420], [1010, 430], [1250, 420], [1300, 640]], seg = clamp(u / 1.1, 0, 3.99), i = Math.floor(seg), f = suave(seg - i);
+      const [x0, y0] = pts[i], [x1, y1] = pts[i + 1]; cur.style.left = (x0 + (x1 - x0) * f) + 'px'; cur.style.top = (y0 + (y1 - y0) * f) + 'px';
+      cur.style.opacity = vis ? Math.min(a, o) : 0; cur.style.transform = `rotate(-25deg) scale(${[1.1, 2.2, 3.3].some(c => u > c && u < c + .15) ? .8 : 1})`;
+      const liked = u > 1.1, subs = u > 2.2, rang = u > 3.3;
+      lk.style.background = liked ? '#1f6feb' : '#f4efe6'; lk.style.transform = `scale(${liked && u < 1.4 ? 1.2 : 1})`;
+      bt.style.background = subs ? '#606060' : '#cc0000'; bt.textContent = subs ? 'SUSCRITO ✓' : 'SUSCRIBIRSE';
+      bl.style.transform = `rotate(${rang ? 22 * Math.sin((u - 3.3) * 18) * Math.max(0, 1 - (u - 3.3) / 1.5) : 0}deg)`; bl.style.background = rang ? '#f2c14e' : '#f4efe6'; }
+    if (k.c && k.c.anim) k.c.anim.forEach((x, i) => { const it = (k.c.items || [])[i], t0 = it && it.ini != null ? it.ini : k.ini + .4 + i * .5;
+      const q = clamp((t - t0) / .4); if (x.classList.contains('b') || x.classList.contains('tramo')) x.style.transform = `scaleX(${suave(q)})`; else x.style.opacity = q; });
+  }
+  const f = D.FRASES.find(f => t >= f.ini && t < f.fin), html = f ? f.txt : '';
+  if ($('sub').dataset.h !== html) { $('sub').innerHTML = html; $('sub').dataset.h = html; }
+}
+const est = { t: 0 };
+const tl = gsap.timeline({ paused: true, onUpdate: () => pinta(est.t) });
+tl.to(est, { t: D.TOTAL, duration: D.TOTAL, ease: 'none' }, 0);
+window.__timelines = window.__timelines || {};
+window.__timelines['main'] = tl;
+tl.seek(0); pinta(0);
+</script>
+</body>
+</html>
