@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="es" data-resolution="landscape">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1920, height=1080" />
+<!-- Prueba: primeros planos estilo Tarantino (de la nariz para abajo) que hablan alternando boca cerrada/abierta. -->
+<script src="assets/gsap.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1920px; height: 1080px; overflow: hidden; background: #1a120a; }
+  #root { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #1a120a; }
+  .plano { position: absolute; inset: 0; transform-origin: 50% 50%; filter: url(#hervir) contrast(1.1) sepia(.2); opacity: 0; }
+  .plano img { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; }
+  #vin { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 45%, rgba(0,0,0,0) 45%, rgba(20,10,0,.7) 100%); }
+  #cortina { position: absolute; inset: 0; background: #1d1209; opacity: 0; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute"><filter id="hervir"><feTurbulence id="turb" type="fractalNoise" baseFrequency=".02" numOctaves="2" seed="1" /><feDisplacementMap in="SourceGraphic" scale="3" /></filter></svg>
+<div id="root" data-composition-id="main" data-start="0" data-duration="10.2" data-width="1920" data-height="1080">
+  <div id="p1" class="plano"><img src="assets/perfil_cerrada.webp" alt="" /><img class="ab" src="assets/perfil_abierta.webp" alt="" style="opacity:0" /></div>
+  <div id="p2" class="plano"><img src="assets/bajo_cerrada.webp" alt="" /><img class="ab" src="assets/bajo_abierta.webp" alt="" style="opacity:0" /></div>
+  <div id="vin"></div><div id="cortina"></div>
+  <audio id="voz" src="assets/voz.mp3" data-start="0.6" data-duration="9.0" data-volume="1"></audio>
+  <audio id="w" src="assets/whoosh.mp3" data-start="4.55" data-duration="1.2" data-volume="0.1"></audio>
+</div>
+<script>
+const BOCA = [0.75, 1.0, 0.99, 0.81, 0.41, 0.29, 0.66, 0.96, 1.0, 1.0, 1.0, 1.0, 0.98, 0.89, 0.8, 0.75, 0.65, 0.37, 0.1, 0.21, 0.64, 0.94, 1.0, 1.0, 0.97, 0.87, 0.77, 0.73, 0.8, 0.93, 1.0, 1.0, 0.99, 0.96, 0.88, 0.7, 0.38, 0.1, 0.0, 0.0, 0.23, 0.71, 0.98, 1.0, 1.0, 0.96, 0.93, 0.97, 1.0, 0.95, 0.91, 0.95, 0.96, 0.88, 0.9, 0.97, 1.0, 1.0, 0.99, 0.96, 0.74, 0.47, 0.58, 0.89, 0.96, 0.89, 0.9, 0.95, 0.78, 0.51, 0.54, 0.79, 0.96, 0.97, 0.89, 0.75, 0.58, 0.42, 0.25, 0.08, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.25, 0.74, 1.0, 1.0, 1.0, 0.97, 0.82, 0.49, 0.37, 0.72, 0.99, 1.0, 1.0, 0.99, 0.99, 0.99, 1.0, 0.92, 0.82, 0.87, 0.95, 0.89, 0.6, 0.36, 0.6, 0.93, 1.0, 0.89, 0.7, 0.7, 0.71, 0.53, 0.27, 0.07, 0.0, 0.0, 0.0, 0.23, 0.71, 0.98, 1.0, 0.98, 0.79, 0.4, 0.34, 0.75, 0.93, 0.64, 0.4, 0.61, 0.91, 0.94, 0.81, 0.7, 0.62, 0.41, 0.12, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.25, 0.75, 1.0, 1.0, 1.0, 0.96, 0.93, 0.96, 1.0, 1.0, 0.99, 0.93, 0.73, 0.65, 0.85, 1.0, 0.98, 0.74, 0.45, 0.63, 0.9, 0.89, 0.83, 0.87, 0.96, 1.0, 1.0, 0.83, 0.61, 0.73, 0.95, 0.97, 0.9, 0.89, 0.96, 1.0, 0.99, 0.94, 0.9, 0.96, 1.0, 1.0, 0.88, 0.51, 0.34, 0.66, 0.95, 0.97, 0.95, 0.98, 0.97, 0.94, 0.97, 1.0, 1.0, 0.97, 0.95, 0.89, 0.59, 0.42, 0.75, 1.0, 0.99, 0.96, 0.89, 0.82, 0.73, 0.46, 0.38, 0.75, 1.0, 1.0, 0.99, 0.88, 0.79, 0.88, 0.91, 0.7, 0.57, 0.8, 1.0, 1.0, 0.84, 0.56, 0.61, 0.89, 1.0, 1.0, 1.0, 0.96, 0.68, 0.49, 0.77, 0.85, 0.6, 0.65, 0.9, 0.95, 0.9, 0.95, 0.98, 0.91, 0.67, 0.49, 0.7, 0.92, 0.91, 0.84, 0.77, 0.67, 0.59, 0.55, 0.45, 0.29, 0.26, 0.33, 0.3, 0.16]
+, $ = id => document.getElementById(id), cl = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x)), su = x => x * x * (3 - 2 * x), r = (t, a, b) => su(cl((t - a) / (b - a)));
+const P = [[$('p1'), 0, 4.75, [1.0, 1.12], [0, -25]], [$('p2'), 4.75, 10.2, [1.05, 1.16], [20, 10]]];
+function pinta(t) {
+  $('turb').setAttribute('seed', Math.floor(t * 12) % 7 + 1);
+  const b = BOCA[Math.floor((t - .6) * 30)] || 0, ab = cl((b - .25) / .2);          // abre la boca con la voz
+  P.forEach(([el, a, e, [z0, z1], [dx, dy]]) => { const vis = t >= a && t < e, k = r(t, a, e);
+    el.style.opacity = vis ? 1 : 0; el.querySelector('.ab').style.opacity = ab;
+    el.style.transform = `translate(${dx * k}px, ${dy * k}px) scale(${z0 + (z1 - z0) * k})`; });
+  $('cortina').style.opacity = 1 - r(t, 0, .5) + (r(t, 4.45, 4.75) - r(t, 4.75, 5.05)) + r(t, 9.7, 10.2);
+}
+const est = { t: 0 }, tl = gsap.timeline({ paused: true, onUpdate: () => pinta(est.t) });
+tl.to(est, { t: 10.2, duration: 10.2, ease: 'none' }, 0);
+window.__timelines = window.__timelines || {}; window.__timelines['main'] = tl; tl.seek(0); pinta(0);
+</script>
+</body>
+</html>
