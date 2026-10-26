@@ -27,6 +27,12 @@ Si una regla se rompe, se corrige o se justifica en el guion con `# excepcion: m
 - La voz manda: la música queda por debajo de la voz siempre.
 - Silencios de más de 0,7 s se recortan salvo pausa dramática marcada.
 - Un efecto de sonido acompaña cada cambio importante (no cada corte).
+- Música de fondo siempre sin copyright y simple (pocos instrumentos, sin melodía protagonista).
+- En los temas serios la música se corta (silencio de música, solo voz y ambiente).
+- Las conclusiones y remates llevan un efecto de sonido que case con lo que se dice.
+
+## R5b — Mostrar lo que se dice
+- Siempre que la voz hable de algo, en pantalla se ve eso mismo (objeto, persona, dato, lugar), con su efecto de sonido.
 
 ## R6 — Cierre
 - El CTA es uno solo y concreto.
@@ -50,3 +56,5 @@ Si una regla se rompe, se corrige o se justifica en el guion con `# excepcion: m
 3. ¿Hay al menos un bucle abierto por cada tercio del video?
 4. ¿Los subtítulos respetan la zona segura?
 5. ¿Hay un solo CTA?
+6. ¿Cada cosa que se nombra se ve en pantalla con su efecto de sonido?
+7. ¿La música es sin copyright, simple, y se corta en los momentos serios?
