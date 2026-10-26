@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="es" data-resolution="landscape">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1920, height=1080" />
+<!-- Españistán · ep. 2 · intro (frases 1–4, voz D clonada con CosyVoice3). Esqueleto de espanistan-01-intro:
+     dibujo en coordenadas 1280×720 + cámara + capas. Novedad: marionetas.
+     · Feijolo: cuerpo / cabeza / mano recortados (historias/espanistan/marionetas/feijolo) que respiran, cabecean y gesticulan.
+     · El Decano (narrador) habla: su boca sigue el volumen de la voz fotograma a fotograma (BOCA2, de herramientas/boca.py).
+     Voces: voz1 +0,3 s · voz2 +6,7 s · voz3 +19,5 s · voz4 +30,1 s. Música: misterio (cueva) → neutro. -->
+<script src="assets/gsap.min.js"></script>
+<style>
+  @font-face { font-family: 'Archivo Black'; src: url(assets/fuentes/archivo-black-latin-400-normal.woff2); }
+  @font-face { font-family: 'Inter'; font-weight: 600; src: url(assets/fuentes/inter-latin-600-normal.woff2); }
+  @font-face { font-family: 'Inter'; font-weight: 800; src: url(assets/fuentes/inter-latin-800-normal.woff2); }
+  @font-face { font-family: 'Lora'; font-style: italic; font-weight: 500; src: url(assets/fuentes/lora-latin-500-italic.woff2); }
+  :root { --papel: #f4efe6; --tinta: #222; --rojo: #c0392b; --azul: #1f4e8c; --oro: #f2c14e; --psoe: #d23b33; --pp: #2a6bc4; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1920px; height: 1080px; overflow: hidden; background: #111; }
+  #root { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #111; }
+  .mundo { position: absolute; left: 0; top: 0; width: 1280px; height: 720px; transform-origin: 0 0; }
+  .mundo > img, .mundo > svg, .mundo > .capa { position: absolute; left: 0; top: 0; width: 1280px; height: 720px; }
+  #brillo { mix-blend-mode: screen; background: radial-gradient(circle at 968px 470px, rgba(255,170,60,.75) 0, rgba(255,140,40,.3) 160px, rgba(255,120,30,0) 520px); }
+  #sombraF { position: absolute; left: 330px; top: 40px; width: 230px; height: auto; mix-blend-mode: multiply; transform-origin: 50% 100%; }
+  #titere { position: absolute; left: 0; top: 0; width: 1280px; height: 720px; transform-origin: 630px 700px; }
+  #titere img { position: absolute; left: 0; top: 0; width: 1280px; height: 720px; }
+  #fCabeza { transform-origin: 630px 150px; }
+  #fMano { transform-origin: 494px 308px; }
+  #vineta { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 45%, rgba(0,0,0,0) 50%, rgba(0,0,0,.55) 100%); }
+  #flash { position: absolute; inset: 0; background: #fffaf0; opacity: 0; }
+  .tarjeta { position: absolute; background: var(--papel); border-radius: 18px; box-shadow: 0 10px 30px rgba(0,0,0,.45); }
+  #cita { left: 1060px; top: 150px; width: 760px; padding: 30px 38px 28px; }
+  #cita .autor { font: 600 30px Inter; color: #8a6d3b; letter-spacing: 2px; }
+  #cita .texto { font: italic 500 52px/1.2 Lora; color: var(--tinta); margin-top: 12px; }
+  #nombre { left: 1180px; top: 210px; padding: 18px 34px 20px; text-align: center; }
+  #nombre .n { font: 96px 'Archivo Black'; color: var(--tinta); line-height: 1; }
+  #nombre .r { font: 600 34px Inter; color: #666; margin-top: 8px; }
+  #pp { position: absolute; left: 1290px; top: 470px; width: 200px; height: 200px; border-radius: 50%; background: var(--pp); color: #fff;
+    font: 92px 'Archivo Black'; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(0,0,0,.45); }
+  #linea { left: 150px; top: 560px; width: 1620px; padding: 26px 36px 22px; }
+  #linea h3 { font: 800 34px Inter; color: var(--tinta); }
+  #barras { position: relative; height: 70px; margin-top: 16px; border-radius: 10px; overflow: hidden; background: #ddd5c6; }
+  .tramo { position: absolute; top: 0; bottom: 0; transform-origin: 0 50%; color: #fff; font: 800 28px Inter; display: flex; align-items: center; justify-content: center; }
+  #anios { position: relative; height: 38px; font: 600 28px Inter; color: #555; }
+  #anios span { position: absolute; transform: translateX(-50%); top: 6px; }
+  #linea .fuente { font: italic 500 28px Lora; color: #777; margin-top: 4px; }
+  .regla { position: absolute; left: 330px; width: 1260px; padding: 22px 40px; font: 800 60px Inter; color: var(--tinta); display: flex; align-items: center; gap: 30px; }
+  .regla i { font-style: normal; width: 74px; height: 74px; border: 7px solid var(--rojo); border-radius: 12px; color: var(--rojo); font: 58px 'Archivo Black'; display: flex; align-items: center; justify-content: center; }
+  #final { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0;
+    background: radial-gradient(ellipse at 50% 50%, rgba(10,10,10,.55) 0%, rgba(10,10,10,.88) 70%); }
+  #final h1 { font: 170px 'Archivo Black'; color: var(--oro); letter-spacing: 6px; -webkit-text-stroke: 4px #3a2a10; paint-order: stroke fill; }
+  #final h2 { font: 800 54px Inter; color: #fff; margin-top: 6px; }
+  #final p { font: italic 500 36px Lora; color: #e9e1d2; margin-top: 34px; }
+  #sub { position: absolute; left: 200px; right: 200px; bottom: 70px; text-align: center; font: 800 56px Inter; color: #fff;
+    -webkit-text-stroke: 10px rgba(0,0,0,.78); paint-order: stroke fill; line-height: 1.2; }
+  #sub b { color: var(--oro); font-weight: 800; }
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-duration="41.5" data-width="1920" data-height="1080">
+  <!-- plano 1: la cueva, ahora con la sombra de Feijolo en la pared -->
+  <div id="cueva" class="mundo">
+    <img src="assets/cueva.webp" alt="" />
+    <img id="sombraF" src="assets/sombra_feijolo.webp" alt="" />
+    <div id="brillo" class="capa"></div>
+  </div>
+  <!-- plano 2: el Decano habla (sobre la portada): párpados, boca y brillo de gafas pintados encima -->
+  <div id="decano" class="mundo" style="visibility:hidden">
+    <img src="assets/portada.webp" alt="" />
+    <svg viewBox="0 0 1280 720">
+      <g id="dParpados" fill="#eeb08c" stroke="#2a1608" stroke-width="2">
+        <ellipse id="dP1" cx="866" cy="212" rx="15" ry="15" /><ellipse id="dP2" cx="830" cy="227" rx="11" ry="11" />
+      </g>
+      <ellipse id="dBoca" cx="878" cy="273" rx="13" ry="1" fill="#3a1a12" stroke="#1d0b06" stroke-width="2" />
+      <path id="dBrillo" d="M852 200 L874 196" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity="0" />
+    </svg>
+  </div>
+  <!-- plano 3: Feijolo, marioneta sobre el mapa -->
+  <div id="feijolo" class="mundo" style="visibility:hidden">
+    <img src="assets/escenario.webp" alt="" />
+    <div id="titere">
+      <img src="assets/cuerpo.webp" alt="" />
+      <img id="fMano" src="assets/mano.webp" alt="" />
+      <img id="fCabeza" src="assets/cabeza.webp" alt="" />
+      <svg viewBox="0 0 1280 720" style="position:absolute;left:0;top:0;width:1280px;height:720px">
+        <g id="fParpados" fill="#e9a47e"><ellipse cx="618" cy="80" rx="8" ry="5" /><ellipse cx="655" cy="80" rx="8" ry="5" /></g>
+      </svg>
+    </div>
+  </div>
+  <div id="vineta"></div>
+
+  <div id="cita" class="tarjeta"><div class="autor">GEORGE SANTAYANA · 1905</div><div class="texto">«Quien no recuerda su pasado está condenado a repetirlo».</div></div>
+  <div id="nombre" class="tarjeta"><div class="n">FEIJOLO</div><div class="r">Líder de la oposición</div></div>
+  <div id="pp">PP</div>
+  <div id="linea" class="tarjeta">
+    <h3>Quién ha gobernado Españistán</h3>
+    <div id="barras">
+      <div class="tramo" style="left:0%;width:31.8%;background:var(--psoe)">PSOE</div>
+      <div class="tramo" style="left:31.8%;width:18.2%;background:var(--pp)">PP</div>
+      <div class="tramo" style="left:50%;width:15.9%;background:var(--psoe)">PSOE</div>
+      <div class="tramo" style="left:65.9%;width:15.9%;background:var(--pp)">PP</div>
+      <div class="tramo" style="left:81.8%;width:18.2%;background:var(--psoe)">PSOE</div>
+    </div>
+    <div id="anios"><span style="left:0%;transform:none">1982</span><span style="left:31.8%">1996</span><span style="left:50%">2004</span><span style="left:65.9%">2011</span><span style="left:81.8%">2018</span><span style="left:100%;transform:translateX(-100%)">2026</span></div>
+    <div class="fuente">Fuente: La Moncloa, presidentes del Gobierno</div>
+  </div>
+  <div id="r1" class="tarjeta regla" style="top:250px"><i>✓</i>Datos públicos</div>
+  <div id="r2" class="tarjeta regla" style="top:400px"><i>✓</i>La palabra exacta de cada sentencia</div>
+  <div id="r3" class="tarjeta regla" style="top:550px"><i>✓</i>Lo bueno también se cuenta</div>
+  <div id="final"><h1>ESPAÑISTÁN</h1><h2>Episodio 2 · Feijolo y el PP</h2><p>Mismas reglas. Mismas preguntas.</p></div>
+  <div id="flash"></div>
+  <div id="sub"></div>
+
+  <audio id="voz1" src="assets/voz1.mp3" data-start="0.3" data-duration="5.85" data-volume="1"></audio>
+  <audio id="voz2" src="assets/voz2.mp3" data-start="6.7" data-duration="12.27" data-volume="1"></audio>
+  <audio id="voz3" src="assets/voz3.mp3" data-start="19.5" data-duration="10.1" data-volume="1"></audio>
+  <audio id="voz4" src="assets/voz4.mp3" data-start="30.1" data-duration="7.2" data-volume="1"></audio>
+  <audio id="musica" src="assets/musica.mp3" data-start="0" data-duration="41.5" data-volume="1"></audio>
+  <audio id="sfx-fuego" src="assets/sfx/fuego_cueva.mp3" data-start="0" data-duration="6.6" data-volume="0.3"></audio>
+  <audio id="sfx-whoosh-sombra" src="assets/sfx/whoosh.mp3" data-start="4.3" data-duration="1.2" data-volume="0.25"></audio>
+  <audio id="sfx-whoosh-decano" src="assets/sfx/whoosh.mp3" data-start="6.35" data-duration="1.2" data-volume="0.3"></audio>
+  <audio id="sfx-trazo-cita" src="assets/sfx/trazo.mp3" data-start="8.95" data-duration="0.14" data-volume="0.5"></audio>
+  <audio id="sfx-golpe-partido" src="assets/sfx/golpe.mp3" data-start="18.55" data-duration="1.2" data-volume="0.4"></audio>
+  <audio id="sfx-whoosh-feijolo" src="assets/sfx/whoosh.mp3" data-start="19.15" data-duration="1.2" data-volume="0.2"></audio>
+  <audio id="sfx-trazo-pp" src="assets/sfx/trazo.mp3" data-start="24.1" data-duration="0.14" data-volume="0.5"></audio>
+  <audio id="sfx-riser-linea" src="assets/sfx/riser.mp3" data-start="25.1" data-duration="3.6" data-volume="0.25"></audio>
+  <audio id="sfx-sello-1" src="assets/sfx/golpe.mp3" data-start="32.1" data-duration="1.2" data-volume="0.35"></audio>
+  <audio id="sfx-sello-2" src="assets/sfx/golpe.mp3" data-start="33.45" data-duration="1.2" data-volume="0.35"></audio>
+  <audio id="sfx-sello-3" src="assets/sfx/golpe.mp3" data-start="35.9" data-duration="1.2" data-volume="0.35"></audio>
+  <audio id="sfx-impacto-final" src="assets/sfx/impacto.mp3" data-start="38.0" data-duration="2.5" data-volume="0.45"></audio>
+</div>
+<script>
+// ---------- subtítulos (texto del guion, tiempos de Whisper) ----------
+const FRASES = [
+  { ini: .3,    fin: 4.2,   txt: 'En el episodio anterior salimos de la cueva para mirar <b>al que gobierna</b>.' },
+  { ini: 4.3,   fin: 6.4,   txt: 'Hoy miramos <b>al que quiere gobernar</b>.' },
+  { ini: 6.7,   fin: 9.0,   txt: 'El filósofo <b>George Santayana</b> escribió' },
+  { ini: 9.0,   fin: 13.7,  txt: 'que quien no recuerda su pasado está <b>condenado a repetirlo</b>.' },
+  { ini: 13.8,  fin: 16.6,  txt: 'Por eso hoy no miramos solo a un hombre.' },
+  { ini: 16.9,  fin: 19.2,  txt: 'Miramos a <b>todo un partido</b>.' },
+  { ini: 19.5,  fin: 22.2,  txt: 'Este es <b>Feijolo</b>, el líder de la oposición.' },
+  { ini: 22.4,  fin: 24.6,  txt: 'Y este es su partido, <b>el PP</b>,' },
+  { ini: 24.7,  fin: 29.7,  txt: 'uno de los dos que se han <b>turnado el poder</b> desde hace más de cuarenta años.' },
+  { ini: 30.1,  fin: 32.0,  txt: 'Mismas reglas que con Sanchís:' },
+  { ini: 32.0,  fin: 35.6,  txt: '<b>datos públicos</b>, la <b>palabra exacta</b> de cada sentencia,' },
+  { ini: 35.6,  fin: 37.9,  txt: 'y <b>lo bueno</b> también se cuenta.' },
+];
+// apertura de la boca del Decano, un valor por fotograma (30 fps) desde que empieza voz2 (6,7 s)
+const BOCA2 = [0.75, 1.0, 0.97, 0.8, 0.54, 0.56, 0.85, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.99, 0.97, 0.81, 0.57, 0.61, 0.87, 1.0, 1.0, 1.0, 0.99, 0.89, 0.68, 0.44, 0.2, 0.04, 0.22, 0.69, 0.97, 1.0, 1.0, 1.0, 1.0, 1.0, 0.97, 0.9, 0.87, 0.92, 0.98, 0.97, 0.91, 0.92, 0.97, 1.0, 1.0, 1.0, 0.94, 0.65, 0.49, 0.77, 0.99, 0.96, 0.94, 0.97, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.99, 0.89, 0.57, 0.16, 0.0, 0.0, 0.0, 0.0, 0.25, 0.75, 1.0, 0.82, 0.58, 0.7, 0.94, 1.0, 1.0, 0.99, 1.0, 1.0, 1.0, 1.0, 1.0, 0.91, 0.57, 0.16, 0.24, 0.72, 0.83, 0.43, 0.28, 0.63, 0.94, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.99, 0.98, 0.99, 1.0, 1.0, 0.91, 0.56, 0.24, 0.35, 0.7, 0.93, 1.0, 1.0, 1.0, 0.95, 0.79, 0.73, 0.89, 0.99, 0.97, 0.97, 0.93, 0.91, 0.95, 0.87, 0.71, 0.76, 0.93, 1.0, 0.97, 0.94, 0.97, 1.0, 1.0, 0.86, 0.73, 0.85, 0.98, 0.94, 0.89, 0.73, 0.4, 0.1, 0.0, 0.0, 0.25, 0.75, 1.0, 0.96, 0.67, 0.21, 0.25, 0.75, 0.99, 0.75, 0.29, 0.28, 0.75, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.99, 0.99, 0.99, 1.0, 1.0, 0.91, 0.82, 0.91, 1.0, 1.0, 1.0, 0.99, 0.97, 0.99, 0.9, 0.54, 0.39, 0.74, 0.91, 0.59, 0.39, 0.7, 0.96, 0.92, 0.87, 0.86, 0.87, 0.95, 0.96, 0.89, 0.76, 0.46, 0.14, 0.01, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.25, 0.75, 1.0, 1.0, 1.0, 1.0, 0.98, 0.94, 0.93, 0.95, 0.99, 1.0, 1.0, 0.96, 0.77, 0.41, 0.1, 0.0, 0.0, 0.25, 0.75, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.98, 0.96, 0.98, 1.0, 0.98, 0.95, 0.96, 0.99, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.97, 0.92, 0.89, 0.84, 0.82, 0.86, 0.88, 0.94, 0.94, 0.81, 0.67, 0.42, 0.12, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.25, 0.75, 1.0, 1.0, 0.99, 0.97, 0.98, 1.0, 1.0, 1.0, 1.0, 1.0, 0.99, 0.98, 0.99, 1.0, 0.93, 0.62, 0.18, 0.0, 0.25, 0.75, 1.0, 0.85, 0.45, 0.1, 0.0, 0.0, 0.0, 0.25, 0.75, 1.0, 1.0, 0.94, 0.86, 0.88, 0.97, 1.0, 1.0, 1.0, 1.0, 1.0, 0.87, 0.63, 0.65, 0.89, 0.93, 0.82, 0.6, 0.38, 0.6, 0.92, 0.97, 0.82, 0.68, 0.76, 0.87, 0.82, 0.56];
+const W = 1280, H = 720, ESC = 1920 / W;
+
+const camC = { x: 470, y: 230, z: 1.5 }, camD = { x: 870, y: 240, z: 2.5 }, camF = { x: 640, y: 360, z: 1 };
+const est = { t: 0, plano: 0, sombra: 0, gafas: -1 };
+function camara(el, cam) { const s = ESC * cam.z, tx = Math.min(0, Math.max(1920 - W * s, 960 - cam.x * s)), ty = Math.min(0, Math.max(1080 - H * s, 540 - cam.y * s));
+  el.style.transform = `translate(${tx}px, ${ty}px) scale(${s})`; }
+const $ = id => document.getElementById(id);
+// parpadeos: instantes fijos (siempre sale igual)
+const parpadeo = (t, lista) => lista.some(k => t > k && t < k + .14);
+function pinta() {
+  const t = est.t;
+  camara($('cueva'), camC); camara($('decano'), camD); camara($('feijolo'), camF);
+  $('cueva').style.visibility = est.plano === 0 ? 'visible' : 'hidden';
+  $('decano').style.visibility = est.plano === 1 ? 'visible' : 'hidden';
+  $('feijolo').style.visibility = est.plano === 2 ? 'visible' : 'hidden';
+  // cueva: la llama late y la sombra de Feijolo tiembla con ella
+  const llama = .5 + .22 * Math.sin(t * 7.3) + .16 * Math.sin(t * 13.1 + 1) + .12 * Math.sin(t * 3.7 + 2);
+  $('brillo').style.opacity = .35 + .45 * llama;
+  $('sombraF').style.opacity = est.sombra * (.55 + .25 * llama);
+  $('sombraF').style.transform = `scale(${.6 + .4 * est.sombra}) skewX(${2 * Math.sin(t * 2.1)}deg)`;
+  // Decano: boca con la voz, parpadeos, brillo que cruza las gafas
+  const k = Math.floor((t - 6.7) * 30), b = k >= 0 && k < BOCA2.length ? BOCA2[k] : 0;
+  $('dBoca').setAttribute('ry', 1 + 6 * b); $('dBoca').setAttribute('rx', 13 - 2 * b);
+  $('dParpados').style.opacity = parpadeo(t, [7.9, 11.6, 14.9, 17.4]) ? 1 : 0;
+  $('dBrillo').setAttribute('opacity', est.gafas >= 0 && est.gafas <= 1 ? Math.sin(est.gafas * Math.PI) : 0);
+  $('dBrillo').setAttribute('transform', `translate(${-10 + 30 * Math.max(0, est.gafas)} 0)`);
+  // Feijolo: respira, cabecea despacio, gesticula y parpadea
+  $('titere').style.transform = `scale(${1 + .004 * Math.sin(t * 2.2)}, ${1 + .007 * Math.sin(t * 2.2)})`;
+  $('fCabeza').style.transform = `rotate(${1.6 * Math.sin(t * 1.3) + .8 * Math.sin(t * 3.1)}deg)`;
+  $('fMano').style.transform = `rotate(${-3 + 4 * Math.sin(t * 2.4)}deg)`;
+  $('fParpados').style.opacity = parpadeo(t, [20.6, 23.9, 26.8, 29.0]) ? 1 : 0;
+  // subtítulo de la frase que suena
+  const f = FRASES.find(f => t >= f.ini && t < f.fin), html = f ? f.txt : '';
+  if ($('sub').dataset.h !== html) { $('sub').innerHTML = html; $('sub').dataset.h = html; }
+}
+
+const tl = gsap.timeline({ paused: true, onUpdate: pinta });
+tl.to(est, { t: 41.5, duration: 41.5, ease: 'none' }, 0);
+const golpe = (k, f = 7) => tl.fromTo('#root', { x: -f, y: f * .6 }, { x: 0, y: 0, duration: .25, ease: 'elastic.out(1, .3)', immediateRender: false }, k);
+
+// ===== 1 · la cueva: «…al que gobierna. Hoy miramos al que quiere gobernar» =====
+tl.to(camC, { x: 640, y: 300, z: 1.15, duration: 3.6, ease: 'sine.inOut' }, 0);
+tl.to(camC, { x: 450, y: 210, z: 1.9, duration: 1.6, ease: 'power2.inOut' }, 4.2);
+tl.to(est, { sombra: 1, duration: 1.2, ease: 'power2.out' }, 4.35);
+tl.to('#flash', { opacity: 1, duration: .3, ease: 'power2.in' }, 6.25);
+tl.set(est, { plano: 1 }, 6.55);
+tl.to('#flash', { opacity: 0, duration: .5, ease: 'power2.out' }, 6.55);
+
+// ===== 2 · el Decano: Santayana =====
+tl.fromTo(camD, { x: 870, y: 240, z: 2.9 }, { x: 870, y: 245, z: 2.4, duration: 2.2, ease: 'power2.out', immediateRender: false }, 6.55);
+tl.fromTo(est, { gafas: -1 }, { gafas: 1.2, duration: .9, ease: 'none', immediateRender: false }, 7.0);
+tl.to(camD, { x: 760, y: 250, z: 2.2, duration: .8, ease: 'power2.inOut' }, 8.76);
+tl.fromTo('#cita', { opacity: 0, x: 60 }, { opacity: 1, x: 0, duration: .45, ease: 'back.out(1.8)' }, 8.95);
+tl.to('#cita', { opacity: 0, x: 60, duration: .3, ease: 'power2.in' }, 13.5);
+tl.to(camD, { x: 870, y: 245, z: 2.6, duration: 1.0, ease: 'power2.inOut' }, 13.6);
+// «…a todo un partido»: se abre el plano
+tl.to(camD, { x: 640, y: 360, z: 1.05, duration: 1.4, ease: 'power2.inOut' }, 17.3);
+golpe(18.6, 5);
+tl.to('#flash', { opacity: 1, duration: .3, ease: 'power2.in' }, 19.0);
+tl.set(est, { plano: 2 }, 19.3);
+tl.to('#flash', { opacity: 0, duration: .5, ease: 'power2.out' }, 19.3);
+
+// ===== 3 · Feijolo, marioneta =====
+tl.fromTo(camF, { x: 630, y: 420, z: 1.0 }, { x: 630, y: 130, z: 2.6, duration: 1.4, ease: 'power3.inOut', immediateRender: false }, 19.4);
+tl.fromTo('#nombre', { opacity: 0, scale: .7 }, { opacity: 1, scale: 1, duration: .4, ease: 'back.out(2)' }, 20.0);
+tl.to('#nombre', { opacity: 0, duration: .3 }, 22.3);
+tl.to(camF, { x: 700, y: 300, z: 1.35, duration: 1.1, ease: 'power2.inOut' }, 22.3);
+tl.fromTo('#pp', { opacity: 0, scale: .3, rotation: -20 }, { opacity: 1, scale: 1, rotation: 0, duration: .45, ease: 'back.out(2.2)' }, 24.1);
+tl.to('#pp', { opacity: 0, scale: .6, duration: .3 }, 25.0);
+// «…se han turnado el poder desde hace más de cuarenta años»: línea del tiempo que se pinta
+tl.to(camF, { x: 640, y: 250, z: 1.15, duration: .9, ease: 'power2.inOut' }, 25.0);
+tl.fromTo('#linea', { opacity: 0, y: 80 }, { opacity: 1, y: 0, duration: .4, ease: 'power2.out' }, 25.1);
+gsap.utils.toArray('.tramo').forEach((e, i) => tl.fromTo(e, { scaleX: 0 }, { scaleX: 1, duration: .55, ease: 'power2.out' }, 25.5 + i * .62));
+tl.to('#linea', { opacity: 0, y: 60, duration: .35 }, 29.7);
+tl.to(camF, { x: 630, y: 140, z: 2.3, duration: 1.2, ease: 'sine.inOut' }, 28.6);
+
+// ===== 4 · «Mismas reglas» =====
+tl.to(camF, { x: 640, y: 360, z: 1.0, duration: .9, ease: 'power2.inOut' }, 30.0);
+tl.to('#titere', { opacity: 0, duration: .6 }, 30.4);
+[['#r1', 32.05], ['#r2', 33.4], ['#r3', 35.85]].forEach(([id, k]) => {
+  tl.fromTo(id, { opacity: 0, scale: 1.25 }, { opacity: 1, scale: 1, duration: .18, ease: 'power4.in' }, k);
+  golpe(k + .18, 4);
+});
+// remate y título
+tl.to(['#r1', '#r2', '#r3'], { opacity: 0, duration: .3 }, 37.85);
+tl.fromTo('#final', { opacity: 0 }, { opacity: 1, duration: .5 }, 38.0);
+tl.fromTo('#final h1', { scale: 1.6 }, { scale: 1, duration: .6, ease: 'power3.out' }, 38.0);
+tl.fromTo(['#final h2', '#final p'], { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: .4, stagger: .25 }, 38.4);
+
+window.__timelines = window.__timelines || {};
+window.__timelines['main'] = tl;
+tl.seek(0);
+</script>
+</body>
+</html>
