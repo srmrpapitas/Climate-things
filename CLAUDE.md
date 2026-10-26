@@ -1,5 +1,7 @@
 # Fábrica de videos
 
+**Antes de nada, leer `fabrica/manual/README.md`**: voz, música, efectos, render y herramientas.
+
 ## Reglas de trabajo (ahorro de tokens)
 - Producir un video = escribir/editar SOLO `videos/<slug>.yaml`. No abrir ni reescribir plantillas salvo que se pida.
 - Formato y tipos de escena: `esqueletos/README.md`. Reglas obligatorias: `reglas/retencion.md` (validar R8 antes de renderizar).
