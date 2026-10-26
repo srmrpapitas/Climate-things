@@ -17,10 +17,11 @@ El contenedor es nuevo en cada sesión: **lo que no está en git hay que reinsta
 - Voz: **CosyVoice3** en VoiceStudio (gratis, Apache-2.0, uso comercial), clonando la voz D. Primero una frase de prueba para que el usuario la compare con la original.
 - Alcance ahora: **guion + intro (~35 s)**. Si gusta, el episodio entero.
 - Siguientes capítulos: ep. 3 **Abascal**, ep. 4 **el bipartidismo**.
+- **No gastar créditos de ElevenLabs** (26-10-2026). Todo gratis y local: dibujos ya existentes recortados en piezas con Python y animados con HyperFrames; voz con CosyVoice3. Nada de PhotoCraft (no hace falta).
 - Hablar en español, corto y sin tecnicismos. Buscar skills con `npx skills find <tema>` cuando falte algo.
 
 ## 3. Pendiente (en este orden)
-1. **Feijolo se parece a Rajoy.** Hacer **una** edición con ElevenLabs (≈430 créditos) sobre `feijolo.webp`: más calvo arriba con entradas grandes, pelo y barba **blancos** y cortos, cara más **alargada y delgada**, gafas finas al aire. Misma postura. Modelo `gpt-image-2.5-sunburst` con la imagen como referencia (raw de GitHub: `https://raw.githubusercontent.com/srmrpapitas/Climate-things/<rama>/historias/espanistan/img/feijolo.webp`).
+1. **(Hecho si existe `feijolo.webp` nuevo)** Feijolo se parecía a Rajoy. Hacer **una** edición con ElevenLabs (≈430 créditos) sobre `feijolo.webp`: más calvo arriba con entradas grandes, pelo y barba **blancos** y cortos, cara más **alargada y delgada**, gafas finas al aire. Misma postura. Modelo `gpt-image-2.5-sunburst` con la imagen como referencia (raw de GitHub: `https://raw.githubusercontent.com/srmrpapitas/Climate-things/<rama>/historias/espanistan/img/feijolo.webp`).
 2. **Recortar a Feijolo en capas** con PhotoCraft (§5) o, si no está, con Python (quitar el fondo beige liso por color, y separar cabeza, mandíbula y brazos con polígonos). Hacer lo mismo con el Decano, recortándolo de `portada.webp`.
 3. **Voz**: instalar VoiceStudio + CosyVoice3 (§4), clonar la voz D y generar la frase 1 → mandarla al usuario junto a `audio/voz/es/espanistan-01/01.mp3`.
 4. Si la voz gusta: frases 1-4 (la intro) → `audio/voz/es/espanistan-02/NN.mp3` → tiempos con `fabrica/manual/herramientas/tiempos.py`.
