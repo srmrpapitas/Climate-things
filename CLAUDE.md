@@ -1,6 +1,6 @@
 # Fábrica de videos
 
-**Antes de nada, leer `fabrica/manual/RETOMAR.md` (trabajo en curso) y `fabrica/manual/README.md`**: voz, música, efectos, render y herramientas.
+**Antes de nada, leer `fabrica/manual/PLAN-15.md` (cómo ahorrar), `fabrica/manual/RETOMAR.md` (trabajo en curso) y `fabrica/manual/README.md`**: voz, música, efectos, render y herramientas.
 
 ## Reglas de trabajo (ahorro de tokens)
 - Producir un video = escribir/editar SOLO `videos/<slug>.yaml`. No abrir ni reescribir plantillas salvo que se pida.
