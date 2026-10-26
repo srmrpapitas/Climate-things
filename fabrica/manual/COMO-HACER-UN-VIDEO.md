@@ -18,7 +18,8 @@
 - **El esqueleto es la estructura** (generador, cámara, tarjetas, frascos, música, subtítulos), **no los dibujos**. Cada episodio lleva **escenarios nuevos con su propio estilo** y los personajes que se nombran **salen en pantalla y se mueven**.
 - Solo se repite lo que es de la serie: el Decano, la cueva del inicio y la portada.
 - Dibujos baratos: **Seedream 5 lite**, una imagen 2×2 = 4 escenarios por ≈ 212 créditos (≈ 53 cada uno); se cortan en 4 con Python. Personajes: una hoja con 6 caricaturas por ≈ 212 créditos → `marioneta.py`.
-- Voz del narrador **calmada**: más lenta y con pausas (no la velocidad por defecto).
+- Voz del narrador **calmada**: en ElevenLabs `voice_settings` → `speed: 0.88`, `stability: 0.7` (más lenta y serena) y pausas de 1 s entre bloques. Para audios ya hechos: `ffmpeg -af rubberband=tempo=0.92`.
+- **Estilo visual (26-10-2026)**: narrador y escenas normales = animación pintada a pincel (`fabrica/pintado`, gratis). **Zooms y diálogos de los protagonistas** = retratos a mano alzada, tinta y plumilla, dramatismo de cómic de Batman (DC) + trazo del cuento de la Varita de Saúco; 3–4 s, ~1 cada 40 s y en momentos clave; animados con mandíbula/parpadeo/efectos de cómic. Retratos en cuadrícula 2×2 (Seedream 5 lite, ≈212 créditos por 4) → biblioteca.
 
 ## Coste real del ep. 2 (26-10-2026)
 - Voz ElevenLabs: ≈ 7.000 créditos (1 crédito por letra; ~8 min de vídeo).
