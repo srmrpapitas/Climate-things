@@ -53,7 +53,7 @@
 </head>
 <body>
 <div id="root" data-composition-id="main" data-start="0" data-duration="__TOTAL__" data-width="1920" data-height="1080">
-  <div id="planos"></div>
+  <div id="planos" style="position:absolute;inset:0;z-index:0"></div>
   <div id="vineta"></div>
   <div id="capas"></div>
   <div id="sub"></div>
@@ -142,7 +142,7 @@ function camara(p, t) {
 function pinta(t) {
   for (const p of D.PLANOS) {
     const vis = t >= p.ini && t < p.fin + .3; p.el.style.visibility = vis ? 'visible' : 'hidden'; if (!vis) continue;
-    p.el.style.opacity = clamp((t - p.ini) / .3);
+    p.el.style.opacity = p.ini === 0 ? 1 : clamp((t - p.ini) / .3);
     const [x, y, z] = camara(p, t), s = ESC * z, tx = Math.min(0, Math.max(1920 - W * s, 960 - x * s)), ty = Math.min(0, Math.max(1080 - H * s, 540 - y * s));
     p.el.style.transform = `translate(${tx}px, ${ty}px) scale(${s})`;
     const parpadea = (t % 3.7) < .13;
