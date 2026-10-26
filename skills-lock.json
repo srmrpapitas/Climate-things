@@ -31,6 +31,24 @@
       "skillPath": "skills/media-use/SKILL.md",
       "computedHash": "372fda62380e0d70f540c4d413af8bc2d89b03c99d85cb557e0e1f0e3e7d79b5"
     },
+    "photocraft": {
+      "source": "ai-2070/claude-storytold-skills",
+      "sourceType": "github",
+      "skillPath": "plugins/storytold/skills/photocraft/SKILL.md",
+      "computedHash": "203351896882671ac70d54c3a04f5109f3f3540bf8a62d87d0938d184a568d67"
+    },
+    "storytold": {
+      "source": "ai-2070/claude-storytold-skills",
+      "sourceType": "github",
+      "skillPath": "plugins/storytold/skills/storytold/SKILL.md",
+      "computedHash": "0a7b4c43a46327c9c5b61fea7f089635f39a4deb901abb2e7bc27d7bc078099a"
+    },
+    "storytold-install": {
+      "source": "ai-2070/claude-storytold-skills",
+      "sourceType": "github",
+      "skillPath": "plugins/storytold/skills/storytold-install/SKILL.md",
+      "computedHash": "8f401d8b9a8adafdbce287eb2a622a2148ab5d1a47a1a15b6ca4f923fecbe94e"
+    },
     "voicestudio": {
       "source": "debpalash/VoiceStudio",
       "sourceType": "github",
