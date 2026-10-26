@@ -17,7 +17,7 @@ Muestra de referencia: `audio/voz/es/altura/01.mp3`.
 
 | Orden | Motor | Coste | Notas |
 |---|---|---|---|
-| 1º | **ElevenLabs, voz D** (conector ElevenLabs) | ~1 crédito por carácter; el ep. 1 entero ≈ 6.600 | Usar hasta gastar los créditos (había ~30.000 el 26-10-2026). El buscador de voces del conector **no encuentra la voz D**: pedir al usuario el *voice ID* (Voices → ⋯ → Copy voice ID) y apuntarlo aquí: `VOICE_ID_D = (pendiente)` |
+| 1º | **ElevenLabs, voz D** (conector ElevenLabs) | ~1 crédito por carácter; el ep. 1 entero ≈ 6.600 | Usar hasta gastar los créditos (había ~30.000 el 26-10-2026). El buscador de voces del conector **no encuentra la voz D**: pedir al usuario el *voice ID* (Voices → ⋯ → Copy voice ID) `VOICE_ID_D = EZDj5TBPpANsOzwaukxI` (26-10-2026: el conector responde «does not resolve» → el conector está unido a otra cuenta de ElevenLabs; hay que conectar la cuenta nueva) |
 | 2º | **Qwen3-TTS** gratis, clonando la voz D, con `--grave` | 0 €; ~40 s por frase en CPU | Al usuario le gustó. `--grave` es la versión elegida (más grave y limpia) |
 | ✗ | Chatterbox | — | Descartado: en español suena muy mal |
 | ✗ | Bajar el tono con filtro después de generar | — | Descartado: suena deformado y poco nítido |
