@@ -40,7 +40,10 @@
 4. **Retratos del protagonista**: 1 imagen Seedream 5 lite 2×2 (≈212 cr.) con perfil estricto, parejas boca cerrada/abierta, papel blanco a grafito.
    - Prompt en `historias/espanistan/retratos/feijolo/` (ver el de `perfil_lapiz`).
    - Recortar y alinear con ECC (`p1_*`, `p2_*`).
-5. **Escenarios**: 5–7 imágenes de teatro de sombras (Seedream 5 lite, 16:9 2K, ≈212 cr. cada una).
+5. **Escenarios — GRATIS con FLUX local** (decisión del usuario, 26-10-2026): `sh fabrica/instalar_todo.sh --flux` (una vez) y
+   `sh fabrica/manual/herramientas/escenario.sh historias/espanistan/sombras/epNN/ESCENA.png "qué sale" [semilla]` (≈ 15 min/imagen, en segundo plano;
+   el estilo va ya dentro del script). Probar 2 semillas en las escenas clave. ElevenLabs (Seedream 5 lite, ≈212 cr.) solo si FLUX no da el resultado.
+   Antes: 5–7 imágenes de teatro de sombras (Seedream 5 lite, 16:9 2K, ≈212 cr. cada una).
    - Prompt base en `historias/espanistan/sombras/ep02/` (copiar el párrafo de estilo).
    - Pedir «figures clearly separated, not overlapping».
 6. **Piezas**: por escena, un JSON con cajas (medidas sobre la imagen a 889 px de ancho, `"ref": 889`): `caja`, `cuello` (separa la cabeza), `pivote`, `tipo` (`figura|grupo|objeto|brazo|baston|iconos`), `padre`.
@@ -61,7 +64,7 @@
 ## Presupuesto por capítulo (créditos ElevenLabs; ver `PLAN-10-SEMANA.md`)
 - Narrador ≈ 7.000 (o ≈ 3.500 con `eleven_flash_v2_5`).
 - Protagonista ≈ 700.
-- Escenarios ≈ 1.300–1.500.
+- Escenarios: 0 (FLUX local); ≈ 1.300–1.500 si se hicieran con ElevenLabs.
 - Retratos ≈ 212.
-- **Total ≈ 9.400** (≈ 5.900 con flash).
+- **Total ≈ 7.900** (≈ 4.400 con flash).
 - Claude: guion + montaje en una sesión, una sola hoja de capturas por revisión.

@@ -1,6 +1,8 @@
 #!/bin/sh
 # Prepara una sesión nueva para producir vídeos: Whisper (tiempos) y, si se pide, VoiceStudio + CosyVoice3 (voz gratis).
-# Uso: sh fabrica/instalar_todo.sh            → solo Whisper (la voz va con ElevenLabs, voz D: EZDj5TBPpANsOzwaukxI)
+# Uso: sh fabrica/instalar_todo.sh            → solo Whisper (+ OpenCV)
+#      sh fabrica/instalar_todo.sh --flux      → además el generador de escenarios gratis (FLUX local, ≈ 9 GB)
+#      La voz va con ElevenLabs (voz D: EZDj5TBPpANsOzwaukxI).
 #      sh fabrica/instalar_todo.sh --cosyvoice → además la voz gratis (≈ 15 GB, ~20 min). Lanzarlo en segundo plano.
 set -e
 if [ ! -x /home/user/qw/bin/python ]; then
@@ -9,6 +11,13 @@ if [ ! -x /home/user/qw/bin/python ]; then
 fi
 /home/user/qw/bin/python -c "import cv2" 2>/dev/null || /home/user/qw/bin/pip install -q opencv-python-headless   # sombras.py y recortes
 echo "Whisper + OpenCV listos: /home/user/qw/bin/python"
+if [ "$1" = "--flux" ]; then   # escenarios gratis: stable-diffusion.cpp + FLUX.1 schnell (Apache-2.0), ≈ 9 GB, ≈ 20 min
+  [ -d /home/user/sdcpp ] || git clone -q --depth 1 --recurse-submodules --shallow-submodules https://github.com/leejet/stable-diffusion.cpp.git /home/user/sdcpp
+  [ -x /home/user/sdcpp/build/bin/sd-cli ] || { cmake -S /home/user/sdcpp -B /home/user/sdcpp/build -DCMAKE_BUILD_TYPE=Release -DGGML_NATIVE=ON && cmake --build /home/user/sdcpp/build -j 4; }
+  mkdir -p /home/user/modelos/flux; B=https://huggingface.co/second-state/FLUX.1-schnell-GGUF/resolve/main
+  for f in ae-f16.gguf clip_l-Q8_0.gguf t5xxl-Q3_K.gguf flux1-schnell-Q4_0.gguf; do [ -s /home/user/modelos/flux/$f ] || curl -sSL --retry 4 -o /home/user/modelos/flux/$f $B/$f; done
+  echo "FLUX listo: sh fabrica/manual/herramientas/escenario.sh SALIDA.png \"escena\""; exit 0
+fi
 [ "$1" = "--cosyvoice" ] || exit 0
 
 VS=/home/user/VoiceStudio
