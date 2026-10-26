@@ -13,7 +13,7 @@ Punto de partida (26-10-2026): ~10 % del límite semanal gastado, casi todo en m
 | Conversación | Muchos mensajes cortos de ida y vuelta | Un mensaje con todas las decisiones al empezar cada vídeo |
 | Modelo | Opus para todo | **Opus solo para la estructura**; **Sonnet** para producir los vídeos |
 
-## 2. Lo que falta de estructura (una vez, con Opus, ~5 %)
+## 2. Estructura (hecha el 26-10-2026: generar.py, plantilla.html, instalar_todo.sh; ep. 2 completo como molde)
 1. **`fabrica/instalar_todo.sh`**: VoiceStudio + CosyVoice3 (con los arreglos de disco y de GitHub) + Whisper + perfil «Voz D». Un comando, en segundo plano.
 2. **`fabrica/generar.py`**: lee `fabrica/videos/<slug>/escenas.json` y escribe el `index.html` con los planos ya hechos:
    `cueva`, `decano` (habla), `marioneta` (personaje), `dato`, `cita`, `linea` (quién gobernó), `mapa`, `frascos` (etiqueta judicial), `balanza`, `reglas`, `titulo`. Cada plano lleva su música y su efecto por defecto (golpe en conclusiones).
