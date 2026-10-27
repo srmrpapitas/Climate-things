@@ -1,0 +1,10 @@
+{"ref": 1280, "umbral": 60, "piezas": [
+ {"nombre": "bandera", "caja": [426, 44, 668, 282], "tipo": "objeto", "pivote": [640, 240]},
+ {"nombre": "jinete", "caja": [446, 206, 804, 456], "tipo": "objeto", "pivote": [610, 462]},
+ {"nombre": "ave", "caja": [1000, 118, 1070, 190], "tipo": "objeto"},
+ {"nombre": "publico", "caja": [900, 462, 1272, 642], "tipo": "grupo"},
+ {"nombre": "m1", "caja": [36, 388, 136, 642], "cuello": 512},
+ {"nombre": "m2", "caja": [138, 360, 242, 642], "cuello": 508},
+ {"nombre": "m3", "caja": [238, 458, 346, 612], "cuello": 490},
+ {"nombre": "m4", "caja": [332, 362, 462, 548], "cuello": 455}
+]}
