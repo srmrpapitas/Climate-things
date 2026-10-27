@@ -27,7 +27,10 @@
    - Hoy el brazo sale de un punto fijo y el tronco es rígido.
    - Mirar sus referencias de Samurai Jack: poses con peso, contrapposto, siluetas claras.
    - Idea: hombro como articulación propia (sube y se adelanta con el brazo), torso en dos piezas (pecho y cadera, con giro entre ellas), cuello con su propio ángulo y retraso.
-2. **Voces** de la escena `sueldo` (≈ 700 créditos; pedir permiso).
+2. **Voces elegidas (27-10-2026)**: narrador **Danny Your Storyteller** `wnKyx1zkUEUnfURKiuaP`; Acascar **Leónidas** `YKrm0N1EAM9Bw27j8kuD` (`eleven_v3`).
+   - Primero, prueba de ≈ 500 créditos (una frase de narrador + «Los jóvenes me adoran. Será por el caballo.»), en cuanto ElevenLabs esté conectado a la cuenta buena.
+   - El 27-10 seguía conectado a la cuenta de «Narrador Si se duplica» (no aparece la voz «narrador»): no gastar ahí.
+   Antes: **Voces** de la escena `sueldo` (≈ 700 créditos; pedir permiso).
    - Narrador: voz «narrador» `6M0AS3MD73daMRG01Q0P` (cuenta buena, 40.000 créditos, plan Starter).
    - Acascar: Leónidas `YKrm0N1EAM9Bw27j8kuD`.
    - Vecina: proponer «Mari Carmen Discute» `YDDaC9XKjODs7hY78qEW`.
