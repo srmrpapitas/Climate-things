@@ -1,0 +1,9 @@
+{"ref": 1280, "umbral": 60, "piezas": [
+ {"nombre": "barca", "caja": [542, 234, 764, 434], "tipo": "objeto", "pivote": [650, 410]},
+ {"nombre": "mujer", "caja": [76, 364, 154, 626], "cuello": 400},
+ {"nombre": "orador", "caja": [166, 280, 314, 626], "cuello": 345},
+ {"nombre": "urna", "caja": [290, 412, 426, 626], "tipo": "objeto"},
+ {"nombre": "saco", "caja": [570, 506, 746, 628], "tipo": "objeto"},
+ {"nombre": "encapuchado", "caja": [742, 402, 962, 626], "tipo": "figura"},
+ {"nombre": "gente", "caja": [1112, 378, 1258, 626], "tipo": "grupo"}
+]}

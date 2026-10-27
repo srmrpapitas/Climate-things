@@ -1,0 +1,121 @@
+{
+ "barca": {
+  "caja": [
+   1090,
+   472,
+   439,
+   397
+  ],
+  "tipo": "objeto",
+  "pivote": [
+   1300,
+   820
+  ]
+ },
+ "mujer": {
+  "caja": [
+   152,
+   800,
+   157,
+   453
+  ],
+  "tipo": "figura",
+  "pivote": [
+   230,
+   1253
+  ]
+ },
+ "mujer_c": {
+  "caja": [
+   152,
+   731,
+   111,
+   69
+  ],
+  "tipo": "cabeza",
+  "pivote": [
+   212,
+   800
+  ],
+  "padre": "mujer"
+ },
+ "orador": {
+  "caja": [
+   332,
+   690,
+   297,
+   563
+  ],
+  "tipo": "figura",
+  "pivote": [
+   480,
+   1253
+  ]
+ },
+ "orador_c": {
+  "caja": [
+   332,
+   560,
+   237,
+   130
+  ],
+  "tipo": "cabeza",
+  "pivote": [
+   430,
+   690
+  ],
+  "padre": "orador"
+ },
+ "urna": {
+  "caja": [
+   628,
+   832,
+   225,
+   421
+  ],
+  "tipo": "objeto",
+  "pivote": [
+   740,
+   1253
+  ]
+ },
+ "saco": {
+  "caja": [
+   1140,
+   1012,
+   353,
+   245
+  ],
+  "tipo": "objeto",
+  "pivote": [
+   1316,
+   1257
+  ]
+ },
+ "encapuchado": {
+  "caja": [
+   1489,
+   814,
+   436,
+   439
+  ],
+  "tipo": "figura",
+  "pivote": [
+   1707,
+   1253
+  ]
+ },
+ "gente": {
+  "caja": [
+   2224,
+   756,
+   293,
+   497
+  ],
+  "tipo": "grupo",
+  "pivote": [
+   2370,
+   1253
+  ]
+ }
+}
