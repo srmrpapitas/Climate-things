@@ -1,0 +1,11 @@
+{"ref": 1280, "umbral": 60, "piezas": [
+ {"nombre": "hombre", "caja": [344, 366, 492, 636], "cuello": 446},
+ {"nombre": "g1", "caja": [464, 460, 562, 636], "cuello": 492},
+ {"nombre": "perro", "caja": [540, 588, 584, 638], "tipo": "figura"},
+ {"nombre": "g2", "caja": [588, 458, 674, 636], "cuello": 496},
+ {"nombre": "dm1", "caja": [32, 426, 142, 636], "cuello": 468},
+ {"nombre": "dm2", "caja": [134, 426, 246, 636], "cuello": 466},
+ {"nombre": "dm3", "caja": [230, 406, 332, 614], "cuello": 452},
+ {"nombre": "torre", "caja": [750, 344, 852, 624], "tipo": "objeto"},
+ {"nombre": "bestia", "caja": [1158, 558, 1248, 616], "tipo": "figura"}
+]}
