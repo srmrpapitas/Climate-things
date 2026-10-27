@@ -1,0 +1,10 @@
+{"ref": 1280, "umbral": 60, "piezas": [
+ {"nombre": "banquero", "caja": [594, 224, 762, 638], "cuello": 318},
+ {"nombre": "bestia", "caja": [738, 404, 902, 638], "tipo": "figura"},
+ {"nombre": "barco", "caja": [1020, 426, 1162, 614], "tipo": "objeto"},
+ {"nombre": "q1", "caja": [6, 356, 82, 638], "cuello": 392},
+ {"nombre": "q2", "caja": [80, 388, 182, 638], "cuello": 430},
+ {"nombre": "q3", "caja": [150, 246, 302, 638], "cuello": 300},
+ {"nombre": "q4", "caja": [254, 244, 440, 638], "cuello": 312},
+ {"nombre": "q5", "caja": [420, 246, 592, 638], "cuello": 318}
+]}
