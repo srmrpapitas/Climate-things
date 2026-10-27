@@ -1,0 +1,15 @@
+{"ref": 1280, "umbral": 60, "piezas": [
+ {"nombre": "mazo", "caja": [230, 208, 314, 300], "tipo": "brazo", "pivote": [262, 300]},
+ {"nombre": "martillo", "caja": [154, 256, 290, 632], "cuello": 318},
+ {"nombre": "h1", "caja": [262, 260, 418, 632], "cuello": 336},
+ {"nombre": "h2", "caja": [380, 256, 614, 632], "cuello": 326},
+ {"nombre": "h3", "caja": [598, 292, 720, 632], "cuello": 342},
+ {"nombre": "puesto", "caja": [812, 460, 902, 632], "tipo": "objeto"},
+ {"nombre": "vendedor", "caja": [748, 366, 848, 632], "cuello": 402},
+ {"nombre": "saco", "caja": [902, 544, 974, 632], "tipo": "objeto"},
+ {"nombre": "pato1", "caja": [1006, 526, 1100, 630], "tipo": "figura"},
+ {"nombre": "pato2", "caja": [1114, 520, 1206, 630], "tipo": "figura"},
+ {"nombre": "a1", "caja": [266, 56, 360, 147], "tipo": "objeto"},
+ {"nombre": "a2", "caja": [824, 84, 938, 162], "tipo": "objeto"},
+ {"nombre": "a3", "caja": [790, 200, 904, 286], "tipo": "objeto"}
+]}
