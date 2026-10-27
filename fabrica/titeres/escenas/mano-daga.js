@@ -26,13 +26,13 @@ window.ESCENA = {
     { desde: 0, ...jack, viento: .5, decorado: pacto, actores: saludo(1.2, 6.4), camara: [[0, 640, 400, 1.3]] },
     { desde: 4.5, ...jack, viento: .5, decorado: pacto, actores: saludo(1.2, 6.4), camara: [[4.5, 640, 330, 3.4]], mira: 'manos' },
     { desde: 6.2, ...jack, viento: .5, decorado: pacto, actores: saludo(1.2, 6.4), camara: [[6.2, 640, 470, 2.1]] },
-    { desde: 7.6, ...jack, viento: .9, decorado: rojo, camara: [[7.6, 600, 400, 1.3]],
+    { desde: 7.6, transicion: 'tajo', ...jack, viento: .9, decorado: rojo, camara: [[7.6, 600, 400, 1.3]],
       actores: [
         { p: FE, x: 560, mira: 1, acciones: [{ hace: 'camina', en: 7.8, hasta: 9.3, a: 680 }, { hace: 'clavada', en: 9.6 }, { hace: 'recibe', en: 9.6, hasta: 13.6, sale: .6 }] },
         { p: AC, x: 300, mira: 1, acciones: [{ hace: 'coge', que: 'daga', mano: 'cerca', en: 0 }, { hace: 'camina', en: 7.9, hasta: 9.2, a: 495 },
           { hace: 'apunala', en: 9.55, hasta: 10.6 }, { hace: 'suelta', mano: 'cerca', en: 9.7 }, { hace: 'gira', en: 10.7 }, { hace: 'camina', en: 10.9, hasta: 12, a: 120 }] }] },
     { desde: 12, ...jack, viento: .9, decorado: rojo, camara: [[12, 640, 330, 3]],
       actores: [{ p: FE, x: 680, mira: 1, acciones: [{ hace: 'clavada', en: 0 }, { hace: 'recibe', en: 11.2, hasta: 13.8, sale: .6 }] }] },
-    { desde: 13.6, ...jack, viento: .5, decorado: vuelta, actores: saludo(14.4, 17.6, [{ hace: 'tirita', en: 0 }]), camara: [[13.6, 640, 400, 1.3]] },
+    { desde: 13.6, transicion: 'papeles', ...jack, viento: .5, decorado: vuelta, actores: saludo(14.4, 17.6, [{ hace: 'tirita', en: 0 }]), camara: [[13.6, 640, 400, 1.3]] },
   ],
 };

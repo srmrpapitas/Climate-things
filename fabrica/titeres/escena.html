@@ -30,6 +30,65 @@ function viento(g, t, k, frente) {
   g.fillStyle = '#0b0705';                                               // hojas arrastradas
   for (let i = 0; i < 18; i++) { g.save(); g.translate(frente + 220 * A(i + 100) - 60, 720 * A(i + 120) + 30 * Math.sin(t * 9 + i)); g.rotate(t * 11 + i); g.beginPath(); g.ellipse(0, 0, 9, 3.5, 0, 0, Math.PI * 2); g.fill(); g.restore(); }
 }
+// ---------- transiciones entre escenas (plano.transicion): k va de 0 a 1 en 0,9 s; `muestra(camino)` enseña el plano nuevo dentro del camino ----------
+const AZ = i => { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+const copia = document.createElement('canvas');
+let G0 = null;                                                     // el contexto del lienzo, para dibujar los caminos de las máscaras
+const ola = (frente, amp, sesgo, k, aLaDerecha) => {                 // borde ondulado que barre la pantalla; enseña lo que queda detrás de él
+  const x = y => frente - amp * Math.sin(y / 120 + k * 4) - (y / 720) * sesgo;
+  G0.moveTo(aLaDerecha ? 1500 : -220, -50); for (let y = -50; y <= 770; y += 30) G0.lineTo(x(y), y); G0.lineTo(aLaDerecha ? 1500 : -220, 770); G0.closePath();
+};
+const TRANS = {
+  // viento: cintas negras, líneas de velocidad y hojas, de izquierda a derecha
+  viento(g, t, k, muestra) { G0 = g; const frente = -500 + 2400 * k; muestra(() => ola(frente, 160, 260, k, false)); viento(g, t, k, frente); },
+  // pájaros: una bandada negra cruza de derecha a izquierda y deja detrás el plano nuevo
+  pajaros(g, t, k, muestra) { G0 = g; const frente = 1780 - 2500 * k; muestra(() => ola(frente, 120, -200, k, true));
+    for (let i = 0; i < 70; i++) {                                 // bandada de cuervos: más grandes y más juntos en el frente
+      const d = AZ(i + 3), x = frente - 120 + (AZ(i) - .25) * 560 * (.4 + d) - AZ(i + 300) * 90 * k, y = 720 * AZ(i + 1) + 25 * Math.sin(t * 3 + i);
+      T.cuervo(g, x, y, 10 + 46 * d * d, t * (11 + 5 * AZ(i + 7)) + i * 2.3, -1);
+    }
+    g.fillStyle = '#0b0705';
+    for (let i = 0; i < 14; i++) { const u = (k * 1.6 + AZ(i + 50)) % 1, x = frente + 200 + 600 * AZ(i + 60) - 200 * u, y = 720 * AZ(i + 70) + 160 * u;   // plumas que caen
+      g.save(); g.translate(x, y); g.rotate(Math.sin(t * 4 + i) * .8); g.beginPath(); g.ellipse(0, 0, 10, 3, 0, 0, 6.3); g.fill(); g.restore(); } },
+  // papeletas: un remolino de sobres y papeletas de voto, de izquierda a derecha
+  papeles(g, t, k, muestra) { G0 = g; const frente = -500 + 2400 * k; muestra(() => ola(frente, 110, 160, k, false));
+    for (let i = 0; i < 80; i++) {
+      const d = AZ(i + 9), x = frente - 380 * AZ(i) + 120, y = 720 * AZ(i + 2) + 40 * Math.sin(t * 5 + i), s = .6 + 1.2 * d;
+      g.save(); g.translate(x, y); g.rotate(t * (3 + 4 * AZ(i + 5)) + i); g.scale(s, s * Math.cos(t * (6 + 5 * AZ(i + 4)) + i));
+      g.fillStyle = AZ(i + 11) < .5 ? '#efe6d2' : '#d9cdb3'; g.fillRect(-14, -18, 28, 36); g.strokeStyle = '#3a2410'; g.lineWidth = 1.4; g.strokeRect(-14, -18, 28, 36);
+      if (AZ(i + 13) < .5) { g.beginPath(); g.moveTo(-14, -18); g.lineTo(0, -4); g.lineTo(14, -18); g.stroke(); }    // sobre
+      else { g.beginPath(); g.moveTo(-6, -8); g.lineTo(6, 4); g.moveTo(6, -8); g.lineTo(-6, 4); g.strokeStyle = '#8f1410'; g.lineWidth = 3; g.stroke(); }   // papeleta con su cruz
+      g.restore(); } },
+  // humo: bocanadas negras que tapan la imagen y, al disiparse, dejan el plano nuevo (para los vendehúmos y los que se van)
+  humo(g, t, k, muestra) { G0 = g; if (k >= .5) muestra(() => G0.rect(-50, -50, 1400, 820));
+    const den = Math.sin(Math.PI * k);
+    for (let i = 0; i < 46; i++) { const x = 1280 * AZ(i), y = 760 - 900 * AZ(i + 1) * (.6 + .4 * k) - 140 * k, r = (90 + 230 * AZ(i + 2)) * (.5 + .9 * den);
+      const gr = g.createRadialGradient(x, y, r * .2, x, y, r); gr.addColorStop(0, `rgba(18,12,9,${.95 * den})`); gr.addColorStop(1, 'rgba(18,12,9,0)');
+      g.fillStyle = gr; g.fillRect(x - r, y - r, 2 * r, 2 * r); }
+    g.fillStyle = `rgba(18,12,9,${Math.pow(den, 4)})`; g.fillRect(0, 0, 1280, 720); },
+  // tinta: una mancha de tinta china que crece desde el centro, lo tapa todo y al retirarse deja el plano nuevo
+  tinta(g, t, k, muestra) { G0 = g; if (k >= .5) muestra(() => G0.rect(-50, -50, 1400, 820));
+    const r = 920 * Math.sin(Math.PI * Math.min(k, .999)), cx = 640 + 60 * Math.sin(k * 3), cy = 360;
+    g.fillStyle = '#0b0705'; g.beginPath();
+    for (let j = 0; j <= 48; j++) { const a = j / 48 * 6.283, rr = r * (1 + .16 * Math.sin(a * 5 + 1.3) + .1 * Math.sin(a * 11) + .08 * AZ(j)); j ? g.lineTo(cx + rr * Math.cos(a), cy + rr * Math.sin(a)) : g.moveTo(cx + rr * Math.cos(a), cy + rr * Math.sin(a)); }
+    g.fill();
+    for (let i = 0; i < 30; i++) { const a = 6.283 * AZ(i + 20), d = r * (1.08 + .5 * AZ(i + 21)), q = (4 + 22 * AZ(i + 22)) * Math.sin(Math.PI * k);   // salpicaduras
+      g.beginPath(); g.arc(cx + d * Math.cos(a), cy + d * Math.sin(a), q, 0, 6.283); g.fill(); } },
+  // tajo: un corte blanco en diagonal y la imagen se parte en dos mitades que se separan (para las rupturas)
+  tajo(g, t, k, muestra) { G0 = g;
+    const p0 = [-100, 760], v = [1480, -800], L0 = [p0[0] - .35 * v[0], p0[1] - .35 * v[1]], L1 = [p0[0] + 1.35 * v[0], p0[1] + 1.35 * v[1]], n = [.475, .88];
+    const linea = Math.min(1, k / .3), u = Math.max(0, (k - .35) / .65), d = 900 * u * u;
+    if (u > 0) {
+      if (copia.width !== g.canvas.width) { copia.width = g.canvas.width; copia.height = g.canvas.height; }
+      copia.getContext('2d').drawImage(g.canvas, 0, 0); muestra(() => G0.rect(-50, -50, 1400, 820));
+      for (const [lado, ex] of [[-1, -1000], [1, 1800]]) { g.save(); g.setTransform(1.5, 0, 0, 1.5, 0, 0); g.translate(lado * n[0] * d, lado * n[1] * d);
+        g.beginPath(); g.moveTo(...L0); g.lineTo(...L1); g.lineTo(L1[0], ex); g.lineTo(L0[0], ex); g.closePath(); g.clip();
+        g.setTransform(1, 0, 0, 1, lado * n[0] * d * 1.5, lado * n[1] * d * 1.5); g.drawImage(copia, 0, 0); g.restore(); }
+      g.setTransform(1.5, 0, 0, 1.5, 0, 0);
+    }
+    const a = Math.max(0, 1 - u * 2.5); if (a > 0) { g.save(); g.strokeStyle = `rgba(255,248,236,${a})`; g.shadowColor = 'rgba(255,255,255,.9)'; g.shadowBlur = 18;
+      g.lineWidth = 6 * (1 - u) + 2; g.beginPath(); g.moveTo(...p0); g.lineTo(p0[0] + v[0] * linea, p0[1] + v[1] * linea); g.stroke(); g.restore(); } },
+};
 // títulos grandes (ESCENA.titulos: {en, hasta, texto, sub}): letras doradas espaciadas que entran despacio
 function titulos(g, t) {
   for (const c of ESCENA.titulos || []) { if (t < c.en || t > c.hasta) continue;
@@ -77,16 +136,13 @@ window.listo = new Promise(r => {
     window.dibuja = t => {
       t = Math.floor(t * (ESCENA.fps || 12) + 1e-6) / (ESCENA.fps || 12);
       let i = 0; planos.forEach((q, k) => { if (t >= q.desde) i = k; });
-      const sig = planos[i + 1], viene = sig && sig.def.transicion === 'viento' && t >= sig.desde - .5;
-      const actual = planos[i], fue = actual.def.transicion === 'viento' && t < actual.desde + .4 && i > 0;
-      if (viene || fue) {                                              // el viento barre la pantalla y deja ver el plano siguiente
+      const sig = planos[i + 1], viene = sig && TRANS[sig.def.transicion] && t >= sig.desde - .5;
+      const actual = planos[i], fue = TRANS[actual.def.transicion] && t < actual.desde + .4 && i > 0;
+      if (viene || fue) {                                              // transición: el plano siguiente aparece a través de la del tipo elegido
         const [a, b, t0] = viene ? [actual, sig, sig.desde] : [planos[i - 1], actual, actual.desde];
         a.pinta(t); tinte(lienzo, a); T.pintaColores(g, a.pinta.colores, t); b.pintaAux(t); tinte(aux, b); T.pintaColores(aux.getContext('2d'), b.pintaAux.colores, t);
-        const k = (t - (t0 - .5)) / .9, frente = -500 + 2400 * k;
-        g.save(); g.setTransform(1.5, 0, 0, 1.5, 0, 0); g.beginPath(); g.moveTo(-50, -50);
-        for (let y = -50; y <= 770; y += 30) g.lineTo(frente - 160 * Math.sin(y / 120 + k * 4) - (y / 720) * 260, y);
-        g.lineTo(-50, 770); g.closePath(); g.clip(); g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(aux, 0, 0); g.restore();
-        g.setTransform(1.5, 0, 0, 1.5, 0, 0); viento(g, t, k, frente);
+        const k = Math.min(1, Math.max(0, (t - (t0 - .5)) / .9));
+        TRANS[b.def.transicion](g, t, k, camino => { g.save(); g.setTransform(1.5, 0, 0, 1.5, 0, 0); g.beginPath(); camino(); g.clip(); g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(aux, 0, 0); g.restore(); g.setTransform(1.5, 0, 0, 1.5, 0, 0); });
       } else { actual.pinta(t); tinte(lienzo, actual); T.pintaColores(g, actual.pinta.colores, t); }
       g.setTransform(1.5, 0, 0, 1.5, 0, 0); carteles(g, t); titulos(g, t); subtitulos(g, t); };
     window.DURA = ESCENA.dura; window.FPS = ESCENA.fps || 12;

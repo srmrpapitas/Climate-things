@@ -564,6 +564,31 @@ const T = (() => {
     };
     return pinta;
   }
+  // cuervo con detalle (vuela hacia la derecha; dir = -1 hacia la izquierda): pico grueso y curvo, cola en abanico,
+  // alas con las cinco plumas primarias abiertas como dedos, ojo con brillo y plumas marcadas. fase = momento del aleteo
+  function cuervo(g, x, y, s, fase, dir = 1) {
+    const al = Math.sin(fase), ala = (lejos) => {
+      const th = (lejos ? -.25 : 0) - 1.15 * al, pl = lejos ? .82 : 1;
+      g.save(); g.translate(lejos ? 4 : 1, -3); g.rotate(th * .55); g.scale(pl, pl);
+      const ab = .55 + .45 * Math.cos(fase);                               // el ala se pliega un poco al subir
+      g.rotate(th * .45); g.fillStyle = lejos ? '#1d1714' : '#0b0705'; g.beginPath(); g.moveTo(8, 0); g.lineTo(9, -14 * ab);
+      g.quadraticCurveTo(7, -26 * ab, 2, -36);                              // borde de ataque hasta la punta
+      const dedos = [[2, -36], [-1, -31], [-3, -37], [-5, -31], [-8, -36], [-10, -30], [-13, -34], [-14, -28], [-17, -30]];
+      for (const [dx, dy] of dedos) g.lineTo(dx, dy * (.8 + .2 * ab));
+      g.quadraticCurveTo(-20, -16 * ab, -14, 0); g.closePath(); g.fill();
+      g.strokeStyle = 'rgba(120,105,95,.35)'; g.lineWidth = .7; g.beginPath();   // plumas de cobertera
+      for (let i = 0; i < 4; i++) { g.moveTo(-10 + i * 4, -3); g.lineTo(-12 + i * 3.5, -18 * ab); } g.stroke(); g.restore(); };
+    g.save(); g.translate(x, y); g.scale(dir * s / 20, s / 20); g.rotate(.08 * Math.cos(fase));
+    ala(true);
+    g.fillStyle = '#0b0705'; g.beginPath();                                // cuerpo y pecho
+    g.moveTo(-16, 1); g.quadraticCurveTo(-6, -8, 10, -6); g.quadraticCurveTo(16, -6, 18, -3); g.quadraticCurveTo(14, 6, 2, 6); g.quadraticCurveTo(-10, 6, -16, 1); g.fill();
+    g.beginPath(); g.moveTo(-14, -1); g.lineTo(-31, -6); g.lineTo(-29, -3); g.lineTo(-33, -1); g.lineTo(-29, 1); g.lineTo(-32, 4); g.lineTo(-14, 3); g.fill();   // cola en abanico
+    g.beginPath(); g.ellipse(18, -4, 6.5, 5.5, -.2, 0, TAU); g.fill();     // cabeza
+    g.beginPath(); g.moveTo(22, -7); g.quadraticCurveTo(29, -7.5, 33, -3); g.quadraticCurveTo(29, -3, 23, -1); g.closePath(); g.fill();   // pico grueso y curvo
+    g.strokeStyle = 'rgba(150,135,125,.45)'; g.lineWidth = .6; g.beginPath(); g.moveTo(23, -4); g.lineTo(30, -4.2); g.stroke();   // comisura
+    g.fillStyle = '#7d726a'; g.beginPath(); g.arc(19.5, -5.5, 1.2, 0, TAU); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.arc(19.9, -5.9, .45, 0, TAU); g.fill();   // ojo
+    ala(false); g.restore();
+  }
   function PARTICULAS(g, t, def) {
     const lista = [{ tipo: 'polvo', n: 45 }].concat(def.particulas || []);
     for (const q of lista) {
@@ -573,6 +598,8 @@ const T = (() => {
         const r1 = azar(i + 1), r2 = azar(i + 101), r3 = azar(i + 201);
         if (q.tipo === 'polvo') { const y = y0 + ((r2 * zh - 12 * t * (.5 + r3)) % zh + zh) % zh, x = x0 + r1 * zw + 18 * Math.sin(t * (.3 + r3) + i);
           g.fillStyle = `rgba(255,225,160,${.12 + .2 * r3})`; g.beginPath(); g.arc(x, y, 1 + 1.6 * r3, 0, TAU); g.fill(); }
+        if (q.tipo === 'cuervos') { const vida = 9 + 5 * r3, u = ((t + r1 * vida) % vida) / vida, x = x0 - 80 + u * (zw + 160), y = y0 + r2 * zh + 18 * Math.sin(t * 1.5 + i);
+          cuervo(g, x, y, 22 + 26 * r3, t * (9 + 3 * r3) + i * 2, 1); }
         if (q.tipo === 'pajaros') { const vida = 8 + 4 * r3, u = ((t + r1 * vida) % vida) / vida, x = x0 + u * zw, y = y0 + r2 * zh + 15 * Math.sin(t * 2 + i), al = 7 * Math.sin(t * 12 + i);
           g.strokeStyle = '#140c06'; g.lineWidth = 2.5; g.beginPath(); g.moveTo(x - 12, y - al); g.quadraticCurveTo(x - 5, y - al * .3 - 2, x, y); g.quadraticCurveTo(x + 5, y - al * .3 - 2, x + 12, y - al); g.stroke(); }
         if (q.tipo === 'papeles' || q.tipo === 'confeti') { const vida = 3 + 2 * r3, u = ((t + r1 * vida) % vida) / vida, x = x0 + r2 * zw + 60 * Math.sin(u * 5 + i), y = y0 + u * zh;
@@ -586,5 +613,5 @@ const T = (() => {
     }
   }
   const DECORADOS = {};
-  return { escena, pose, pintaColores, enColor, mascara, DECORADOS, OBJETOS, PELO, SOMBREROS, tela: DECORADO_TELA, azar, ruido, suave, clamp, mezcla, rebote, peso, ik, miembro, hueco, circulo, dir, NEGRO, TAU };
+  return { cuervo, escena, pose, pintaColores, enColor, mascara, DECORADOS, OBJETOS, PELO, SOMBREROS, tela: DECORADO_TELA, azar, ruido, suave, clamp, mezcla, rebote, peso, ik, miembro, hueco, circulo, dir, NEGRO, TAU };
 })();
