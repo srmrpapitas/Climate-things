@@ -26,15 +26,24 @@
    - El narrador puede dejar caer «X dice que…» y entonces entra el primer plano de X.
 4. **Personaje-protagonista satírico**: vendehúmos que promete; frases de sátira sobre promesas y hechos documentados. **Nunca** atribuirle delitos sin sentencia.
 
-## Más animación por escena (lección del ep. 2, el usuario: «las animaciones son mínimas»)
-- **Una acción cada 4–5 s** en cada plano de teatro (en el ep. 2 había 1–3 por plano: poco). Que siempre se mueva algo.
-- **Más piezas articuladas** por protagonista: brazo(s), antebrazo, cabeza y, si camina, piernas (`pivote` en cadera/rodilla). Recortarlas
-  con `poli` y `padre` como en `historias/espanistan/sombras/ep02/promesas.json` (el Decano con brazo, bastones y cabeza).
-- **Acciones encadenadas que cuenten la frase**: alza → saluda → asiente; el público salta y luego asiente; el que es nombrado tiembla o se inclina.
-- **Capas que dan vida sin recortar nada**: parallax (el fondo se mueve más lento que las figuras), partículas (lluvia, polvo en la luz, humo)
-  y parpadeo del candil. Pedirlas en la plantilla una vez y reutilizarlas.
-- **Cámara**: un zoom o un paneo en cada plano, hacia quien actúa.
-- No sube el coste en créditos: solo algo más de trabajo al marcar piezas (unas cajas más por escena).
+## Animación por escena (lección del ep. 2, el usuario: «las animaciones son mínimas»)
+- **Movimiento continuo y elaborado**: varias cosas moviéndose a la vez y algo nuevo cada 1–2 s, nunca un plano quieto.
+- **Cronológico, no en bucle**: la escena **evoluciona** con lo que cuenta el narrador, de principio a fin.
+  Ejemplo, la dana de Valencia:
+  1. Empieza a llover.
+  2. La lluvia arrecia.
+  3. El agua sube por la calle.
+  4. Se lleva los coches.
+  5. La gente trepa a los tejados.
+  6. Llega la ola.
+  7. El responsable mira hacia otro lado.
+  Cada paso, anclado a su palabra del guion. Nada de vaivenes repetidos.
+- **Más piezas articuladas**: brazos, antebrazos, cabeza y piernas si camina (`poli`, `pivote`, `padre`, como el Decano de `ep02/promesas.json`).
+  Además, cada elemento que tenga que hacer algo es su propia pieza: el agua, cada coche, cada grupo de gente, la lluvia.
+- **Acciones nuevas en la plantilla** para contar historias: `sube` (nivel que crece), `arrastra` (cruza la escena), `cae`, `entra`/`sale`
+  (desde fuera de cuadro), `gira`, más partículas (lluvia, polvo, humo, chispas) con intensidad que cambia en el tiempo.
+- **Parallax y cámara**: fondo más lento que las figuras; zoom o paneo siguiendo la acción.
+- No cuesta créditos: es trabajo de montaje (más piezas y acciones por plano). Mejor menos escenas y mucho más animadas.
 
 ## Pasos (≈ 2–3 h de trabajo de Claude por capítulo)
 1. **Guion** `historias/espanistan/NN-tema.md` (datos + fuentes) → `fabrica/herramientas/guion_espanistan-NN.txt`.
