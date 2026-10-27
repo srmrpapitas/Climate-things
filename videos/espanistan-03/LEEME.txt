@@ -1,0 +1,13 @@
+Españistán · Episodio 3: Acascar y Vox
+Vídeo completo en HD: 1920×1080, 10 min 1 s, partido en 8 trozos (GitHub no admite archivos de más de 100 MB).
+
+Cada parte se puede ver sola. Para tener UN solo archivo (para subirlo a YouTube), sin perder calidad:
+
+1. Descarga las 8 partes en la misma carpeta, junto con este archivo y lista.txt.
+2. Abre una terminal en esa carpeta y escribe:
+
+   ffmpeg -f concat -safe 0 -i lista.txt -c copy espanistan-03.mp4
+
+   (ffmpeg es gratis: https://ffmpeg.org/download.html)
+
+Sin terminal: cualquier editor de vídeo (CapCut, DaVinci Resolve, iMovie…) — pon las 8 partes en orden en la línea de tiempo y exporta.
