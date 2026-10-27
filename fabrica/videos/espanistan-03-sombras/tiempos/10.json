@@ -1,1 +1,69 @@
-[]
+[
+ {
+  "texto": "Hay que cerrar todos los chiringuitos, empezando por los de los demás.",
+  "inicio": 0.0,
+  "fin": 4.86,
+  "palabras": [
+   [
+    "Hay",
+    0.0,
+    0.44
+   ],
+   [
+    "que",
+    0.44,
+    0.62
+   ],
+   [
+    "cerrar",
+    0.62,
+    1.04
+   ],
+   [
+    "todos",
+    1.04,
+    1.38
+   ],
+   [
+    "los",
+    1.38,
+    1.66
+   ],
+   [
+    "chiringuitos,",
+    1.66,
+    3.0
+   ],
+   [
+    "empezando",
+    3.22,
+    3.68
+   ],
+   [
+    "por",
+    3.68,
+    3.94
+   ],
+   [
+    "los",
+    3.94,
+    4.12
+   ],
+   [
+    "de",
+    4.12,
+    4.32
+   ],
+   [
+    "los",
+    4.32,
+    4.52
+   ],
+   [
+    "demás.",
+    4.52,
+    4.86
+   ]
+  ]
+ }
+]

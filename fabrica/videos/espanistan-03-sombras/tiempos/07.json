@@ -1,1 +1,56 @@
-[]
+[
+ {
+  "texto": "Los jóvenes me adoran.",
+  "inicio": 0.0,
+  "fin": 2.04,
+  "palabras": [
+   [
+    "Los",
+    0.0,
+    0.5
+   ],
+   [
+    "jóvenes",
+    0.5,
+    0.9
+   ],
+   [
+    "me",
+    0.9,
+    1.2
+   ],
+   [
+    "adoran.",
+    1.2,
+    2.04
+   ]
+  ]
+ },
+ {
+  "texto": "Será por el caballo.",
+  "inicio": 2.26,
+  "fin": 3.48,
+  "palabras": [
+   [
+    "Será",
+    2.26,
+    2.7
+   ],
+   [
+    "por",
+    2.7,
+    2.96
+   ],
+   [
+    "el",
+    2.96,
+    3.14
+   ],
+   [
+    "caballo.",
+    3.14,
+    3.48
+   ]
+  ]
+ }
+]
