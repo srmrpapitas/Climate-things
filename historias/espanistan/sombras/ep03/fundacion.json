@@ -1,0 +1,8 @@
+{"ref": 1280, "umbral": 60, "piezas": [
+ {"nombre": "asta", "caja": [760, 158, 794, 630], "tipo": "objeto", "pivote": [777, 630]},
+ {"nombre": "perro", "caja": [556, 506, 668, 630], "tipo": "figura"},
+ {"nombre": "f1", "caja": [252, 256, 426, 630], "cuello": 330},
+ {"nombre": "f2", "caja": [418, 242, 600, 630], "cuello": 300},
+ {"nombre": "f3", "caja": [604, 218, 806, 630], "cuello": 282},
+ {"nombre": "f4", "caja": [790, 212, 1002, 630], "cuello": 300}
+]}

@@ -110,7 +110,7 @@ En el próximo episodio de Españistán: el bipartidismo. Por qué en Españist�
 - **Infancia:** año del incendio de la tienda (Vozpópuli dice 1999) y número de ataques; si el padre fue concejal o solo dirigente del PP en Amurrio.
 - **Cargos vascos:** concejal en Llodio (desde 1999) y parlamentario vasco (2004-2009): fechas exactas.
 - **Por qué se fue del PP:** que los motivos citados (presos de ETA tras la doctrina Parot, impuestos, Cataluña) sean los que dio él al salir.
-- **Ortega Lara:** 532 días secuestrado; si sigue siendo militante de Vox el día de publicar.
+- **Ortega Lara:** 532 días secuestrado; si sigue siendo militante de Vox el día de publicar. La voz dice «de aquella mesa, hoy solo queda Ortega Lara»: se entiende «además de Acascar» (en pantalla sale una nota que lo aclara).
 - **Dinero iraní:** cifra exacta (≈ 800.000 de ≈ 1 millón) y si el Tribunal de Cuentas dijo algo.
 - **Europeas 2014:** votos de Vox (≈ 1,6 %, 0 escaños).
 - **Andalucía 2018:** 12 escaños. Generales: 24 (abril 2019), 52 (noviembre 2019), 33 (2023).
