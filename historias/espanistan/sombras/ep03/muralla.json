@@ -1,0 +1,12 @@
+{"ref": 1280, "umbral": 60, "piezas": [
+ {"nombre": "orador", "caja": [464, 224, 608, 340], "tipo": "figura", "pivote": [520, 340]},
+ {"nombre": "maleta", "caja": [542, 510, 586, 642], "tipo": "objeto"},
+ {"nombre": "viejo", "caja": [472, 444, 572, 640], "cuello": 476},
+ {"nombre": "nina", "caja": [586, 470, 662, 642], "cuello": 502},
+ {"nombre": "c1", "caja": [78, 380, 174, 638], "cuello": 420},
+ {"nombre": "c2", "caja": [160, 356, 274, 638], "cuello": 400},
+ {"nombre": "c3", "caja": [256, 388, 360, 638], "cuello": 430},
+ {"nombre": "c4", "caja": [350, 413, 458, 638], "cuello": 452},
+ {"nombre": "guardia", "caja": [750, 384, 860, 642], "cuello": 420},
+ {"nombre": "publico", "caja": [863, 524, 1182, 646], "tipo": "grupo"}
+]}
