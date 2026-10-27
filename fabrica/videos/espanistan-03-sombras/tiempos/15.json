@@ -1,0 +1,1687 @@
+[
+ {
+  "texto": "Tercer frasco, las huchas.",
+  "inicio": 0.0,
+  "fin": 2.98,
+  "palabras": [
+   [
+    "Tercer",
+    0.0,
+    0.5
+   ],
+   [
+    "frasco,",
+    0.5,
+    1.08
+   ],
+   [
+    "las",
+    1.28,
+    1.52
+   ],
+   [
+    "huchas.",
+    1.52,
+    2.98
+   ]
+  ]
+ },
+ {
+  "texto": "El Tribunal de Cuentas multó a Vox con 862.000 euros.",
+  "inicio": 3.36,
+  "fin": 7.48,
+  "palabras": [
+   [
+    "El",
+    3.36,
+    3.4
+   ],
+   [
+    "Tribunal",
+    3.4,
+    3.78
+   ],
+   [
+    "de",
+    3.78,
+    3.98
+   ],
+   [
+    "Cuentas",
+    3.98,
+    4.36
+   ],
+   [
+    "multó",
+    4.36,
+    4.66
+   ],
+   [
+    "a",
+    4.66,
+    4.88
+   ],
+   [
+    "Vox",
+    4.88,
+    5.0
+   ],
+   [
+    "con",
+    5.0,
+    5.26
+   ],
+   [
+    "862",
+    5.26,
+    6.7
+   ],
+   [
+    ".000",
+    6.7,
+    6.96
+   ],
+   [
+    "euros.",
+    6.96,
+    7.48
+   ]
+  ]
+ },
+ {
+  "texto": "Decía que el dinero de las huchas de sus puestos eran donativos ilegales.",
+  "inicio": 7.76,
+  "fin": 11.56,
+  "palabras": [
+   [
+    "Decía",
+    7.76,
+    8.02
+   ],
+   [
+    "que",
+    8.02,
+    8.18
+   ],
+   [
+    "el",
+    8.18,
+    8.32
+   ],
+   [
+    "dinero",
+    8.32,
+    8.58
+   ],
+   [
+    "de",
+    8.58,
+    8.76
+   ],
+   [
+    "las",
+    8.76,
+    8.94
+   ],
+   [
+    "huchas",
+    8.94,
+    9.24
+   ],
+   [
+    "de",
+    9.24,
+    9.4
+   ],
+   [
+    "sus",
+    9.4,
+    9.6
+   ],
+   [
+    "puestos",
+    9.6,
+    10.02
+   ],
+   [
+    "eran",
+    10.02,
+    10.3
+   ],
+   [
+    "donativos",
+    10.3,
+    10.84
+   ],
+   [
+    "ilegales.",
+    10.84,
+    11.56
+   ]
+  ]
+ },
+ {
+  "texto": "En junio de 2026, el Supremo anuló la multa.",
+  "inicio": 12.12,
+  "fin": 15.8,
+  "palabras": [
+   [
+    "En",
+    12.12,
+    12.18
+   ],
+   [
+    "junio",
+    12.18,
+    12.5
+   ],
+   [
+    "de",
+    12.5,
+    12.82
+   ],
+   [
+    "2026,",
+    12.82,
+    13.72
+   ],
+   [
+    "el",
+    14.08,
+    14.22
+   ],
+   [
+    "Supremo",
+    14.22,
+    14.64
+   ],
+   [
+    "anuló",
+    14.64,
+    15.02
+   ],
+   [
+    "la",
+    15.02,
+    15.2
+   ],
+   [
+    "multa.",
+    15.2,
+    15.8
+   ]
+  ]
+ },
+ {
+  "texto": "No se probó.",
+  "inicio": 16.06,
+  "fin": 16.92,
+  "palabras": [
+   [
+    "No",
+    16.06,
+    16.24
+   ],
+   [
+    "se",
+    16.24,
+    16.46
+   ],
+   [
+    "probó.",
+    16.46,
+    16.92
+   ]
+  ]
+ },
+ {
+  "texto": "Etiqueta.",
+  "inicio": 17.4,
+  "fin": 18.0,
+  "palabras": [
+   [
+    "Etiqueta.",
+    17.4,
+    18.0
+   ]
+  ]
+ },
+ {
+  "texto": "Anulado.",
+  "inicio": 18.26,
+  "fin": 18.86,
+  "palabras": [
+   [
+    "Anulado.",
+    18.26,
+    18.86
+   ]
+  ]
+ },
+ {
+  "texto": "Esto también se cuenta.",
+  "inicio": 19.44,
+  "fin": 20.54,
+  "palabras": [
+   [
+    "Esto",
+    19.44,
+    19.68
+   ],
+   [
+    "también",
+    19.68,
+    19.96
+   ],
+   [
+    "se",
+    19.96,
+    20.2
+   ],
+   [
+    "cuenta.",
+    20.2,
+    20.54
+   ]
+  ]
+ },
+ {
+  "texto": "Cuarto frasco, los proveedores.",
+  "inicio": 20.92,
+  "fin": 23.24,
+  "palabras": [
+   [
+    "Cuarto",
+    20.92,
+    21.28
+   ],
+   [
+    "frasco,",
+    21.28,
+    21.9
+   ],
+   [
+    "los",
+    22.1,
+    22.42
+   ],
+   [
+    "proveedores.",
+    22.42,
+    23.24
+   ]
+  ]
+ },
+ {
+  "texto": "Vox paga casi 27.000 euros al mes a la empresa del asesor de Acascar,",
+  "inicio": 23.78,
+  "fin": 28.12,
+  "palabras": [
+   [
+    "Vox",
+    23.78,
+    24.12
+   ],
+   [
+    "paga",
+    24.12,
+    24.42
+   ],
+   [
+    "casi",
+    24.42,
+    24.7
+   ],
+   [
+    "27",
+    24.7,
+    25.28
+   ],
+   [
+    ".000",
+    25.28,
+    25.48
+   ],
+   [
+    "euros",
+    25.48,
+    25.88
+   ],
+   [
+    "al",
+    25.88,
+    26.06
+   ],
+   [
+    "mes",
+    26.06,
+    26.22
+   ],
+   [
+    "a",
+    26.22,
+    26.38
+   ],
+   [
+    "la",
+    26.38,
+    26.5
+   ],
+   [
+    "empresa",
+    26.5,
+    26.82
+   ],
+   [
+    "del",
+    26.82,
+    27.04
+   ],
+   [
+    "asesor",
+    27.04,
+    27.48
+   ],
+   [
+    "de",
+    27.48,
+    27.6
+   ],
+   [
+    "Acascar,",
+    27.6,
+    28.12
+   ]
+  ]
+ },
+ {
+  "texto": "una sociedad sin empleados.",
+  "inicio": 28.12,
+  "fin": 30.18,
+  "palabras": [
+   [
+    "una",
+    28.12,
+    28.64
+   ],
+   [
+    "sociedad",
+    28.64,
+    29.12
+   ],
+   [
+    "sin",
+    29.12,
+    29.4
+   ],
+   [
+    "empleados.",
+    29.4,
+    30.18
+   ]
+  ]
+ },
+ {
+  "texto": "Y la mujer de Acascar cobra 63.600 euros al año de una editorial de la misma familia empresarial.",
+  "inicio": 30.62,
+  "fin": 37.2,
+  "palabras": [
+   [
+    "Y",
+    30.62,
+    30.7
+   ],
+   [
+    "la",
+    30.7,
+    30.8
+   ],
+   [
+    "mujer",
+    30.8,
+    31.02
+   ],
+   [
+    "de",
+    31.02,
+    31.2
+   ],
+   [
+    "Acascar",
+    31.2,
+    31.66
+   ],
+   [
+    "cobra",
+    31.66,
+    31.92
+   ],
+   [
+    "63",
+    31.92,
+    32.64
+   ],
+   [
+    ".600",
+    32.64,
+    33.36
+   ],
+   [
+    "euros",
+    33.36,
+    33.88
+   ],
+   [
+    "al",
+    33.88,
+    34.08
+   ],
+   [
+    "año",
+    34.08,
+    34.28
+   ],
+   [
+    "de",
+    34.28,
+    34.5
+   ],
+   [
+    "una",
+    34.5,
+    34.68
+   ],
+   [
+    "editorial",
+    34.68,
+    35.14
+   ],
+   [
+    "de",
+    35.14,
+    35.38
+   ],
+   [
+    "la",
+    35.38,
+    35.46
+   ],
+   [
+    "misma",
+    35.46,
+    35.78
+   ],
+   [
+    "familia",
+    35.78,
+    36.3
+   ],
+   [
+    "empresarial.",
+    36.3,
+    37.2
+   ]
+  ]
+ },
+ {
+  "texto": "Vox dice que el Tribunal de Cuentas revisó esos contratos sin ver irregularidades.",
+  "inicio": 38.26,
+  "fin": 43.04,
+  "palabras": [
+   [
+    "Vox",
+    38.26,
+    38.4
+   ],
+   [
+    "dice",
+    38.4,
+    38.64
+   ],
+   [
+    "que",
+    38.64,
+    38.82
+   ],
+   [
+    "el",
+    38.82,
+    39.04
+   ],
+   [
+    "Tribunal",
+    39.04,
+    39.36
+   ],
+   [
+    "de",
+    39.36,
+    39.58
+   ],
+   [
+    "Cuentas",
+    39.58,
+    40.2
+   ],
+   [
+    "revisó",
+    40.2,
+    40.64
+   ],
+   [
+    "esos",
+    40.64,
+    40.94
+   ],
+   [
+    "contratos",
+    40.94,
+    41.42
+   ],
+   [
+    "sin",
+    41.42,
+    41.7
+   ],
+   [
+    "ver",
+    41.7,
+    41.9
+   ],
+   [
+    "irregularidades.",
+    41.9,
+    43.04
+   ]
+  ]
+ },
+ {
+  "texto": "PP y PSOE piden que audite su fundación.",
+  "inicio": 44.02,
+  "fin": 48.34,
+  "palabras": [
+   [
+    "PP",
+    44.02,
+    44.4
+   ],
+   [
+    "y",
+    44.4,
+    44.84
+   ],
+   [
+    "PSOE",
+    44.84,
+    45.74
+   ],
+   [
+    "piden",
+    45.74,
+    46.1
+   ],
+   [
+    "que",
+    46.1,
+    46.32
+   ],
+   [
+    "audite",
+    46.32,
+    46.64
+   ],
+   [
+    "su",
+    46.64,
+    46.8
+   ],
+   [
+    "fundación.",
+    46.8,
+    48.34
+   ]
+  ]
+ },
+ {
+  "texto": "Etiqueta.",
+  "inicio": 48.76,
+  "fin": 49.44,
+  "palabras": [
+   [
+    "Etiqueta.",
+    48.76,
+    49.44
+   ]
+  ]
+ },
+ {
+  "texto": "Sin causa.",
+  "inicio": 49.8,
+  "fin": 50.68,
+  "palabras": [
+   [
+    "Sin",
+    49.8,
+    50.04
+   ],
+   [
+    "causa.",
+    50.04,
+    50.68
+   ]
+  ]
+ },
+ {
+  "texto": "Preguntas abiertas.",
+  "inicio": 51.52,
+  "fin": 53.08,
+  "palabras": [
+   [
+    "Preguntas",
+    51.52,
+    51.98
+   ],
+   [
+    "abiertas.",
+    51.98,
+    53.08
+   ]
+  ]
+ },
+ {
+  "texto": "Quinto frasco, la dana.",
+  "inicio": 53.32,
+  "fin": 55.4,
+  "palabras": [
+   [
+    "Quinto",
+    53.32,
+    53.62
+   ],
+   [
+    "frasco,",
+    53.62,
+    54.12
+   ],
+   [
+    "la",
+    54.32,
+    54.46
+   ],
+   [
+    "dana.",
+    54.46,
+    55.4
+   ]
+  ]
+ },
+ {
+  "texto": "Revuelta.",
+  "inicio": 55.74,
+  "fin": 56.4,
+  "palabras": [
+   [
+    "Revuelta.",
+    55.74,
+    56.4
+   ]
+  ]
+ },
+ {
+  "texto": "Una asociación juvenil cercana a Vox recogió donativos para los afectados de Valencia.",
+  "inicio": 56.4,
+  "fin": 62.16,
+  "palabras": [
+   [
+    "Una",
+    56.4,
+    56.86
+   ],
+   [
+    "asociación",
+    56.86,
+    57.46
+   ],
+   [
+    "juvenil",
+    57.46,
+    57.96
+   ],
+   [
+    "cercana",
+    57.96,
+    58.38
+   ],
+   [
+    "a",
+    58.38,
+    58.56
+   ],
+   [
+    "Vox",
+    58.56,
+    58.76
+   ],
+   [
+    "recogió",
+    58.76,
+    59.4
+   ],
+   [
+    "donativos",
+    59.4,
+    59.92
+   ],
+   [
+    "para",
+    59.92,
+    60.22
+   ],
+   [
+    "los",
+    60.22,
+    60.44
+   ],
+   [
+    "afectados",
+    60.44,
+    60.96
+   ],
+   [
+    "de",
+    60.96,
+    61.18
+   ],
+   [
+    "Valencia.",
+    61.18,
+    62.16
+   ]
+  ]
+ },
+ {
+  "texto": "Dos miembros de Vox la denunciaron por quedarse parte del dinero.",
+  "inicio": 62.36,
+  "fin": 65.66,
+  "palabras": [
+   [
+    "Dos",
+    62.36,
+    62.54
+   ],
+   [
+    "miembros",
+    62.54,
+    62.9
+   ],
+   [
+    "de",
+    62.9,
+    63.02
+   ],
+   [
+    "Vox",
+    63.02,
+    63.3
+   ],
+   [
+    "la",
+    63.3,
+    63.56
+   ],
+   [
+    "denunciaron",
+    63.56,
+    64.1
+   ],
+   [
+    "por",
+    64.1,
+    64.34
+   ],
+   [
+    "quedarse",
+    64.34,
+    64.76
+   ],
+   [
+    "parte",
+    64.76,
+    65.08
+   ],
+   [
+    "del",
+    65.08,
+    65.26
+   ],
+   [
+    "dinero.",
+    65.26,
+    65.66
+   ]
+  ]
+ },
+ {
+  "texto": "La fiscalía archivó la denuncia en abril de 2026.",
+  "inicio": 66.28,
+  "fin": 69.78,
+  "palabras": [
+   [
+    "La",
+    66.28,
+    66.42
+   ],
+   [
+    "fiscalía",
+    66.42,
+    66.94
+   ],
+   [
+    "archivó",
+    66.94,
+    67.32
+   ],
+   [
+    "la",
+    67.32,
+    67.48
+   ],
+   [
+    "denuncia",
+    67.48,
+    67.96
+   ],
+   [
+    "en",
+    67.96,
+    68.14
+   ],
+   [
+    "abril",
+    68.14,
+    68.48
+   ],
+   [
+    "de",
+    68.48,
+    68.7
+   ],
+   [
+    "2026.",
+    68.7,
+    69.78
+   ]
+  ]
+ },
+ {
+  "texto": "Etiqueta.",
+  "inicio": 70.42,
+  "fin": 71.1,
+  "palabras": [
+   [
+    "Etiqueta.",
+    70.42,
+    71.1
+   ]
+  ]
+ },
+ {
+  "texto": "Archivado.",
+  "inicio": 72.18,
+  "fin": 72.86,
+  "palabras": [
+   [
+    "Archivado.",
+    72.18,
+    72.86
+   ]
+  ]
+ },
+ {
+  "texto": "Sexto frasco.",
+  "inicio": 73.18,
+  "fin": 74.32,
+  "palabras": [
+   [
+    "Sexto",
+    73.18,
+    73.58
+   ],
+   [
+    "frasco.",
+    73.58,
+    74.32
+   ]
+  ]
+ },
+ {
+  "texto": "En 2024, un diputado de Vox en Castilla-La Mancha fue condenado a seis meses por",
+  "inicio": 74.66,
+  "fin": 80.42,
+  "palabras": [
+   [
+    "En",
+    74.66,
+    74.8
+   ],
+   [
+    "2024,",
+    74.8,
+    75.84
+   ],
+   [
+    "un",
+    76.5,
+    76.64
+   ],
+   [
+    "diputado",
+    76.64,
+    77.08
+   ],
+   [
+    "de",
+    77.08,
+    77.26
+   ],
+   [
+    "Vox",
+    77.26,
+    77.56
+   ],
+   [
+    "en",
+    77.56,
+    77.74
+   ],
+   [
+    "Castilla",
+    77.74,
+    78.16
+   ],
+   [
+    "-La",
+    78.16,
+    78.36
+   ],
+   [
+    "Mancha",
+    78.36,
+    78.66
+   ],
+   [
+    "fue",
+    78.66,
+    78.9
+   ],
+   [
+    "condenado",
+    78.9,
+    79.44
+   ],
+   [
+    "a",
+    79.44,
+    79.58
+   ],
+   [
+    "seis",
+    79.58,
+    79.8
+   ],
+   [
+    "meses",
+    79.8,
+    80.14
+   ],
+   [
+    "por",
+    80.14,
+    80.42
+   ]
+  ]
+ },
+ {
+  "texto": "administración desleal.",
+  "inicio": 80.42,
+  "fin": 81.92,
+  "palabras": [
+   [
+    "administración",
+    80.42,
+    81.18
+   ],
+   [
+    "desleal.",
+    81.18,
+    81.92
+   ]
+  ]
+ },
+ {
+  "texto": "Por un negocio privado entre dos empresas, no por dinero público.",
+  "inicio": 81.92,
+  "fin": 86.06,
+  "palabras": [
+   [
+    "Por",
+    81.92,
+    82.4
+   ],
+   [
+    "un",
+    82.4,
+    82.62
+   ],
+   [
+    "negocio",
+    82.62,
+    82.98
+   ],
+   [
+    "privado",
+    82.98,
+    83.36
+   ],
+   [
+    "entre",
+    83.36,
+    83.62
+   ],
+   [
+    "dos",
+    83.62,
+    83.86
+   ],
+   [
+    "empresas,",
+    83.86,
+    84.44
+   ],
+   [
+    "no",
+    84.66,
+    84.92
+   ],
+   [
+    "por",
+    84.92,
+    85.12
+   ],
+   [
+    "dinero",
+    85.12,
+    85.48
+   ],
+   [
+    "público.",
+    85.48,
+    86.06
+   ]
+  ]
+ },
+ {
+  "texto": "Etiqueta.",
+  "inicio": 86.9,
+  "fin": 87.54,
+  "palabras": [
+   [
+    "Etiqueta.",
+    86.9,
+    87.54
+   ]
+  ]
+ },
+ {
+  "texto": "Condenado.",
+  "inicio": 87.84,
+  "fin": 88.48,
+  "palabras": [
+   [
+    "Condenado.",
+    87.84,
+    88.48
+   ]
+  ]
+ },
+ {
+  "texto": "Y el último.",
+  "inicio": 88.92,
+  "fin": 89.6,
+  "palabras": [
+   [
+    "Y",
+    88.92,
+    89.04
+   ],
+   [
+    "el",
+    89.04,
+    89.22
+   ],
+   [
+    "último.",
+    89.22,
+    89.6
+   ]
+  ]
+ },
+ {
+  "texto": "Los que se fueron.",
+  "inicio": 90.18,
+  "fin": 91.08,
+  "palabras": [
+   [
+    "Los",
+    90.18,
+    90.34
+   ],
+   [
+    "que",
+    90.34,
+    90.52
+   ],
+   [
+    "se",
+    90.52,
+    90.74
+   ],
+   [
+    "fueron.",
+    90.74,
+    91.08
+   ]
+  ]
+ },
+ {
+  "texto": "Vidal Cuadras.",
+  "inicio": 91.62,
+  "fin": 92.46,
+  "palabras": [
+   [
+    "Vidal",
+    91.62,
+    91.88
+   ],
+   [
+    "Cuadras.",
+    91.88,
+    92.46
+   ]
+  ]
+ },
+ {
+  "texto": "Espinosa de los Monteros.",
+  "inicio": 92.92,
+  "fin": 94.24,
+  "palabras": [
+   [
+    "Espinosa",
+    92.92,
+    93.32
+   ],
+   [
+    "de",
+    93.32,
+    93.46
+   ],
+   [
+    "los",
+    93.46,
+    93.64
+   ],
+   [
+    "Monteros.",
+    93.64,
+    94.24
+   ]
+  ]
+ },
+ {
+  "texto": "Macarena Olona.",
+  "inicio": 94.58,
+  "fin": 95.54,
+  "palabras": [
+   [
+    "Macarena",
+    94.58,
+    95.0
+   ],
+   [
+    "Olona.",
+    95.0,
+    95.54
+   ]
+  ]
+ },
+ {
+  "texto": "Casi todos los que levantaron Vox ya no están.",
+  "inicio": 96.38,
+  "fin": 98.98,
+  "palabras": [
+   [
+    "Casi",
+    96.38,
+    96.66
+   ],
+   [
+    "todos",
+    96.66,
+    96.9
+   ],
+   [
+    "los",
+    96.9,
+    97.1
+   ],
+   [
+    "que",
+    97.1,
+    97.26
+   ],
+   [
+    "levantaron",
+    97.26,
+    97.78
+   ],
+   [
+    "Vox",
+    97.78,
+    98.1
+   ],
+   [
+    "ya",
+    98.1,
+    98.42
+   ],
+   [
+    "no",
+    98.42,
+    98.68
+   ],
+   [
+    "están.",
+    98.68,
+    98.98
+   ]
+  ]
+ },
+ {
+  "texto": "Y varios salieron diciendo que el partido no explicaba bien sus cuentas.",
+  "inicio": 99.42,
+  "fin": 103.44,
+  "palabras": [
+   [
+    "Y",
+    99.42,
+    99.64
+   ],
+   [
+    "varios",
+    99.64,
+    99.84
+   ],
+   [
+    "salieron",
+    99.84,
+    100.28
+   ],
+   [
+    "diciendo",
+    100.28,
+    100.66
+   ],
+   [
+    "que",
+    100.66,
+    100.88
+   ],
+   [
+    "el",
+    100.88,
+    101.2
+   ],
+   [
+    "partido",
+    101.2,
+    101.42
+   ],
+   [
+    "no",
+    101.42,
+    101.88
+   ],
+   [
+    "explicaba",
+    101.88,
+    102.2
+   ],
+   [
+    "bien",
+    102.2,
+    102.48
+   ],
+   [
+    "sus",
+    102.48,
+    102.7
+   ],
+   [
+    "cuentas.",
+    102.7,
+    103.44
+   ]
+  ]
+ },
+ {
+  "texto": "Etiqueta.",
+  "inicio": 104.2,
+  "fin": 104.84,
+  "palabras": [
+   [
+    "Etiqueta.",
+    104.2,
+    104.84
+   ]
+  ]
+ },
+ {
+  "texto": "Sin causa.",
+  "inicio": 105.22,
+  "fin": 105.86,
+  "palabras": [
+   [
+    "Sin",
+    105.22,
+    105.42
+   ],
+   [
+    "causa.",
+    105.42,
+    105.86
+   ]
+  ]
+ },
+ {
+  "texto": "Lección del decano.",
+  "inicio": 107.12,
+  "fin": 108.18,
+  "palabras": [
+   [
+    "Lección",
+    107.12,
+    107.52
+   ],
+   [
+    "del",
+    107.52,
+    107.72
+   ],
+   [
+    "decano.",
+    107.72,
+    108.18
+   ]
+  ]
+ },
+ {
+  "texto": "Que no haya condenas al partido es un dato a favor.",
+  "inicio": 108.54,
+  "fin": 111.12,
+  "palabras": [
+   [
+    "Que",
+    108.54,
+    108.7
+   ],
+   [
+    "no",
+    108.7,
+    108.88
+   ],
+   [
+    "haya",
+    108.88,
+    109.04
+   ],
+   [
+    "condenas",
+    109.04,
+    109.54
+   ],
+   [
+    "al",
+    109.54,
+    109.7
+   ],
+   [
+    "partido",
+    109.7,
+    110.06
+   ],
+   [
+    "es",
+    110.06,
+    110.32
+   ],
+   [
+    "un",
+    110.32,
+    110.52
+   ],
+   [
+    "dato",
+    110.52,
+    110.68
+   ],
+   [
+    "a",
+    110.68,
+    110.9
+   ],
+   [
+    "favor.",
+    110.9,
+    111.12
+   ]
+  ]
+ },
+ {
+  "texto": "Pero el estudio del episodio anterior ya lo decía.",
+  "inicio": 111.84,
+  "fin": 114.64,
+  "palabras": [
+   [
+    "Pero",
+    111.75,
+    112.02
+   ],
+   [
+    "el",
+    112.02,
+    112.26
+   ],
+   [
+    "estudio",
+    112.26,
+    112.54
+   ],
+   [
+    "del",
+    112.54,
+    112.72
+   ],
+   [
+    "episodio",
+    112.72,
+    113.32
+   ],
+   [
+    "anterior",
+    113.32,
+    113.78
+   ],
+   [
+    "ya",
+    113.78,
+    114.06
+   ],
+   [
+    "lo",
+    114.06,
+    114.32
+   ],
+   [
+    "decía.",
+    114.32,
+    114.64
+   ]
+  ]
+ },
+ {
+  "texto": "La corrupción crece con el tiempo y con el poder.",
+  "inicio": 115.46,
+  "fin": 118.22,
+  "palabras": [
+   [
+    "La",
+    115.46,
+    115.66
+   ],
+   [
+    "corrupción",
+    115.66,
+    116.2
+   ],
+   [
+    "crece",
+    116.2,
+    116.56
+   ],
+   [
+    "con",
+    116.56,
+    116.78
+   ],
+   [
+    "el",
+    116.78,
+    116.98
+   ],
+   [
+    "tiempo",
+    116.98,
+    117.24
+   ],
+   [
+    "y",
+    117.24,
+    117.48
+   ],
+   [
+    "con",
+    117.48,
+    117.64
+   ],
+   [
+    "el",
+    117.64,
+    117.8
+   ],
+   [
+    "poder.",
+    117.8,
+    118.22
+   ]
+  ]
+ },
+ {
+  "texto": "Vox lleva poco tiempo y ha tenido poco poder.",
+  "inicio": 119.38,
+  "fin": 122.28,
+  "palabras": [
+   [
+    "Vox",
+    119.38,
+    119.54
+   ],
+   [
+    "lleva",
+    119.54,
+    119.84
+   ],
+   [
+    "poco",
+    119.84,
+    120.14
+   ],
+   [
+    "tiempo",
+    120.14,
+    120.62
+   ],
+   [
+    "y",
+    120.62,
+    121.06
+   ],
+   [
+    "ha",
+    121.06,
+    121.2
+   ],
+   [
+    "tenido",
+    121.2,
+    121.46
+   ],
+   [
+    "poco",
+    121.46,
+    121.72
+   ],
+   [
+    "poder.",
+    121.72,
+    122.28
+   ]
+  ]
+ },
+ {
+  "texto": "¿Cómo sabremos qué haría con mucho?",
+  "inicio": 123.22,
+  "fin": 124.8,
+  "palabras": [
+   [
+    "¿Cómo",
+    123.22,
+    123.44
+   ],
+   [
+    "sabremos",
+    123.44,
+    123.86
+   ],
+   [
+    "qué",
+    123.86,
+    124.06
+   ],
+   [
+    "haría",
+    124.06,
+    124.36
+   ],
+   [
+    "con",
+    124.36,
+    124.6
+   ],
+   [
+    "mucho?",
+    124.6,
+    124.8
+   ]
+  ]
+ }
+]
