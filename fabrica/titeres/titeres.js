@@ -54,7 +54,8 @@ const T = (() => {
     const vel = (r.x - r2.x) * 24, anda = clamp(Math.abs(vel) / (90 * p.alto)), velAtras = (r2.x - r3.x) / .18;
     const o = { x: r.x, y: 0, f: r.f, fase: r.fase, anda, vel: vel * Math.sign(r.mira), velAtras: velAtras * Math.sign(r.mira),
       inclina: .07 * anda + (p.encorvado || 0) + .015 * ruido(t * .7, s), cabeza: .03 * ruido(t * .9, s + 2), boca: 0, aplasta: 1,
-      parpadea: ((t + azar(s) * 4) % (3.2 + azar(s + 1))) < .12, hombros: 0, cabezaAncho: 1, cejas: .15 * ruido(t * .6, s + 7),
+      parpadea: (u => u < .12 || (azar(Math.floor((t + azar(s) * 4) / (3.2 + azar(s + 1))) + s) < .3 && u > .26 && u < .36))((t + azar(s) * 4) % (3.2 + azar(s + 1))),
+      respira: Math.sin(t * 1.9 + s), hombros: 0, cabezaAncho: 1, cejas: .15 * ruido(t * .6, s + 7),
       ojos: .5 * Math.sin(t * .7 + s) * (Math.sin(t * .23 + s) > 0), activos: [] };
     // vista (perfil / frente / espalda): al cambiar, el títere se estrecha y se da la vuelta como una carta
     let vista = ac.vista || 'perfil', cambio = -9, antes = vista;
@@ -68,6 +69,17 @@ const T = (() => {
     o.cerca = [.12 - .42 * sw + .03 * ruido(t, s + 4), .22 + .25 * anda, p.mano || 'abierta'];
     o.lejos = [.1 + .42 * sw + .03 * ruido(t, s + 5), .2 + .25 * anda, p.manoLejos || 'abierta'];
     for (const a of ac.acciones) gesto(a, t, o, s);
+    const habla = o.activos.find(a => a.hace === 'habla'), libre = !o.activos.some(a => a.hace !== 'habla' && a.hace !== 'asiente' && a.hace !== 'niega');
+    if (habla && libre && o.anda < .2) {                                 // la mano acompaña lo que dice, con golpes de énfasis
+      const w = habla.w, golpe = Math.max(0, Math.sin(t * 4.3 + s)) ** 3;
+      brazo(o, 'cerca', .75 + .25 * Math.sin(t * 1.7 + s) + .18 * golpe, 1.05 - .35 * golpe, 'abierta', w * .85);
+      o.cabeza += .06 * w * golpe; o.cejas += .35 * w * golpe; o.inclina += .02 * w * golpe;
+    }
+    if (o.anda < .2) { o.cabeza += .05 * Math.sin(t * .31 + s * 2) * (Math.sin(t * .13 + s) > .3); o.inclina += .012 * o.respira; o.x += 2.5 * Math.sin(t * .4 + s); }
+    if (!pose.dentro) {                                                  // arrastre: el antebrazo llega un poco después que el brazo
+      pose.dentro = true; const atras = pose(ac, t - .09); pose.dentro = false;
+      for (const b of ['cerca', 'lejos']) o[b][1] = mezcla(o[b][1], atras[b][1] + (o[b][0] - atras[b][0]) * -.6, .45);
+    }
     return o;
   }
   const brazo = (o, cual, sH, sC, mano, w) => { const b = o[cual]; o[cual] = [mezcla(b[0], sH, w), mezcla(b[1], sC, w), w > .5 && mano ? mano : b[2]]; };
@@ -153,7 +165,7 @@ const T = (() => {
   }
   function ropa(g, p, t, o, cad, inc, largo, G, A, pies) {
     const w = 27 * G * A, bar = (p.barriga || 0) * 18 * A, lag = clamp(o.velAtras / 200, -1, 1);
-    g.save(); g.translate(cad[0], cad[1]); g.rotate(inc);
+    g.save(); g.translate(cad[0], cad[1]); g.rotate(inc); g.scale(1 + .012 * o.respira, 1 + .008 * o.respira);
     // tronco: espalda curva, pecho y barriga
     g.beginPath(); g.moveTo(-w * .9, 4 * A);
     g.bezierCurveTo(-w * 1.15, -largo * .45, -w * 1.05, -largo * .85, -w * .45, -largo - o.hombros);
@@ -298,7 +310,8 @@ const T = (() => {
   // ---------- escena: decorado, títeres, partículas, luz y cámara ----------
   function escena(def, lienzo, fondo) {
     const g = lienzo.getContext('2d'), W = 1280, H = 720, S = lienzo.width / W, capa = document.createElement('canvas'); capa.width = lienzo.width; capa.height = lienzo.height;
-    const K = capa.getContext('2d');
+    const K = capa.getContext('2d'), halo = document.createElement('canvas'), lejos = document.createElement('canvas');
+    halo.width = capa.width / 10; halo.height = capa.height / 10; lejos.width = capa.width / 3; lejos.height = capa.height / 3;
     const cam = t => {                                                 // [x, y, zoom] interpolados entre las claves, más el pulso de la mano
       const c = def.camara || [[0, 640, 360, 1]]; let a = c[0], b = c[0], k = 0;
       for (let i = 0; i < c.length; i++) if (t >= c[i][0]) { a = c[i]; b = c[i + 1] || c[i]; k = b === a ? 0 : suave((t - a[0]) / (b[0] - a[0])); }
@@ -311,7 +324,14 @@ const T = (() => {
       const matriz = par => [z * S, 0, 0, z * S, (W / 2 - (640 + (cx - 640) * par) * z) * S, (H / 2 - (360 + (cy - 360) * par) * z) * S];
       const capaCam = par => g.setTransform(...matriz(par));
       capaCam(.3); g.filter = `brightness(${luz})`; if (fondo && fondo.complete) g.drawImage(fondo, -120, -80, W + 240, H + 160); g.filter = 'none';
-      for (const d of def.decorado || []) { capaCam(d.par ?? 1); if (DECORADOS[d.tipo]) DECORADOS[d.tipo](g, t, d); }
+      // lo lejano (par < 0,6) se dibuja a un tercio de resolución y se agranda: desenfoque de cine casi gratis
+      const lg = lejos.getContext('2d'); let hayLejos = false;
+      const vuelca = () => { if (!hayLejos) return; g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingQuality = 'high'; g.drawImage(lejos, 0, 0, lienzo.width, lienzo.height); g.restore(); lg.setTransform(1, 0, 0, 1, 0, 0); lg.clearRect(0, 0, lejos.width, lejos.height); hayLejos = false; };
+      lg.setTransform(1, 0, 0, 1, 0, 0); lg.clearRect(0, 0, lejos.width, lejos.height);
+      for (const d of def.decorado || []) { const p = d.par ?? 1; if (!DECORADOS[d.tipo]) continue;
+        if (p < .6) { const m = matriz(p), f = lejos.width / lienzo.width; lg.setTransform(m[0] * f, 0, 0, m[3] * f, m[4] * f, m[5] * f); DECORADOS[d.tipo](lg, t, d); hayLejos = true; }
+        else { vuelca(); capaCam(p); DECORADOS[d.tipo](g, t, d); } }
+      vuelca(); capaCam(1);
       capaCam(1);
       // títeres, en su propia capa para que los calados dejen ver el pergamino
       K.setTransform(1, 0, 0, 1, 0, 0); K.clearRect(0, 0, capa.width, capa.height); K.setTransform(...matriz(1)); const luces = [];
@@ -320,7 +340,11 @@ const T = (() => {
         K.globalAlpha = ac.p.tono ?? 1; dibuja(K, ac, t, o); K.restore();
         for (const l of o.luces || []) luces.push([o.x + l[0] * o.f * (ac.p.escala || 1), (def.suelo || 600) + l[1] * (ac.p.escala || 1)]);
       }
-      g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(capa, 0, 0); capaCam(1);
+      g.setTransform(1, 0, 0, 1, 0, 0);
+      if (def.contraluz !== 0) { const h = halo.getContext('2d'); h.globalCompositeOperation = 'copy'; h.drawImage(capa, 0, 0, halo.width, halo.height);
+        h.globalCompositeOperation = 'source-in'; h.fillStyle = 'rgb(255,190,110)'; h.fillRect(0, 0, halo.width, halo.height);
+        g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = (def.contraluz ?? .5) * luz; g.imageSmoothingQuality = 'high'; g.drawImage(halo, 0, 0, capa.width, capa.height); g.restore(); }
+      g.drawImage(capa, 0, 0); capaCam(1);
       for (const d of def.delante || []) if (DECORADOS[d.tipo]) DECORADOS[d.tipo](g, t, d);
       g.globalCompositeOperation = 'lighter';
       for (const [lx, ly] of luces.concat((def.luces || []).map(l => [l[0], l[1]]))) {
@@ -330,6 +354,9 @@ const T = (() => {
       g.globalCompositeOperation = 'source-over';
       PARTICULAS(g, t, def);
       g.setTransform(S, 0, 0, S, 0, 0);
+      for (let i = 0; i < 260; i++) { const r = azar(i * 7 + Math.floor(t * 24) * 131); g.fillStyle = r < .5 ? 'rgba(255,240,210,.05)' : 'rgba(0,0,0,.07)';
+        g.fillRect(azar(i * 3 + Math.floor(t * 24)) * W, azar(i * 5 + 1 + Math.floor(t * 24)) * H, 1.5 + 2 * r, 1.5 + 2 * r); }
+      g.fillStyle = `rgba(0,0,0,${.03 + .03 * azar(Math.floor(t * 12))})`; g.fillRect(0, 0, W, H);
       const v = g.createRadialGradient(640, 380, 300, 640, 380, 820); v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,.72)'); g.fillStyle = v; g.fillRect(0, 0, W, H);
     };
   }

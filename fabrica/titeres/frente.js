@@ -22,6 +22,9 @@
       if (g.hace === 'golpea') d = pon(d, .9 + .5 * Math.max(0, Math.sin(u * 7)), -.6, 'puno', w);
       if (g.hace === 'brazos') { d = pon(d, g.h ?? 1, g.c ?? 0, null, w); }
     }
+    const habla = o.activos.find(a => a.hace === 'habla');
+    if (habla && !o.activos.some(a => !['habla', 'asiente', 'niega'].includes(a.hace))) { const golpe = Math.max(0, Math.sin(t * 4.3 + s)) ** 3;
+      d = pon(d, .55 + .15 * Math.sin(t * 1.7 + s) + .15 * golpe, -1.2 + .5 * golpe, 'abierta', habla.w * .85); }
     return [d, i];
   }
 
@@ -40,7 +43,7 @@
     }
     // tronco y ropa
     const largo = 112 * A, hom = 31 * G * A + 2 * o.hombros, top = caderaY - largo - o.hombros, bar = (p.barriga || 0) * 14 * A;
-    g.save(); g.translate(0, caderaY); g.rotate(.02 * Math.sin(t * 1.1 + s));
+    g.save(); g.translate(0, caderaY); g.rotate(.02 * Math.sin(t * 1.1 + s)); g.scale(1 + .015 * o.respira, 1 + .008 * o.respira);
     g.beginPath(); g.moveTo(-hw * 1.35 - bar, 6 * A); g.bezierCurveTo(-hw * 1.6 - bar, -largo * .4, -hom - 4, -largo * .75, -hom, -largo - o.hombros);
     g.quadraticCurveTo(0, -largo - 8 * A - o.hombros, hom, -largo - o.hombros); g.bezierCurveTo(hom + 4, -largo * .75, hw * 1.6 + bar, -largo * .4, hw * 1.35 + bar, 6 * A); g.closePath(); g.fill();
     if (p.ropa === 'traje') {
@@ -86,7 +89,7 @@
       if (ob && OBJETOS[ob]) OBJETOS[ob](g, mu, sl * a2, t, o, A);
     }
     // cabeza
-    g.save(); g.translate(0, top - 2 * A); g.rotate(.06 * o.cabeza * 0 + .03 * Math.sin(t * .9 + s)); g.scale((p.cabeza || 1) * A * o.cabezaAncho, (p.cabeza || 1) * A);
+    g.save(); g.translate(0, top - 2 * A); g.rotate(.5 * o.cabeza + .03 * Math.sin(t * .9 + s)); g.scale((p.cabeza || 1) * A * o.cabezaAncho, (p.cabeza || 1) * A);
     if (o.activos.some(a => a.hace === 'asiente')) g.translate(0, 3 * Math.max(0, Math.sin(t * 8)));
     esp ? cabezaEspalda(g, p, t, o) : cabezaFrente(g, p, t, o);
     g.restore();

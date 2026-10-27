@@ -65,6 +65,11 @@
     hueco(g, () => { g.rect(-30, -74, 60, 4); g.rect(-30, -64, 46, 4); g.rect(-30, -54, 52, 4); }); g.restore(); };
   D.mesa = (g, t, d) => { const x = d.x, y = d.y || 600, w = d.ancho || 260; g.fillStyle = color(d); g.fillRect(x - w / 2, y - 92, w, 14); g.fillRect(x - w / 2 + 14, y - 80, 12, 80); g.fillRect(x + w / 2 - 26, y - 80, 12, 80);
     hueco(g, () => { for (let i = 0; i < 5; i++) g.rect(x - w / 2 + 20 + i * (w - 40) / 5, y - 88, 14, 6); }); };
+  D.saco = (g, t, d) => {                       // saco de monedas con el símbolo del euro; `crece` lo hincha con el tiempo
+    const x = d.x, y = d.y || 600, e = (d.escala || 1) * (1 + (d.crece || 0) * T.suave((t - (d.en ?? 0)) / 2)); g.save(); g.translate(x, y); g.scale(e, e); g.fillStyle = color(d);
+    g.beginPath(); g.moveTo(-14, -78); g.quadraticCurveTo(-58, -60, -50, -18); g.quadraticCurveTo(-44, 0, 0, 0); g.quadraticCurveTo(44, 0, 50, -18); g.quadraticCurveTo(58, -60, 14, -78); g.closePath(); g.fill();
+    g.fillRect(-16, -90, 32, 12); g.beginPath(); g.moveTo(-10, -90); g.lineTo(-22, -104); g.lineTo(0, -96); g.lineTo(22, -104); g.lineTo(10, -90); g.fill();
+    hueco(g, () => { g.font = '700 46px Georgia, serif'; g.textAlign = 'center'; g.fillText('€', 0, -20); g.textAlign = 'left'; }); g.restore(); };
   D.molino = (g, t, d) => { const x = d.x, y = d.y || 520; g.fillStyle = color(d); g.beginPath(); g.moveTo(x - 26, y); g.lineTo(x - 14, y - 120); g.lineTo(x + 14, y - 120); g.lineTo(x + 26, y); g.fill();
     g.save(); g.translate(x, y - 120); g.rotate(t * .6); for (let i = 0; i < 4; i++) { g.rotate(TAU / 4); g.fillRect(-3, 0, 6, 90); g.fillRect(3, 20, 18, 66); } g.restore(); };
   D.nubes = (g, t, d) => { g.fillStyle = color(d);

@@ -31,6 +31,10 @@ fotos y moverlas. Todo es reutilizable: una escena nueva = combinar personajes, 
   Ejemplo: `escenas/mitin2.js` (primer plano de frente, contraplano desde la espalda).
 - `decorado` (detrás, con `par` = parallax y `tono` = lejanía), `delante` (por delante de los títeres), `luces`, `particulas`
   (`pajaros`, `papeles`, `confeti`, `hojas`, `polvo`).
+- Por plano: `transicion: 'viento'` (una ráfaga dibujada barre la pantalla y cambia de plano) y `tinte: 'rojo' | 'noche' | 'sepia'`
+  (rojo = momento tenso, cielo rojo con siluetas negras).
+- `voces: [{ en, dura, quien, texto, archivo }]` (subtítulos con el nombre en dorado; el audio se mezcla al grabar si el archivo existe) y
+  `carteles: [{ en, hasta, titulo, filas: [[texto, valor, color]], fuente }]` (datos reales con su fuente). Ejemplo: `escenas/sueldo.js`.
 - `camara`: `[segundo, x, y, zoom]`. **Dos claves en el mismo segundo = corte de plano** (plano general → medio → primer plano → contraplano).
 
 ## Ideas de estilo (el usuario: «como un corto de Netflix»)

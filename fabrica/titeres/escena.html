@@ -8,13 +8,78 @@
 // Para grabar: fabrica/titeres/grabar.mjs (llama a window.dibuja(t) fotograma a fotograma).
 const nombre = new URLSearchParams(location.search).get('e') || 'mitin';
 const fondo = new Image(); fondo.src = '../../historias/espanistan/sombras/pergamino.png';
+const TINTES = { rojo: 'rgb(214,52,38)', noche: 'rgb(90,110,170)', sepia: 'rgb(235,200,150)' };
+// ráfaga de viento dibujada (a lo Samurai Jack, pero en teatro de sombras): cintas negras que se enroscan con cortes de papel,
+// líneas de velocidad y hojas, todo a lo largo del frente que barre la pantalla
+function viento(g, t, k, frente) {
+  const A = i => { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+  for (let i = 0; i < 9; i++) {
+    const y0 = 40 + i * 80 + 30 * A(i), largo = 520 + 420 * A(i + 9), grosor = 14 + 46 * A(i + 3), cabeza = frente + 140 * A(i + 5) - (y0 / 720) * 260;
+    const ola = x => y0 + 38 * Math.sin((x - cabeza) / 90 + i) + 18 * Math.sin((x - cabeza) / 37 + k * 9);
+    g.beginPath();
+    for (let j = 0; j <= 24; j++) { const u = j / 24, x = cabeza - largo * u, w = grosor * Math.sin(Math.PI * Math.min(1, u * 1.4)) * (1 - u * .6); g.lineTo(x, ola(x) - w / 2); }
+    for (let j = 24; j >= 0; j--) { const u = j / 24, x = cabeza - largo * u, w = grosor * Math.sin(Math.PI * Math.min(1, u * 1.4)) * (1 - u * .6); g.lineTo(x + (j % 3 === 0 ? 14 : 0), ola(x) + w / 2); }
+    g.closePath(); g.fillStyle = '#0b0705'; g.fill();
+    g.strokeStyle = 'rgba(242,214,160,.85)'; g.lineWidth = 2; g.beginPath();      // corte de papel dentro de la cinta
+    for (let j = 2; j <= 18; j++) { const x = cabeza - largo * j / 24; j === 2 ? g.moveTo(x, ola(x)) : g.lineTo(x, ola(x)); } g.stroke();
+    const rizo = cabeza + 10, ry = ola(cabeza);                          // la punta se enrosca
+    g.lineWidth = Math.max(3, grosor * .18); g.lineCap = 'round'; g.strokeStyle = '#0b0705'; g.beginPath(); g.arc(rizo - grosor * .3, ry - grosor * .45, grosor * .45, Math.PI * .55, Math.PI * (1.45 + .25 * Math.sin(k * 6 + i))); g.stroke();
+  }
+  g.strokeStyle = 'rgba(11,7,5,.7)'; g.lineWidth = 3;                    // líneas de velocidad
+  for (let i = 0; i < 26; i++) { const y = 720 * A(i + 40), x = frente + 300 * A(i + 60) - 200, l = 120 + 260 * A(i + 80); g.beginPath(); g.moveTo(x, y); g.lineTo(x - l, y + 8); g.stroke(); }
+  g.fillStyle = '#0b0705';                                               // hojas arrastradas
+  for (let i = 0; i < 18; i++) { g.save(); g.translate(frente + 220 * A(i + 100) - 60, 720 * A(i + 120) + 30 * Math.sin(t * 9 + i)); g.rotate(t * 11 + i); g.beginPath(); g.ellipse(0, 0, 9, 3.5, 0, 0, Math.PI * 2); g.fill(); g.restore(); }
+}
+// subtítulos de las voces (ESCENA.voces: {en, dura, quien, texto, archivo}); el nombre del personaje en dorado
+function subtitulos(g, t) {
+  const v = (ESCENA.voces || []).find(v => t >= v.en && t < v.en + v.dura + .25); if (!v) return;
+  const a = Math.min(1, (t - v.en) / .2, (v.en + v.dura + .25 - t) / .2);
+  g.save(); g.globalAlpha = a; g.font = '600 30px Georgia, serif'; g.textAlign = 'center';
+  const nombre = v.quien && v.quien !== 'narrador' ? v.quien.toUpperCase() + ':  ' : '', txt = nombre + v.texto, w = g.measureText(txt).width;
+  g.fillStyle = 'rgba(10,6,3,.62)'; g.fillRect(640 - w / 2 - 22, 636, w + 44, 48);
+  g.fillStyle = v.quien && v.quien !== 'narrador' ? '#f2c14e' : '#f4ead2'; g.font = (nombre ? 'italic ' : '') + '600 30px Georgia, serif'; g.fillText(txt, 640, 670); g.restore();
+}
+// carteles con datos (ESCENA.carteles: {en, hasta, titulo, filas: [[texto, valor, color]], fuente}), en papel viejo
+function carteles(g, t) {
+  for (const c of ESCENA.carteles || []) {
+    if (t < c.en || t > c.hasta) continue;
+    const a = Math.min(1, (t - c.en) / .35, (c.hasta - t) / .3), x = c.x ?? 700, y = c.y ?? 90, w = c.ancho ?? 520, h = 92 + c.filas.length * 64;
+    g.save(); g.globalAlpha = a; g.translate(x + w / 2, y + h / 2); g.rotate(-.012); g.scale(.92 + .08 * Math.min(1, (t - c.en) / .35), .92 + .08 * Math.min(1, (t - c.en) / .35)); g.translate(-w / 2, -h / 2);
+    g.fillStyle = 'rgba(0,0,0,.35)'; g.fillRect(8, 10, w, h); g.fillStyle = '#efe0bd'; g.fillRect(0, 0, w, h); g.strokeStyle = '#3a2410'; g.lineWidth = 3; g.strokeRect(8, 8, w - 16, h - 16);
+    g.fillStyle = '#2a1708'; g.font = '700 26px Georgia, serif'; g.fillText(c.titulo, 28, 48);
+    c.filas.forEach(([txt, val, col], i) => { const ti = c.en + .5 + i * (c.paso ?? .9); if (t < ti) return; const k = Math.min(1, (t - ti) / .3);
+      g.globalAlpha = a * k; g.font = '500 22px Georgia, serif'; g.fillStyle = '#2a1708'; g.fillText(txt, 28, 96 + i * 64);
+      g.font = '700 34px Georgia, serif'; g.fillStyle = col || '#7a1d0c'; g.textAlign = 'right'; g.fillText(val, w - 28, 100 + i * 64); g.textAlign = 'left'; });
+    g.globalAlpha = a; g.font = 'italic 16px Georgia, serif'; g.fillStyle = '#5b4126'; g.fillText('Fuente: ' + c.fuente, 28, h - 20); g.restore();
+  }
+}
 window.listo = new Promise(r => {
   const s = document.createElement('script'); s.src = `escenas/${nombre}.js`;
   s.onload = () => { const lienzo = document.getElementById('c');
     lienzo.width = 1920; lienzo.height = 1080;   // se dibuja directamente a 1080p
     // una escena puede tener varios planos con su propio decorado y reparto (contraplanos, vistas de frente o de espaldas)
-    const planos = (ESCENA.planos || [ESCENA]).map(pl => ({ desde: pl.desde ?? 0, pinta: T.escena(Object.assign({ fps: ESCENA.fps, suelo: ESCENA.suelo }, pl), lienzo, fondo) }));
-    window.dibuja = t => { let pl = planos[0]; for (const q of planos) if (t >= q.desde) pl = q; pl.pinta(t); };
+    // cada plano se puede pintar en el lienzo o en uno auxiliar (para las transiciones de viento)
+    const aux = document.createElement('canvas'); aux.width = lienzo.width; aux.height = lienzo.height;
+    const planos = (ESCENA.planos || [ESCENA]).map(pl => { const d = Object.assign({ fps: ESCENA.fps, suelo: ESCENA.suelo }, pl);
+      return { desde: pl.desde ?? 0, def: pl, pinta: T.escena(d, lienzo, fondo), pintaAux: T.escena(d, aux, fondo) }; });
+    const g = lienzo.getContext('2d');
+    const tinte = (c, pl) => { if (!pl.def.tinte) return; const x = c.getContext('2d'); x.save(); x.setTransform(1, 0, 0, 1, 0, 0);
+      x.globalCompositeOperation = 'multiply'; x.fillStyle = TINTES[pl.def.tinte] || pl.def.tinte; x.fillRect(0, 0, c.width, c.height); x.restore(); };
+    window.dibuja = t => {
+      t = Math.floor(t * (ESCENA.fps || 12) + 1e-6) / (ESCENA.fps || 12);
+      let i = 0; planos.forEach((q, k) => { if (t >= q.desde) i = k; });
+      const sig = planos[i + 1], viene = sig && sig.def.transicion === 'viento' && t >= sig.desde - .5;
+      const actual = planos[i], fue = actual.def.transicion === 'viento' && t < actual.desde + .4 && i > 0;
+      if (viene || fue) {                                              // el viento barre la pantalla y deja ver el plano siguiente
+        const [a, b, t0] = viene ? [actual, sig, sig.desde] : [planos[i - 1], actual, actual.desde];
+        a.pinta(t); tinte(lienzo, a); b.pintaAux(t); tinte(aux, b);
+        const k = (t - (t0 - .5)) / .9, frente = -500 + 2400 * k;
+        g.save(); g.setTransform(1.5, 0, 0, 1.5, 0, 0); g.beginPath(); g.moveTo(-50, -50);
+        for (let y = -50; y <= 770; y += 30) g.lineTo(frente - 160 * Math.sin(y / 120 + k * 4) - (y / 720) * 260, y);
+        g.lineTo(-50, 770); g.closePath(); g.clip(); g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(aux, 0, 0); g.restore();
+        g.setTransform(1.5, 0, 0, 1.5, 0, 0); viento(g, t, k, frente);
+      } else { actual.pinta(t); tinte(lienzo, actual); }
+      g.setTransform(1.5, 0, 0, 1.5, 0, 0); carteles(g, t); subtitulos(g, t); };
     window.DURA = ESCENA.dura; window.FPS = ESCENA.fps || 12;
     const fin = () => { r(); let t0 = null; const vivo = ts => { if (t0 === null) t0 = ts; if (!window.grabando) window.dibuja(((ts - t0) / 1000) % ESCENA.dura); requestAnimationFrame(vivo); }; requestAnimationFrame(vivo); };
     fondo.complete ? fin() : (fondo.onload = fondo.onerror = fin); };
