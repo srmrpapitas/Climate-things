@@ -26,6 +26,16 @@
    - El narrador puede dejar caer «X dice que…» y entonces entra el primer plano de X.
 4. **Personaje-protagonista satírico**: vendehúmos que promete; frases de sátira sobre promesas y hechos documentados. **Nunca** atribuirle delitos sin sentencia.
 
+## Más animación por escena (lección del ep. 2, el usuario: «las animaciones son mínimas»)
+- **Una acción cada 4–5 s** en cada plano de teatro (en el ep. 2 había 1–3 por plano: poco). Que siempre se mueva algo.
+- **Más piezas articuladas** por protagonista: brazo(s), antebrazo, cabeza y, si camina, piernas (`pivote` en cadera/rodilla). Recortarlas
+  con `poli` y `padre` como en `historias/espanistan/sombras/ep02/promesas.json` (el Decano con brazo, bastones y cabeza).
+- **Acciones encadenadas que cuenten la frase**: alza → saluda → asiente; el público salta y luego asiente; el que es nombrado tiembla o se inclina.
+- **Capas que dan vida sin recortar nada**: parallax (el fondo se mueve más lento que las figuras), partículas (lluvia, polvo en la luz, humo)
+  y parpadeo del candil. Pedirlas en la plantilla una vez y reutilizarlas.
+- **Cámara**: un zoom o un paneo en cada plano, hacia quien actúa.
+- No sube el coste en créditos: solo algo más de trabajo al marcar piezas (unas cajas más por escena).
+
 ## Pasos (≈ 2–3 h de trabajo de Claude por capítulo)
 1. **Guion** `historias/espanistan/NN-tema.md` (datos + fuentes) → `fabrica/herramientas/guion_espanistan-NN.txt`.
    - Una frase por línea, números en letra.
