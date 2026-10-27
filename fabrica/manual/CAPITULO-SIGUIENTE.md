@@ -47,6 +47,16 @@
 - **Más escenas, cada una muy animada** (el usuario, 27-10-2026): ≈ 12–15 escenarios por capítulo con FLUX local (gratis, ≈ 15 min cada uno; lanzarlos todos en tmux al empezar, mientras se hace la voz).
 - **Ritmo: un vídeo cada dos días** (≈ 15 al mes ≈ 120.000 créditos con el narrador normal, ≈ 66.000 con flash). Render siempre por partes (`render_partes.py`).
 
+## Decisión del usuario (27-10-2026): narrador con ElevenLabs, escenas con FLUX
+- **Narrador: ElevenLabs** (voz D, paso 2). **Escenarios: FLUX local** (paso 5), sin ElevenLabs.
+- Truco del pergamino: el FLUX sale con un degradado naranja liso. Encima se pone una textura de pergamino manchado y una viñeta:
+  1. La silueta se queda negra.
+  2. Lo claro toma el pergamino.
+  3. Se oscurecen los bordes.
+  - Ejemplo: `historias/espanistan/sombras/prueba_flux2.png` (semilla 11).
+  - Usar un pergamino **limpio**, sin dibujos: generarlo una vez con FLUX y guardarlo en `historias/espanistan/sombras/pergamino.png`.
+  - Código de la prueba: `luz = clip((gris − 0,12) / 0,6)`, `resultado = pergamino × luz × 1,05 × viñeta`.
+
 ## Pasos (≈ 2–3 h de trabajo de Claude por capítulo)
 1. **Guion** `historias/espanistan/NN-tema.md` (datos + fuentes) → `fabrica/herramientas/guion_espanistan-NN.txt`.
    - Una frase por línea, números en letra.
