@@ -89,7 +89,8 @@ D.PLANOS.forEach((p, i) => {
       el('img', null, null, d).src = `assets/sombras/${p.escena}/${n}.png`; p.E[n] = d;
       Object.keys(p.piezas).filter(c => p.piezas[c].padre === n).forEach(c => crea(c, d)); };
     Object.keys(p.piezas).filter(n => !p.piezas[n].padre).forEach(n => crea(n));
-    p.candil = el('div', 'capa candil', null, m);
+    p.candil = el('div', 'capa candil', null, m); p.fondoImg = m.firstChild;
+    p.lienzo = el('canvas', 'capa', null, m); p.lienzo.width = W; p.lienzo.height = H;   // partículas (lluvia, chispas, humo…)
     (p.acciones || []).forEach(a => { a.n = ['asiente', 'niega'].includes(a.hace) && p.piezas[a.pieza + '_c'] ? a.pieza + '_c' : a.pieza; });
   } else if (p.tipo === 'retrato') {         // primer plano a lápiz, bandas negras; habla alternando boca cerrada/abierta
     m.style.background = '#eceae4'; p.cara = el('div', 'cara', null, m);
@@ -134,7 +135,7 @@ D.PLANOS.forEach(p => (p.capas || []).forEach(c => {
   }
   if (c.tipo === 'barras') {
     const mx = c.max || Math.max(...c.filas.map(f => f[1]));
-    e = el('div', 'c tarjeta barras', `<h3>${c.titulo}</h3>` + c.filas.map(([n, v, col]) => `<div class="fila"><div class="n">${n}</div><div class="b" style="width:${900 * v / mx}px;background:${COLOR[col] || col}"></div><div>${String(v).replace('.', ',')} %</div></div>`).join('') + (c.fuente ? `<div class="fuente">${c.fuente}</div>` : ''), $('capas'));
+    e = el('div', 'c tarjeta barras', `<h3>${c.titulo}</h3>` + c.filas.map(([n, v, col]) => `<div class="fila"><div class="n">${n}</div><div class="b" style="width:${900 * v / mx}px;background:${COLOR[col] || col}"></div><div>${String(v).replace('.', ',')}${c.unidad != null ? c.unidad : ' %'}</div></div>`).join('') + (c.fuente ? `<div class="fuente">${c.fuente}</div>` : ''), $('capas'));
     c.anim = [...e.querySelectorAll('.b')];
   }
   if (c.tipo === 'lista') {
@@ -164,6 +165,7 @@ function camara(p, t) {
   const a = p.cam || [640, 360, 1.05], b = p.cam2 || [a[0], a[1], a[2] * 1.08], k = suave(clamp((t - p.ini) / Math.max(1, p.fin - p.ini)));
   let c = a.map((x, i) => x + (b[i] - x) * k);
   for (const [t0, x, y, z, d] of p.zooms || []) { const q = suave(clamp((t - t0) / (d || .8))); if (t >= t0) c = c.map((v, i) => v + ([x, y, z][i] - v) * q); }
+  if (p.tipo === 'teatro') c = [c[0] + 5 * Math.sin(t * .37) + 2 * Math.sin(t * 1.1), c[1] + 4 * Math.sin(t * .29), c[2] * (1 + .008 * Math.sin(t * .23))];   // cámara al hombro: nunca quieta
   return c;
 }
 // marionetas del teatro: vaivén suave según el tipo de pieza + lo que el guion les pide (acciones)
@@ -192,10 +194,48 @@ function mueve(p, t) {
       if (a.hace === 'crece') sc *= 1 + g(.2) * e;
       if (a.hace === 'avanza') dx += g(40) * e;
       if (a.hace === 'desaparece') op *= 1 - e;
-      if (a.hace === 'aparece') op *= e; }
+      if (a.hace === 'aparece') op *= e;
+      const p1 = r01(t, a.ini, a.fin);                                    // acciones que se quedan hechas (la escena evoluciona)
+      if (a.hace === 'entra') dx += g(-900) * (1 - p1);
+      if (a.hace === 'sale') dx += g(900) * p1;
+      if (a.hace === 'arrastra') { dx += g(500) * p1; rot += 3 * Math.sin(t * 6) * ven(t, a.ini, a.fin); }
+      if (a.hace === 'camina') { dx += g(200) * p1; dy -= 6 * Math.abs(Math.sin(t * 7)) * ven(t, a.ini, a.fin, .3); rot += 2 * Math.sin(t * 7) * ven(t, a.ini, a.fin, .3); }
+      if (a.hace === 'cae') { dy += g(420) * p1 * p1; rot += 35 * p1; }
+      if (a.hace === 'sube') dy -= g(80) * p1;
+      if (a.hace === 'gira') rot += g(1) * 360 * (t - a.ini) * (t > a.ini ? 1 : 0) * (t < a.fin ? 1 : 0);
+      if (a.hace === 'late') sc *= 1 + g(.06) * Math.max(0, Math.sin(t * 7)) * ven(t, a.ini, a.fin); }
     p.E[n].style.transform = `translate(${dx}px, ${dy}px) rotate(${rot}deg) scale(${sc})`; p.E[n].style.opacity = op;
   }
   p.candil.style.opacity = .7 + .2 * Math.sin(t * 5.3) + .1 * Math.sin(t * 9.1);
+  particulas(p, t);
+}
+// partículas deterministas (dependen solo de t, para que el render por fotogramas salga igual): polvo siempre + las que pida el plano
+const azar = i => { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+function particulas(p, t) {
+  const c = p.lienzo.getContext('2d'); c.clearRect(0, 0, W, H);
+  const lista = [{ tipo: 'polvo', ini: p.ini, fin: p.fin + .3, n: 40 }].concat(p.particulas || []);
+  for (const q of lista) {
+    const e = clamp((t - q.ini) / (q.sube || 1.2)) * clamp((q.fin - t) / .6), [x0, y0, x1, y1] = q.zona || [0, 0, W, H];
+    if (e <= 0) continue; const n = Math.round((q.n || 60) * e), zw = x1 - x0, zh = y1 - y0;
+    for (let i = 0; i < n; i++) {
+      const r1 = azar(i + 1), r2 = azar(i + 101), r3 = azar(i + 201);
+      if (q.tipo === 'lluvia') { const v = 700 + 300 * r3, y = y0 + ((r2 * zh + v * t) % zh), x = x0 + ((r1 * zw + .25 * v * t) % zw);
+        c.strokeStyle = 'rgba(30,18,8,.55)'; c.lineWidth = 1.6; c.beginPath(); c.moveTo(x, y); c.lineTo(x - 6, y - 24); c.stroke(); }
+      if (q.tipo === 'polvo') { const y = y0 + ((r2 * zh - 12 * t * (.5 + r3)) % zh + zh) % zh, x = x0 + r1 * zw + 18 * Math.sin(t * (.3 + r3) + i);
+        c.fillStyle = `rgba(255,225,160,${.12 + .2 * r3})`; c.beginPath(); c.arc(x, y, 1 + 1.6 * r3, 0, 7); c.fill(); }
+      if (q.tipo === 'chispas') { const vida = 1.6 + r3, u = ((t + r1 * vida) % vida) / vida, x = x0 + r2 * zw + 25 * Math.sin(u * 6 + i), y = y1 - u * zh;
+        c.fillStyle = `rgba(255,${150 + 80 * r3 | 0},60,${(1 - u) * .9})`; c.beginPath(); c.arc(x, y, 1.5 + 2 * (1 - u), 0, 7); c.fill(); }
+      if (q.tipo === 'humo') { const vida = 4 + 2 * r3, u = ((t + r1 * vida) % vida) / vida, x = x0 + r2 * zw + 40 * u * Math.sin(i), y = y1 - u * zh;
+        c.fillStyle = `rgba(20,12,6,${.28 * (1 - u)})`; c.beginPath(); c.arc(x, y, 10 + 45 * u, 0, 7); c.fill(); }
+      if (q.tipo === 'monedas') { const vida = 1.4 + r3, u = ((t + r1 * vida) % vida) / vida, x = x0 + r2 * zw, y = y0 + u * zh, a = Math.abs(Math.sin(t * 6 + i));
+        c.fillStyle = '#e7b53c'; c.strokeStyle = '#3a2508'; c.lineWidth = 2; c.beginPath(); c.ellipse(x, y, 9 * a + 1, 9, 0, 0, 7); c.fill(); c.stroke(); }
+      if (q.tipo === 'papeles') { const vida = 3 + 2 * r3, u = ((t + r1 * vida) % vida) / vida, x = x0 + r2 * zw + 60 * Math.sin(u * 5 + i), y = y0 + u * zh;
+        c.save(); c.translate(x, y); c.rotate(u * 9 + i); c.fillStyle = 'rgba(240,228,200,.9)'; c.strokeStyle = '#2a1a0c'; c.lineWidth = 1.5; c.fillRect(-10, -13, 20, 26); c.strokeRect(-10, -13, 20, 26); c.restore(); }
+      if (q.tipo === 'pajaros') { const vida = 7 + 4 * r3, u = ((t + r1 * vida) % vida) / vida, x = x0 + u * zw, y = y0 + r2 * zh + 15 * Math.sin(t * 2 + i), al = 6 * Math.sin(t * 12 + i);
+        c.strokeStyle = '#140c06'; c.lineWidth = 2.5; c.beginPath(); c.moveTo(x - 11, y - al); c.lineTo(x, y); c.lineTo(x + 11, y - al); c.stroke(); }
+      if (q.tipo === 'estrellas') { const b = .4 + .6 * Math.abs(Math.sin(t * (1 + r3) + i)); c.fillStyle = `rgba(255,240,200,${b})`; c.beginPath(); c.arc(x0 + r1 * zw, y0 + r2 * zh, 1.5 + r3, 0, 7); c.fill(); }
+    }
+  }
 }
 function pinta(t) {
   $('turb').setAttribute('seed', Math.floor(t * 12) % 7 + 1);
@@ -208,6 +248,7 @@ function pinta(t) {
       p.ab.style.opacity = clamp(((D.BOCA_F[Math.floor(t * 30)] || 0) - .25) / .2); }
     const [x, y, z] = camara(p, t), s = ESC * z, tx = Math.min(0, Math.max(1920 - W * s, 960 - x * s)), ty = Math.min(0, Math.max(1080 - H * s, 540 - y * s));
     p.el.style.transform = `translate(${tx}px, ${ty}px) scale(${s})`;
+    if (p.fondoImg) p.fondoImg.style.transform = `translate(${(x - 640) * .07}px, ${(y - 360) * .05}px) scale(1.04)`;   // parallax: el telón va más lento
     const parpadea = (t % 3.7) < .13;
     if (p.brillo) p.brillo.style.opacity = .35 + .45 * (.5 + .22 * Math.sin(t * 7.3) + .16 * Math.sin(t * 13.1 + 1) + .12 * Math.sin(t * 3.7 + 2));
     if (p.titere) { p.titere.style.transform = `scale(${1 + .004 * Math.sin(t * 2.2)}, ${1 + .007 * Math.sin(t * 2.2)})`;

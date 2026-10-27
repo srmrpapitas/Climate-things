@@ -9,7 +9,9 @@
 #               "musica": "neutro|misterio|esperanza|tension|silencio", "capas": [...], "sfx": [[nombre, ANCLA, volumen]]}]
 #   capas: {"tipo": "dato|cita|frasco|barras|lista|comparacion|linea|sello|pines|titulo", "en": ANCLA, "hasta": ANCLA, ...}
 #   tipo «teatro»: "escena" (carpeta de sombras.py en cfg['sombras']), "acciones": [{"pieza", "hace": asiente|niega|alza|saluda|salta|
-#     tiembla|inclina|golpea|balancea|crece|avanza|aparece|desaparece, "en", "hasta", "g": cantidad}]
+#     tiembla|inclina|golpea|balancea|crece|avanza|aparece|desaparece  (vuelven a su sitio) | entra|sale|arrastra|camina|cae|sube|gira|late
+#     (se quedan hechas: la escena evoluciona), "en", "hasta", "g": cantidad}],
+#     "particulas": [{"tipo": lluvia|chispas|humo|monedas|papeles|pajaros|estrellas|polvo, "en", "hasta", "n", "zona": [x0, y0, x1, y1] en 1280×720}]
 #   tipo «retrato»: "img" (p1|p2…), "lado" (1 mira a la derecha, -1 izquierda), "z": [zoom inicio, fin], "y": deriva; habla con BOCA_F
 #   voces de personaje: {"archivo", "texto", "quien": "feijolo"} (sin "lineas")
 #   ANCLA = "B:palabras" (B = número de voz, 1…; palabras del guion; "#2" = segunda vez) o un número de segundos.
@@ -94,6 +96,8 @@ for p in planos:
         for it in c.get('pines', []):
             if len(it) > 4: it[4] = ancla(it[4])
     for z in p.get('zooms', []): z[0] = ancla(z[0])
+    for q in p.get('particulas', []):
+        q['ini'] = ancla(q['en']) if 'en' in q else p['ini']; q['fin'] = ancla(q['hasta']) if 'hasta' in q else p['fin'] + .3
     for ac in p.get('acciones', []):
         ac['ini'] = ancla(ac['en']) if 'en' in ac else p['ini'] + .3
         ac['fin'] = ancla(ac['hasta']) if 'hasta' in ac else (p['fin'] if ac['hace'] in ('desaparece', 'aparece') else ac['ini'] + 2.5)
