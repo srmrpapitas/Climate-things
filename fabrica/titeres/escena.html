@@ -2,7 +2,7 @@
 <html><head><meta charset="utf-8"><title>Teatro de títeres</title>
 <style>html,body{margin:0;background:#000}canvas{display:block;width:1280px;height:720px}</style></head>
 <body><canvas id="c" width="1280" height="720"></canvas>
-<script src="titeres.js"></script><script src="personajes.js"></script><script src="decorados.js"></script>
+<script src="titeres.js"></script><script src="personajes.js"></script><script src="decorados.js"></script><script src="frente.js"></script>
 <script>
 // Reproductor: escena.html?e=NOMBRE carga escenas/NOMBRE.js (que define window.ESCENA) y la reproduce en bucle.
 // Para grabar: fabrica/titeres/grabar.mjs (llama a window.dibuja(t) fotograma a fotograma).
@@ -12,7 +12,9 @@ window.listo = new Promise(r => {
   const s = document.createElement('script'); s.src = `escenas/${nombre}.js`;
   s.onload = () => { const lienzo = document.getElementById('c');
     lienzo.width = 1920; lienzo.height = 1080;   // se dibuja directamente a 1080p
-    window.dibuja = T.escena(window.ESCENA, lienzo, fondo);
+    // una escena puede tener varios planos con su propio decorado y reparto (contraplanos, vistas de frente o de espaldas)
+    const planos = (ESCENA.planos || [ESCENA]).map(pl => ({ desde: pl.desde ?? 0, pinta: T.escena(Object.assign({ fps: ESCENA.fps, suelo: ESCENA.suelo }, pl), lienzo, fondo) }));
+    window.dibuja = t => { let pl = planos[0]; for (const q of planos) if (t >= q.desde) pl = q; pl.pinta(t); };
     window.DURA = ESCENA.dura; window.FPS = ESCENA.fps || 12;
     const fin = () => { r(); let t0 = null; const vivo = ts => { if (t0 === null) t0 = ts; if (!window.grabando) window.dibuja(((ts - t0) / 1000) % ESCENA.dura); requestAnimationFrame(vivo); }; requestAnimationFrame(vivo); };
     fondo.complete ? fin() : (fondo.onload = fondo.onerror = fin); };

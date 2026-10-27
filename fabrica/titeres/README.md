@@ -10,6 +10,7 @@ fotos y moverlas. Todo es reutilizable: una escena nueva = combinar personajes, 
 ## Piezas
 | Archivo | Qué hay |
 |---|---|
+| `frente.js` | Vistas de frente y de espaldas: cara con ojos, cejas, nariz y boca; ropa por delante y por detrás; gestos. |
 | `titeres.js` | El motor: esqueleto, caminar con los pies apoyados, gestos, boca, parpadeo, movimiento secundario, cámara, luz, partículas. |
 | `personajes.js` | Fichas: `decano`, `acascar`, `sanchis`, `feijolo` y `ciudadano(n)` (gente variada y siempre igual para el mismo n). |
 | `decorados.js` | `suelo`, `colinas`, `montes`, `ciudad`, `congreso`, `arbol`, `farola`, `atril`, `bandera`, `urna`, `mesa`, `molino`, `nubes`, `astro`, `telon`. |
@@ -22,7 +23,12 @@ fotos y moverlas. Todo es reutilizable: una escena nueva = combinar personajes, 
   - `gira`;
   - gestos: `puno`, `senala`, `saluda`, `celebra`, `aplaude`, `encoge`, `piensa`, `golpea`, `asiente`, `niega`, `inclina`, `salta`;
   - `brazos` (ángulos a mano: `h`, `c`, `h2`, `c2`);
-  - `habla` (mueve la mandíbula).
+  - `habla` (mueve la mandíbula);
+  - `vista` (con `a`: `perfil` | `frente` | `espalda`; se da la vuelta como una carta);
+  - `acerca` (con `a`: escala final; anda hacia la cámara o se aleja).
+- También se puede empezar ya de frente o de espaldas: `{ ..., vista: 'frente', z: 1.5 }` (`z` = cerca o lejos de la cámara).
+- **Varios planos con decorado y reparto propios** (contraplanos): `planos: [{ desde, decorado, actores, camara, ... }, ...]`.
+  Ejemplo: `escenas/mitin2.js` (primer plano de frente, contraplano desde la espalda).
 - `decorado` (detrás, con `par` = parallax y `tono` = lejanía), `delante` (por delante de los títeres), `luces`, `particulas`
   (`pajaros`, `papeles`, `confeti`, `hojas`, `polvo`).
 - `camara`: `[segundo, x, y, zoom]`. **Dos claves en el mismo segundo = corte de plano** (plano general → medio → primer plano → contraplano).

@@ -54,7 +54,16 @@ const T = (() => {
     const vel = (r.x - r2.x) * 24, anda = clamp(Math.abs(vel) / (90 * p.alto)), velAtras = (r2.x - r3.x) / .18;
     const o = { x: r.x, y: 0, f: r.f, fase: r.fase, anda, vel: vel * Math.sign(r.mira), velAtras: velAtras * Math.sign(r.mira),
       inclina: .07 * anda + (p.encorvado || 0) + .015 * ruido(t * .7, s), cabeza: .03 * ruido(t * .9, s + 2), boca: 0, aplasta: 1,
-      parpadea: ((t + azar(s) * 4) % (3.2 + azar(s + 1))) < .12, hombros: 0, cabezaAncho: 1 };
+      parpadea: ((t + azar(s) * 4) % (3.2 + azar(s + 1))) < .12, hombros: 0, cabezaAncho: 1, cejas: .15 * ruido(t * .6, s + 7),
+      ojos: .5 * Math.sin(t * .7 + s) * (Math.sin(t * .23 + s) > 0), activos: [] };
+    // vista (perfil / frente / espalda): al cambiar, el títere se estrecha y se da la vuelta como una carta
+    let vista = ac.vista || 'perfil', cambio = -9, antes = vista;
+    for (const a of ac.acciones) if (a.hace === 'vista' && t >= a.en - .15) { antes = vista; vista = a.a; cambio = a.en - .15; }
+    const kv = clamp((t - cambio) / .3); o.vista = kv < .5 ? antes : vista; o.giroVista = kv < 1 ? Math.max(.06, Math.abs(Math.cos(Math.PI * kv))) : 1;
+    // acercarse o alejarse de la cámara (crece o encoge mientras anda de frente)
+    o.z = ac.z || 1; o.andaFrente = 0; o.faseFrente = 0;
+    for (const a of ac.acciones) if (a.hace === 'acerca' && t > a.en) { const q = suave((t - a.en) / (a.hasta - a.en)); o.z = mezcla(o.z, a.a, q);
+      if (t < a.hasta) { o.andaFrente = Math.min(1, 4 * q, 4 * (1 - q)); o.faseFrente = (t - a.en) * 1.7; } }
     const sw = Math.sin(TAU * r.fase) * anda;
     o.cerca = [.12 - .42 * sw + .03 * ruido(t, s + 4), .22 + .25 * anda, p.mano || 'abierta'];
     o.lejos = [.1 + .42 * sw + .03 * ruido(t, s + 5), .2 + .25 * anda, p.manoLejos || 'abierta'];
@@ -65,15 +74,16 @@ const T = (() => {
   function gesto(a, t, o, s) {
     const hasta = a.hasta ?? a.en + 1.2, [w, ant] = peso(t, a.en, hasta), u = t - a.en;
     if (w === 0 && ant === 0 && a.hace !== 'salta') return;
+    o.activos.push({ hace: a.hace, w, ant, u, h: a.h, c: a.c });
     switch (a.hace) {
-      case 'puno': brazo(o, 'cerca', 2.3 + .08 * Math.sin(t * 11) + .5 * ant, .7, 'puno', w); o.inclina -= .06 * w; o.cabeza -= .05 * w; break;
+      case 'puno': o.cejas -= .6 * w; brazo(o, 'cerca', 2.3 + .08 * Math.sin(t * 11) + .5 * ant, .7, 'puno', w); o.inclina -= .06 * w; o.cabeza -= .05 * w; break;
       case 'senala': brazo(o, 'cerca', 1.5 + .04 * Math.sin(t * 3) + .3 * ant, .05, 'indice', w); o.inclina += .05 * w; break;
       case 'saluda': brazo(o, 'cerca', 2.55, .55 + .4 * Math.sin(u * 10), 'abierta', w); o.cabeza -= .05 * w; break;
       case 'celebra': brazo(o, 'cerca', 2.9 + .12 * Math.sin(t * 9 + s), .2, 'abierta', w); brazo(o, 'lejos', 2.75 + .12 * Math.sin(t * 9 + s + 1), .25, 'abierta', w);
         o.y -= 12 * w * Math.abs(Math.sin(t * 6 + s)); o.cabeza -= .1 * w; break;
       case 'aplaude': brazo(o, 'cerca', 1.25, .95 + .3 * Math.sin(t * 15 + s), 'abierta', w); brazo(o, 'lejos', 1.1, 1.05, 'abierta', w); break;
-      case 'encoge': brazo(o, 'cerca', .45, 1.7, 'abierta', w); brazo(o, 'lejos', .4, 1.75, 'abierta', w); o.hombros = 8 * w; o.cabeza += .18 * w; break;
-      case 'piensa': brazo(o, 'cerca', .55, 2.45, 'puno', w); o.cabeza += .16 * w + .03 * Math.sin(t * 2) * w; o.inclina += .04 * w; break;
+      case 'encoge': o.cejas += .8 * w; brazo(o, 'cerca', .45, 1.7, 'abierta', w); brazo(o, 'lejos', .4, 1.75, 'abierta', w); o.hombros = 8 * w; o.cabeza += .18 * w; break;
+      case 'piensa': o.cejas += .4 * w * Math.sin(t * 1.3); o.ojos = .8 * w; brazo(o, 'cerca', .55, 2.45, 'puno', w); o.cabeza += .16 * w + .03 * Math.sin(t * 2) * w; o.inclina += .04 * w; break;
       case 'golpea': brazo(o, 'cerca', 1.25 + .65 * Math.max(0, Math.sin(u * 7)) + .4 * ant, .5, 'puno', w); o.inclina += .06 * w; break;
       case 'asiente': o.cabeza += .2 * w * Math.max(0, Math.sin(u * 8)); break;
       case 'niega': o.cabezaAncho = 1 - .3 * w * Math.abs(Math.sin(u * 9)); o.cabeza += .04 * w; break;
@@ -95,6 +105,7 @@ const T = (() => {
   const circulo = (g, x, y, r) => { g.moveTo(x + r, y); g.arc(x, y, r, 0, TAU); };
 
   function dibuja(g, ac, t, o) {
+    if (o.vista !== 'perfil' && T.dibujaFrente) return T.dibujaFrente(g, ac, t, o);
     const p = ac.p, A = p.alto, G = p.grueso, L1 = 80 * A, L2 = 78 * A, C = 150 * A;
     // pies: cada uno apoyado mientras el cuerpo avanza; en el aire, sube y adelanta
     const pies = [0, .5].map(d => {
@@ -103,7 +114,7 @@ const T = (() => {
       const k = (u - .5) / .5; return [-C / 4 + C / 2 * suave(k), -20 * A * Math.sin(Math.PI * k) * o.anda, .35 * Math.sin(Math.PI * k) * o.anda];
     });
     const caderaY = -(L1 + L2) * .965 + 5 * o.anda * (.5 + .5 * Math.cos(2 * TAU * o.fase)) + o.y;
-    g.save(); g.translate(o.x, 0); g.scale(o.f * (p.escala || 1), (p.escala || 1) * o.aplasta); g.fillStyle = g.strokeStyle = NEGRO;
+    g.save(); g.translate(o.x, 0); g.scale(o.f * (p.escala || 1) * o.z * o.giroVista, (p.escala || 1) * o.z * o.aplasta); g.fillStyle = g.strokeStyle = NEGRO;
     const [pc, pl] = pies, cad = [0, caderaY];
     const rod = pie => ik(0, caderaY, pie[0], pie[1] - 6 * A, L1, L2);
     // lo de atrás, un poco más claro para que se lea
@@ -178,32 +189,64 @@ const T = (() => {
     }
     g.restore();
   }
-  // cabeza de perfil; el origen es la base del cuello
+  // cabeza de perfil; el origen es la base del cuello. Nariz (p.narizForma: recta | aguilena | respingona | gruesa),
+  // mentón (p.menton: marcado | redondo | doble), arrugas (p.arrugas: 0–1), ojo con pupila y párpado, ceja que se mueve.
   function cabeza(g, p, t, o) {
-    const n = p.nariz || 1, b = o.boca, sw = .25 * Math.sin(t * 2.2 + (p.semilla || 0)) + .4 * clamp(o.vel / 150, -1, 1);
-    g.beginPath(); g.moveTo(-9, 2); g.lineTo(-8, -14); g.lineTo(8, -14); g.lineTo(9, 2); g.fill();      // cuello
-    // cráneo y cara: nuca, coronilla, frente, nariz, labio de arriba
+    const n = p.nariz || 1, b = o.boca, sw = .25 * Math.sin(t * 2.2 + (p.semilla || 0)) + .4 * clamp(o.vel / 150, -1, 1), ce = clamp(o.cejas, -1, 1);
+    g.beginPath(); g.moveTo(-10, 2); g.lineTo(-9, -16); g.lineTo(9, -16); g.lineTo(12, -4); g.quadraticCurveTo(13, -1, 10, 2); g.fill();   // cuello y nuez
+    if (p.ropa === 'traje') hueco(g, () => { g.moveTo(-10, 2); g.lineTo(-8, -6); g.lineTo(12, -3); g.lineTo(13, 3); g.closePath(); });   // cuello de la camisa
+    // cráneo, frente, ceja, nariz y labio de arriba
     g.beginPath(); g.moveTo(-6, -12);
-    g.bezierCurveTo(-30, -16, -30, -58, -4, -64);
-    g.bezierCurveTo(14, -67, 23, -56, 22, -44);
-    g.lineTo(23, -38); g.lineTo(24 + 9 * n, -27 + 2 * n); g.lineTo(23, -25); g.quadraticCurveTo(25, -22, 23, -19); g.lineTo(6, -17); g.closePath(); g.fill();
+    g.bezierCurveTo(-31, -16, -31, -59, -4, -65);
+    g.bezierCurveTo(14, -68, 22, -58, 21, -50);
+    g.quadraticCurveTo(24, -47, 23, -43);                               // arco de la ceja
+    const f = p.narizForma || 'recta';
+    if (f === 'aguilena') { g.quadraticCurveTo(30, -40, 29 + 7 * n, -30); g.quadraticCurveTo(30 + 7 * n, -26, 26 + 6 * n, -25); }
+    else if (f === 'respingona') { g.lineTo(25 + 4 * n, -31); g.quadraticCurveTo(30 + 6 * n, -30, 27 + 4 * n, -26); }
+    else if (f === 'gruesa') { g.lineTo(26 + 5 * n, -33); g.bezierCurveTo(36 + 6 * n, -33, 36 + 6 * n, -24, 27 + 4 * n, -24); }
+    else { g.lineTo(24 + 9 * n, -27 + 2 * n); }
+    g.lineTo(23, -25); g.quadraticCurveTo(25.5, -22, 23.5, -19.5); g.lineTo(6, -17); g.closePath(); g.fill();
     // mandíbula: gira al hablar y abre la boca
     g.save(); g.translate(4, -17); g.rotate(.32 * b);
-    g.beginPath(); g.moveTo(-10, 0); g.lineTo(19, 0); g.quadraticCurveTo(21, 4, 18, 6); g.quadraticCurveTo(18, 12, 12, 13); g.quadraticCurveTo(0, 12, -10, 5); g.closePath(); g.fill();
+    const m = p.menton || 'redondo';
+    g.beginPath(); g.moveTo(-10, 0); g.lineTo(19.5, 0); g.quadraticCurveTo(22, 3, 18.5, 5);
+    if (m === 'marcado') { g.lineTo(19, 11); g.lineTo(14, 14); g.lineTo(-4, 12); }
+    else if (m === 'doble') { g.quadraticCurveTo(19, 12, 12, 13); g.quadraticCurveTo(10, 20, -2, 17); }
+    else { g.quadraticCurveTo(18, 12, 12, 13); g.quadraticCurveTo(0, 12, -10, 5); }
+    g.lineTo(-10, 5); g.closePath(); g.fill();
     if (p.barba === 'corta' || p.barba === 'larga') {
       const lg = p.barba === 'larga' ? 26 : 9, ba = sw * (p.barba === 'larga' ? .25 : .05);
       g.beginPath(); g.moveTo(-14, -6); g.lineTo(20, 2); g.quadraticCurveTo(22, 10, 16, 15 + lg * .3);
       for (let i = 0; i <= 5; i++) { const x = 14 - i * 6, y = 13 + lg * (1 - i / 6) + (i % 2 ? 4 : 0); g.lineTo(x + Math.sin(ba) * (y - 5), y); }
       g.lineTo(-16, 4); g.closePath(); g.fill();
+      hueco(g, () => { for (let i = 0; i < 9; i++) circulo(g, -8 + 3.2 * i + 2 * azar(i), 4 + 6 * azar(i + 30), .7); });   // textura de la barba
     }
+    hueco(g, () => { g.moveTo(17, 1.5); g.quadraticCurveTo(13, 2.5, 10, 1.5); g.lineTo(10, 2.5); g.quadraticCurveTo(13, 3.5, 17, 2.5); });   // labio de abajo
     g.restore();
-    if (p.barba === 'bigote' || p.barba === 'corta') { g.beginPath(); g.moveTo(10, -22); g.quadraticCurveTo(22, -24, 25, -17); g.quadraticCurveTo(16, -17, 10, -19); g.fill(); }
-    // oreja calada, ojo (parpadea) y ceja
-    hueco(g, () => { g.moveTo(-6, -40); g.arc(-8, -36, 5, -1.2, 2.4); g.closePath(); });
-    if (!o.parpadea) hueco(g, () => { g.ellipse(12, -42, 3.4, 2.6, 0, 0, TAU); });
-    else hueco(g, () => { g.rect(9, -42, 7, 1.2); });
-    g.beginPath(); g.moveTo(6, -49); g.quadraticCurveTo(13, -52, 21, -48); g.lineTo(20, -46); g.quadraticCurveTo(13, -49, 7, -47); g.fill();
-    if (p.gafas) { g.lineWidth = 2.4; g.beginPath(); circulo(g, 13, -42, p.gafas === 'redondas' ? 8.5 : 7); g.moveTo(5, -43); g.lineTo(-6, -40); g.stroke(); }
+    if (p.barba === 'bigote' || p.barba === 'corta') { g.beginPath(); g.moveTo(10, -22); g.quadraticCurveTo(22, -24, 25, -17); g.quadraticCurveTo(16, -17, 10, -19); g.fill();
+      hueco(g, () => { for (let i = 0; i < 4; i++) { g.moveTo(14 + i * 2.6, -21); g.lineTo(15 + i * 2.8, -18.4); g.lineTo(15.6 + i * 2.8, -18.4); g.lineTo(14.6 + i * 2.6, -21); } }); }
+    // fosa nasal, comisura y surco de la mejilla
+    hueco(g, () => { g.ellipse(20.5 + 3 * n, -25.5, 2.2, 1.1, .3, 0, TAU); });
+    hueco(g, () => { g.moveTo(9, -18.5); g.quadraticCurveTo(7, -17, 8, -15); g.lineTo(8.8, -15); g.quadraticCurveTo(8, -17, 9.8, -18.5); });
+    // oreja con su hélice
+    hueco(g, () => { g.moveTo(-3, -44); g.bezierCurveTo(-14, -48, -16, -30, -6, -28); g.lineTo(-6, -30); g.bezierCurveTo(-13, -32, -12, -45, -3, -42); g.closePath(); });
+    hueco(g, () => { g.ellipse(-7, -36, 1.8, 3, 0, 0, TAU); });
+    // ojo: almendra calada con pupila y párpado; parpadea
+    if (!o.parpadea) {
+      hueco(g, () => { g.moveTo(8, -41); g.quadraticCurveTo(13, -46, 18.5, -42.5); g.quadraticCurveTo(14, -38.5, 8, -41); });
+      g.beginPath(); circulo(g, 15 + o.ojos * 1.2, -42, 1.9); g.fill();
+      g.beginPath(); g.moveTo(7.5, -42); g.quadraticCurveTo(13, -47.5, 19.5, -43); g.lineTo(18.5, -42.6); g.quadraticCurveTo(13, -46, 8.5, -41.4); g.fill();
+    } else hueco(g, () => { g.moveTo(8, -41.5); g.quadraticCurveTo(13, -39.5, 18.5, -42); g.lineTo(18.5, -41.2); g.quadraticCurveTo(13, -38.5, 8, -40.6); });
+    // ceja (sube y baja con la expresión): una línea calada encima del arco
+    hueco(g, () => { const y = -49 - 3 * ce; g.moveTo(6, y + 1 + 2 * Math.max(0, -ce)); g.quadraticCurveTo(13, y - 2.5, 21, y + .5 - 1.5 * Math.max(0, -ce)); g.lineTo(21, y + 1.6); g.quadraticCurveTo(13, y - 1, 6, y + 2.2 + 2 * Math.max(0, -ce)); });
+    // arrugas: frente, pata de gallo y surco nasolabial
+    const ar = p.arrugas || 0;
+    if (ar) hueco(g, () => {
+      for (let i = 0; i < 3; i++) { const y = -56 - i * 3.5 - 2 * ce; g.moveTo(6 + i, y); g.quadraticCurveTo(12, y - 1.5, 18 - i, y); g.lineTo(18 - i, y + .7 * ar); g.quadraticCurveTo(12, y - .8, 6 + i, y + .7 * ar); }
+      for (let i = 0; i < 2; i++) { g.moveTo(4, -43 + i * 3.4); g.lineTo(1, -44 + i * 4.6); g.lineTo(1.4, -43.3 + i * 4.6); g.lineTo(4, -42.3 + i * 3.4); }
+      g.moveTo(19, -27); g.quadraticCurveTo(12, -24, 11, -18); g.lineTo(11.8, -18); g.quadraticCurveTo(13, -23.5, 19.5, -26.2);
+    });
+    if (p.gafas) { g.lineWidth = 2.4; g.beginPath(); circulo(g, 13, -42, p.gafas === 'redondas' ? 8.5 : 7); g.moveTo(5, -43); g.lineTo(-4, -40); g.stroke(); }
     PELO[p.pelo || 'corto'](g, t, o, sw, p);
     if (p.sombrero) SOMBREROS[p.sombrero](g, t, o);
   }
@@ -310,5 +353,5 @@ const T = (() => {
     }
   }
   const DECORADOS = {};
-  return { escena, DECORADOS, OBJETOS, PELO, SOMBREROS, tela: DECORADO_TELA, azar, ruido, suave, clamp, NEGRO, TAU };
+  return { escena, pose, DECORADOS, OBJETOS, PELO, SOMBREROS, tela: DECORADO_TELA, azar, ruido, suave, clamp, mezcla, rebote, peso, ik, miembro, hueco, circulo, dir, NEGRO, TAU };
 })();
