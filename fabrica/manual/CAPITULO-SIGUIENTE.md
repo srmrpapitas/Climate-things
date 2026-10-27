@@ -51,8 +51,11 @@
    - Mirar `ESCENA/previa.jpg`.
 7. **Montaje**: copiar `fabrica/videos/espanistan-02-sombras/hacer_escenas.py` y adaptarlo (voces, planos, acciones, capas de datos).
    - Generar con `/home/user/qw/bin/python -I fabrica/generar.py fabrica/videos/espanistan-NN-sombras/escenas.json`.
-8. **Revisar**: `npx hyperframes@0.8.204 check`; **una** tanda de capturas con `snapshot --at t1,t2,…`; luego `render` en segundo plano (≈ 4,4 × la duración).
-9. **Subir** al repo (commit + push); el `.mp4` va en `out/` (no se sube); pasárselo al usuario.
+8. **Render a prueba de reinicios** (la nube recicla la máquina cuando el chat está inactivo): en tmux,
+   `tmux new -d -s render "cd fabrica/videos/espanistan-NN-sombras && python3 ../../manual/herramientas/render_partes.py . out/espanistan-NN.mp4; sleep 900"`.
+   Renderiza en trozos de 90 s guardados en disco; si se corta, relanzar el mismo comando y sigue donde iba. Programar con `send_later` una comprobación cada ~45 min.
+9. **Revisar**: `npx hyperframes@0.8.204 check`; **una** tanda de capturas con `snapshot --at t1,t2,…`; el render va con `render_partes.py` (paso 8).
+10. **Subir** al repo (commit + push); el `.mp4` va en `out/` (no se sube); pasárselo al usuario.
 
 ## Tipos de plano del generador
 - `teatro` (`escena`, `cam`/`cam2` [x, y, zoom] en 1280×720, `zooms`, `acciones`).
