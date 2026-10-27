@@ -120,7 +120,7 @@ P = [
    capas=[dict(tipo='nota', texto='2023 → 2024 → 2026', sub='Entra, se va por los menores migrantes, vuelve', dato='«Prioridad nacional» en las ayudas', pos='izq', en='11:En julio', hasta='11:Cicerón')],
    acciones=[A('hombre', 'camina', '11:entró en cinco', g=260, hasta='11:con el PP'), A('torre', 'late', '11:con el PP', g=.05, hasta='11:En julio'),
              A('hombre', 'sale', '11:se salió de todos', g=-900, hasta='11:por el reparto'), A('dm1', 'niega', '11:menores migrantes'), A('dm2', 'asiente', '11:menores migrantes'),
-             A('hombre', 'entra', '11:ha vuelto', g=900, hasta='11:vicepresidencias'), A('g1', 'asiente', '11:prioridad nacional', hasta='11:Cicerón'), A('g2', 'niega', '11:prioridad nacional', hasta='11:Cicerón'),
+             A('hombre', 'camina', '11:ha vuelto', g=900, hasta='11:vicepresidencias'), A('g1', 'asiente', '11:prioridad nacional', hasta='11:Cicerón'), A('g2', 'niega', '11:prioridad nacional', hasta='11:Cicerón'),
              A('perro', 'salta', '11:ha vuelto'), A('bestia', 'camina', '11:En dos mil veintitrés entró', g=-120, hasta='11:Cicerón'), A('dm3', 'inclina', '11:como bandera', g=5)]),
  DEC('11:Cicerón', [860, 250, 2.4], [760, 260, 2.1],
      capas=[cita('CICERÓN', '¿Cui bono? ¿A quién beneficia?', '11:a quién beneficia')], sfx=[['impacto', '11:donde ya mandan', .3]]),
