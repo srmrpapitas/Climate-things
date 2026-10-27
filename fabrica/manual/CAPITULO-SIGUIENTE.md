@@ -43,7 +43,9 @@
 - **Acciones nuevas en la plantilla** para contar historias: `sube` (nivel que crece), `arrastra` (cruza la escena), `cae`, `entra`/`sale`
   (desde fuera de cuadro), `gira`, más partículas (lluvia, polvo, humo, chispas) con intensidad que cambia en el tiempo.
 - **Parallax y cámara**: fondo más lento que las figuras; zoom o paneo siguiendo la acción.
-- No cuesta créditos: es trabajo de montaje (más piezas y acciones por plano). Mejor menos escenas y mucho más animadas.
+- No cuesta créditos: es trabajo de montaje (más piezas y acciones por plano).
+- **Más escenas, cada una muy animada** (el usuario, 27-10-2026): ≈ 12–15 escenarios por capítulo con FLUX local (gratis, ≈ 15 min cada uno; lanzarlos todos en tmux al empezar, mientras se hace la voz).
+- **Ritmo: un vídeo cada dos días** (≈ 15 al mes ≈ 120.000 créditos con el narrador normal, ≈ 66.000 con flash). Render siempre por partes (`render_partes.py`).
 
 ## Pasos (≈ 2–3 h de trabajo de Claude por capítulo)
 1. **Guion** `historias/espanistan/NN-tema.md` (datos + fuentes) → `fabrica/herramientas/guion_espanistan-NN.txt`.
