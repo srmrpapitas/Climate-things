@@ -61,9 +61,14 @@
 1. **Guion** `historias/espanistan/NN-tema.md` (datos + fuentes) → `fabrica/herramientas/guion_espanistan-NN.txt`.
    - Una frase por línea, números en letra.
    - Deja una línea partida donde vaya a entrar el protagonista («…Abascal dice que…» / siguiente línea).
-2. **Voz del narrador**: ElevenLabs, voz D `EZDj5TBPpANsOzwaukxI`, `eleven_multilingual_v2`, `speed 0.88`, `stability 0.7`.
-   - Por bloques; normalizar con el `ffmpeg` del manual.
-   - Si sale rápida: `atempo=0.92`.
+2. **Voz del narrador** (lección del 27-10-2026: el usuario prefiere la voz del ep. 1, «nada robótica»): ElevenLabs, voz D `EZDj5TBPpANsOzwaukxI`, `eleven_multilingual_v2`.
+   - **Como en el ep. 1: una llamada por frase** (o por 2 frases cortas), no bloques de 1–2 min.
+     En bloques largos el modelo cae en un soniquete de lectura; frase a frase cada una tiene su entonación.
+   - **Nunca ralentizar después** (`atempo`/`rubberband`): el estiramiento aplana las pequeñas subidas y bajadas
+     del tono (medido: −15 % de microvariación en el ep. 2 y el ep. 3) y es lo que suena a robot.
+     Si hace falta más calma: más pausa entre frases en `escenas.json` (`"pausa": 0.8`) y puntuación en el texto.
+   - Normalizar solo volumen y silencios con el `ffmpeg` del manual (sin cambiar la velocidad).
+   - Coste igual (se paga por letra); son más llamadas, pero se lanzan todas a la vez.
 3. **Voz del protagonista**: buscar en `creative_list_voices` (`es`, acento `peninsular`, `characters_animation`).
    - Feijolo = «Johnny The Rogue» `HMCmDsbKeaSZp5LMOYKR` (`eleven_v3`, etiquetas `[confident]` `[sly]` `[chuckles]`).
    - **Todas sus frases en una sola llamada**, separadas por líneas en blanco.
