@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tsunami que se duplica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@600;800&family=Lora:ital,wght@1,600&display=swap" rel="stylesheet">
+<style>
+  :root { --bg: #000; --fg: #fff; --accent: #ffd23f; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #000; } }
+  :root[data-theme="dark"] { --bg: #000; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--fg); overflow: hidden; font-family: Inter, system-ui, sans-serif; }
+  #stage { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); overflow: hidden; background: #000; }
+  #stage canvas { display: block; width: 100%; height: 100%; }
+  .capa { position: absolute; inset: 0; pointer-events: none; }
+  /* «¿BOMBOCLAT?» de cómic */
+  #grito { position: absolute; left: 4%; right: 4%; top: 15%; text-align: center; font-family: 'Archivo Black', Inter, sans-serif; font-size: 1.85em;
+    color: #ffd23f; -webkit-text-stroke: .07em #10131c; paint-order: stroke fill; letter-spacing: .01em; opacity: 0;
+    text-shadow: .06em .09em 0 #10131c; }
+  body.cine #grito { font-family: Inter, sans-serif; font-weight: 800; color: #fff; -webkit-text-stroke: 0; font-size: 1.5em; letter-spacing: .08em;
+    text-shadow: 0 .05em .4em rgba(0,0,0,.8); top: auto; bottom: 21%; }
+  #hud { position: absolute; left: 7%; top: 9%; line-height: 1.1; opacity: 0; text-shadow: 0 .05em .3em rgba(0,0,0,.6); }
+  #hud .a { font-weight: 800; font-size: .55em; letter-spacing: .18em; }
+  #hud .b { font-family: 'Archivo Black', Inter, sans-serif; font-size: 2.2em; }
+  #hud .c { font-weight: 800; font-size: .55em; letter-spacing: .08em; color: #ffd23f; text-transform: uppercase; margin-top: .2em; }
+  body.cine #hud .b { font-family: Lora, Georgia, serif; font-style: italic; font-weight: 600; }
+  #lineas { opacity: 0; }
+  #flash { background: #fff; opacity: 0; }
+  #negro { background: #000; opacity: 0; }
+  #sub { position: absolute; left: 6%; right: 6%; bottom: 13%; text-align: center; font-weight: 800; font-size: .78em; line-height: 1.2; opacity: 0;
+    color: #fff; -webkit-text-stroke: .12em #10131c; paint-order: stroke fill; }
+  #final { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; opacity: 0; }
+  #final .n { font-family: 'Archivo Black', Inter, sans-serif; font-size: 3.4em; color: #fff; line-height: 1; }
+  #final .l { font-weight: 800; font-size: .55em; letter-spacing: .08em; padding: 0 6%; color: var(--accent); margin-top: .5em; text-transform: uppercase; }
+  #cierre { position: absolute; left: 6%; right: 6%; top: 40%; text-align: center; font-family: 'Archivo Black', Inter, sans-serif; font-size: 1.5em; color: #fff; opacity: 0; line-height: 1.15; }
+  #carga { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: .7em; background: #061826; }
+</style>
+<script type="importmap">
+{ "imports": { "three": "../vendor/three.module.min.js", "three/addons/": "../vendor/jsm/" } }
+</script>
+</head>
+<body class="ilustrado">
+<div id="stage">
+  <svg id="lineas" class="capa" viewBox="0 0 1080 1920" preserveAspectRatio="none"></svg>
+  <div id="flash" class="capa"></div>
+  <div id="negro" class="capa"></div>
+  <div id="hud"><div class="a"></div><div class="b"></div><div class="c"></div></div>
+  <div id="grito"></div>
+  <div id="sub"></div>
+  <div id="final"><div class="n"></div><div class="l"></div></div>
+  <div id="cierre"></div>
+  <div id="carga">Cargando…</div>
+</div>
+<script type="module" src="peli.js"></script>
+</body>
+</html>

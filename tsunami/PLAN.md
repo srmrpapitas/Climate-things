@@ -1,5 +1,9 @@
 # El tsunami que se duplica · plan para hacerlo (pegar esto en una conversación nueva)
 
+> **Hecho (27-10-2026):** la película completa está en `tsunami/peli.html` (motor + escenas + guion). Cómo se hizo,
+> qué se aprendió y cómo repetirlo deprisa: **`tsunami/COMO-SE-HIZO.md`**. Voz del narrador: la «D» de siempre
+> (`EZDj5TBPpANsOzwaukxI`), que sigue en la cuenta nueva; la toma está en `tsunami/voz/`.
+
 > **Para Claude:** estás en el repo `srmrpapitas/Climate-things`. Lee este archivo entero antes de empezar.
 > El estilo ya está **aprobado**: **3D ilustrado** (ver `tsunami/referencia/estilo-3d-ilustrado.jpg`): sombreado por bandas,
 > contorno de tinta, textura de papel, colores vivos, movimiento muy exagerado. No lo cambies.
