@@ -12,12 +12,19 @@ if (!pagina || !salida) { console.log('uso: node tsunami/grabar.mjs "<página?pa
 const url = `http://localhost:${puerto}/${pagina}${pagina.includes('?') ? '&' : '?'}grabar=1`;
 fs.mkdirSync(path.dirname(salida), { recursive: true });
 
-const nav = await chromium.launch({ args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
+// En el Mac: ANGLE sobre Metal con la gráfica dedicada (AMD Radeon Pro 5300M) → ~0,1 s/fotograma.
+// Con GRABAR_CPU=1 usa SwiftShader (sin tarjeta gráfica, como en la nube: 3–7 s/fotograma).
+const args = process.env.GRABAR_CPU ? ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist']
+  : ['--use-angle=metal', '--force_high_performance_gpu', '--ignore-gpu-blocklist'];
+const nav = await chromium.launch({ args });
 const p = await nav.newPage({ viewport: { width: 1080, height: 1920 } });
 p.on('pageerror', e => console.log('[error en la página]', e.message));
 await p.goto(url);
 await p.waitForFunction(() => window.__peli?.listo, null, { timeout: 300000 });
 await p.evaluate(() => document.fonts.ready);
+const gpu = await p.evaluate(() => { const gl = document.createElement('canvas').getContext('webgl2'); const e = gl.getExtension('WEBGL_debug_renderer_info'); return gl.getParameter(e.UNMASKED_RENDERER_WEBGL); });
+console.log('gráfica:', gpu);
+if (/SwiftShader/i.test(gpu) && !process.env.GRABAR_CPU) console.log('¡ojo! va por CPU (SwiftShader): será lento');
 const { dur, fps, sonidos } = await p.evaluate(() => ({ dur: __peli.dur, fps: __peli.fps, sonidos: __peli.sonidos }));
 const N = Math.round(dur * fps), mudo = salida.replace(/\.mp4$/, '.mudo.mp4');
 
