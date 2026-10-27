@@ -1,0 +1,10 @@
+{"ref": 1280, "umbral": 60, "piezas": [
+ {"nombre": "escolta", "caja": [348, 412, 474, 618], "cuello": 440},
+ {"nombre": "coche", "caja": [545, 488, 762, 618], "tipo": "objeto"},
+ {"nombre": "padre", "caja": [468, 452, 572, 618], "tipo": "figura", "pivote": [505, 618]},
+ {"nombre": "vigia", "caja": [748, 384, 852, 618], "cuello": 412},
+ {"nombre": "chico", "caja": [903, 458, 960, 618], "cuello": 484},
+ {"nombre": "nino", "caja": [1022, 515, 1092, 618], "tipo": "figura"},
+ {"nombre": "mujer", "caja": [196, 414, 262, 612], "cuello": 450},
+ {"nombre": "llamas", "caja": [118, 512, 198, 608], "tipo": "objeto", "pivote": [158, 608]}
+]}

@@ -1,0 +1,162 @@
+{
+ "escolta": {
+  "caja": [
+   696,
+   880,
+   253,
+   357
+  ],
+  "tipo": "figura",
+  "pivote": [
+   822,
+   1237
+  ]
+ },
+ "escolta_c": {
+  "caja": [
+   766,
+   829,
+   60,
+   51
+  ],
+  "tipo": "cabeza",
+  "pivote": [
+   799,
+   880
+  ],
+  "padre": "escolta"
+ },
+ "coche": {
+  "caja": [
+   1090,
+   976,
+   435,
+   261
+  ],
+  "tipo": "objeto",
+  "pivote": [
+   1307,
+   1237
+  ]
+ },
+ "padre": {
+  "caja": [
+   948,
+   909,
+   197,
+   328
+  ],
+  "tipo": "figura",
+  "pivote": [
+   1010,
+   1236
+  ]
+ },
+ "vigia": {
+  "caja": [
+   1506,
+   824,
+   199,
+   413
+  ],
+  "tipo": "figura",
+  "pivote": [
+   1605,
+   1237
+  ]
+ },
+ "vigia_c": {
+  "caja": [
+   1557,
+   773,
+   60,
+   51
+  ],
+  "tipo": "cabeza",
+  "pivote": [
+   1590,
+   824
+  ],
+  "padre": "vigia"
+ },
+ "chico": {
+  "caja": [
+   1810,
+   968,
+   105,
+   269
+  ],
+  "tipo": "figura",
+  "pivote": [
+   1862,
+   1237
+  ]
+ },
+ "chico_c": {
+  "caja": [
+   1837,
+   925,
+   54,
+   43
+  ],
+  "tipo": "cabeza",
+  "pivote": [
+   1862,
+   968
+  ],
+  "padre": "chico"
+ },
+ "nino": {
+  "caja": [
+   2045,
+   1038,
+   140,
+   199
+  ],
+  "tipo": "figura",
+  "pivote": [
+   2115,
+   1237
+  ]
+ },
+ "mujer": {
+  "caja": [
+   392,
+   900,
+   133,
+   325
+  ],
+  "tipo": "figura",
+  "pivote": [
+   458,
+   1225
+  ]
+ },
+ "mujer_c": {
+  "caja": [
+   392,
+   828,
+   122,
+   72
+  ],
+  "tipo": "cabeza",
+  "pivote": [
+   443,
+   900
+  ],
+  "padre": "mujer"
+ },
+ "llamas": {
+  "caja": [
+   236,
+   1032,
+   157,
+   185
+  ],
+  "tipo": "objeto",
+  "pivote": [
+   316,
+   1216
+  ]
+ }
+}
