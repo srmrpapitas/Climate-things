@@ -1,0 +1,162 @@
+{
+ "lupa": {
+  "caja": [
+   1557,
+   632,
+   116,
+   149
+  ],
+  "tipo": "brazo",
+  "pivote": [
+   1624,
+   776
+  ]
+ },
+ "hucha": {
+  "caja": [
+   1112,
+   680,
+   125,
+   121
+  ],
+  "tipo": "objeto",
+  "pivote": [
+   1174,
+   801
+  ]
+ },
+ "lampara": {
+  "caja": [
+   1152,
+   92,
+   281,
+   161
+  ],
+  "tipo": "objeto",
+  "pivote": [
+   1292,
+   92
+  ]
+ },
+ "juez": {
+  "caja": [
+   1507,
+   380,
+   498,
+   909
+  ],
+  "tipo": "figura",
+  "pivote": [
+   1756,
+   1289
+  ]
+ },
+ "mujer1": {
+  "caja": [
+   513,
+   660,
+   382,
+   629
+  ],
+  "tipo": "figura",
+  "pivote": [
+   703,
+   1289
+  ]
+ },
+ "mujer1_c": {
+  "caja": [
+   512,
+   516,
+   320,
+   144
+  ],
+  "tipo": "cabeza",
+  "pivote": [
+   702,
+   660
+  ],
+  "padre": "mujer1"
+ },
+ "mujer2": {
+  "caja": [
+   894,
+   600,
+   219,
+   689
+  ],
+  "tipo": "figura",
+  "pivote": [
+   1003,
+   1289
+  ]
+ },
+ "mujer2_c": {
+  "caja": [
+   948,
+   508,
+   165,
+   92
+  ],
+  "tipo": "cabeza",
+  "pivote": [
+   1024,
+   600
+  ],
+  "padre": "mujer2"
+ },
+ "hada": {
+  "caja": [
+   152,
+   864,
+   153,
+   425
+  ],
+  "tipo": "figura",
+  "pivote": [
+   228,
+   1289
+  ]
+ },
+ "hada_c": {
+  "caja": [
+   152,
+   788,
+   113,
+   76
+  ],
+  "tipo": "cabeza",
+  "pivote": [
+   208,
+   864
+  ],
+  "padre": "hada"
+ },
+ "escriba": {
+  "caja": [
+   2216,
+   820,
+   289,
+   469
+  ],
+  "tipo": "figura",
+  "pivote": [
+   2360,
+   1289
+  ]
+ },
+ "escriba_c": {
+  "caja": [
+   2266,
+   740,
+   239,
+   80
+  ],
+  "tipo": "cabeza",
+  "pivote": [
+   2412,
+   820
+  ],
+  "padre": "escriba"
+ }
+}

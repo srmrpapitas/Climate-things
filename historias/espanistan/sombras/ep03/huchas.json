@@ -1,0 +1,10 @@
+{"ref": 1280, "umbral": 60, "piezas": [
+ {"nombre": "lupa", "caja": [774, 312, 836, 390], "tipo": "brazo", "pivote": [812, 388]},
+ {"nombre": "hucha", "caja": [556, 340, 618, 400], "tipo": "objeto"},
+ {"nombre": "lampara", "caja": [576, 46, 716, 130], "tipo": "objeto", "pivote": [646, 46]},
+ {"nombre": "juez", "caja": [750, 190, 1002, 644], "tipo": "figura"},
+ {"nombre": "mujer1", "caja": [256, 258, 447, 644], "cuello": 330},
+ {"nombre": "mujer2", "caja": [426, 254, 556, 644], "cuello": 300},
+ {"nombre": "hada", "caja": [76, 394, 152, 644], "cuello": 432},
+ {"nombre": "escriba", "caja": [1108, 370, 1252, 644], "cuello": 410}
+]}
