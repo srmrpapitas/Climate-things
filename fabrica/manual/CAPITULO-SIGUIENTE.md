@@ -6,7 +6,7 @@
 > Antes de empezar: `sh fabrica/instalar_todo.sh` (Whisper) (instala Whisper y OpenCV en `/home/user/qw`).
 
 ## La serie
-- 15 vídeos. Ep. 1 Sanchís (hecho), ep. 2 Feijolo y el PP (hecho), **ep. 3 Abascal (Vox)** (guion: `historias/espanistan/03-abascal.md`), ep. 4 el bipartidismo (enfoque del usuario: partidocracia, listas cerradas, quienes mandan no necesitan tus votos ni los puedes elegir)…
+- 15 vídeos. Ep. 1 Sanchís (hecho), ep. 2 Feijolo y el PP (hecho), **ep. 3 Abascalón (Abascal, Vox)** (guion: `historias/espanistan/03-abascal.md`), ep. 4 el bipartidismo (enfoque del usuario: partidocracia, listas cerradas, quienes mandan no necesitan tus votos ni los puedes elegir)…
 - País ficticio con **datos reales y fuentes**; la palabra **exacta** de cada sentencia (presunción de inocencia: nadie es culpable sin sentencia).
 - **Nunca** decir a quién votar. Lo bueno también se cuenta.
 - El **Decano** (profesor platónico, pelo loco, gafas redondas, candil y lupa) guía; **un filósofo por bloque** con su frase.

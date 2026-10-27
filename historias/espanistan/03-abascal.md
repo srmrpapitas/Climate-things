@@ -1,4 +1,4 @@
-# Españistán · Episodio 3: Abascal y Vox
+# Españistán · Episodio 3: Abascalón y Vox
 
 Serie para YouTube (16:9, 8-10 min). Mismas reglas que los episodios 1 y 2. Elecciones generales: 29 de noviembre de 2026. Datos comprobados a 27 de octubre de 2026.
 
@@ -10,7 +10,7 @@ Serie para YouTube (16:9, 8-10 min). Mismas reglas que los episodios 1 y 2. Elec
 
 **El guía: el Decano.** Pregunta en vez de dar respuestas. Un filósofo por bloque y una pregunta al final de cada uno.
 
-**Protagonista:** Abascal (nombre provisional: falta decidir si lleva nombre de sátira, como Sanchís y Feijolo). Vendehúmos que promete mano dura; sus frases son sátira de promesas y de hechos documentados, **nunca** de delitos sin sentencia. Solo habla en su primer plano (líneas **ABASCAL:**), con su propia voz.
+**Protagonista:** Abascalón (nombre de sátira, como Sanchís y Feijolo). Vendehúmos que promete mano dura; sus frases son sátira de promesas y de hechos documentados, **nunca** de delitos sin sentencia. Solo habla en su primer plano (líneas **ABASCAL:**), con su propia voz.
 
 Narrador: voz D. Una frase por línea en `fabrica/herramientas/guion_espanistan-03.txt`. Entre corchetes, lo que se ve.
 
@@ -22,14 +22,14 @@ Narrador: voz D. Una frase por línea en `fabrica/herramientas/guion_espanistan-
 En los dos episodios anteriores miramos a los dos partidos que se han turnado el poder. Hoy miramos al que quiere romper ese turno.
 [El Decano entra con el candil y acerca la lupa a la sombra.]
 Montaigne escribió que nada se cree con tanta fuerza como lo que menos se conoce. Así que hoy toca conocer.
-[Teatro de sombras: Abascal llega a caballo sobre el mapa de Españistán. Rótulo: ABASCAL. Logo: VOX.]
-Este es Abascal, el líder de Vox, el tercer partido de Españistán. Hace doce años no tenía ni un diputado. Hoy las encuestas lo ponen cerca del veinte por ciento.
+[Teatro de sombras: Abascalón llega a caballo sobre el mapa de Españistán. Rótulo: ABASCAL. Logo: VOX.]
+Este es Abascalón, el líder de Vox, el tercer partido de Españistán. Hace doce años no tenía ni un diputado. Hoy las encuestas lo ponen cerca del veinte por ciento.
 Mismas reglas que con Sanchís y con Feijolo: datos públicos, la palabra exacta de cada sentencia, y lo bueno también se cuenta.
 
 ## 1. Quién es: un chico amenazado (0:35-1:40)
 [Un pueblo vasco de noche. Un escaparate con pintadas. Una tienda en llamas. Un hombre con escolta mira debajo de su coche.]
 
-Abascal creció en Amurrio, en el País Vasco, en los años de ETA. Su padre, concejal del PP, tenía una tienda de ropa.
+Abascalón creció en Amurrio, en el País Vasco, en los años de ETA. Su padre, concejal del PP, tenía una tienda de ropa.
 ETA amenazó a la familia durante años: pintadas, escaparates rotos, y en 1999 la tienda acabó quemada. El padre vivía con escolta. *(eldiario.es; Vozpópuli)*
 El hijo entró en el PP y fue concejal en Llodio y diputado en el Parlamento Vasco, también con escolta.
 Aristóteles decía que el valor es el punto medio entre el miedo y la temeridad. La pregunta del Decano: ¿qué le hace el miedo a una persona, y qué hace esa persona con él?
@@ -46,9 +46,9 @@ ABASCAL: A mí nadie me ha regalado nada. Bueno… salvo aquel sueldo. Pero era 
 [Una mesa con cuatro sombras. Una de ellas con barba blanca y gesto cansado: Ortega Lara.]
 
 Vox nace de militantes del PP enfadados con Rajoy. Lo acusaban de ser blando: con los presos de ETA que salieron de la cárcel, con los impuestos, y con el independentismo catalán.
-En la mesa fundadora estaban Abascal, Alejo Vidal-Quadras, antiguo líder del PP catalán, y José Antonio Ortega Lara, el funcionario de prisiones que ETA tuvo secuestrado 532 días.
+En la mesa fundadora estaban Abascalón, Alejo Vidal-Quadras, antiguo líder del PP catalán, y José Antonio Ortega Lara, el funcionario de prisiones que ETA tuvo secuestrado 532 días.
 Se presentaron a las europeas de 2014 y no sacaron ni un escaño. Aquella campaña costó cerca de un millón de euros, y el ochenta por ciento lo pusieron simpatizantes de un grupo de la oposición iraní en el exilio. *(El País, 2019; 3Cat)*
-Vidal-Quadras dijo que esos donativos eran para él. Abascal dijo que todo era legal. Nunca hubo una causa judicial. Vidal-Quadras se fue al año siguiente. De aquella mesa, hoy solo queda Ortega Lara. *(Valencia Plaza)*
+Vidal-Quadras dijo que esos donativos eran para él. Abascalón dijo que todo era legal. Nunca hubo una causa judicial. Vidal-Quadras se fue al año siguiente. De aquella mesa, hoy solo queda Ortega Lara. *(Valencia Plaza)*
 
 ## 4. La subida (3:30-4:30)
 [Un gráfico de barras que crece por escalones. Público de sombras que se pone de pie.]
@@ -79,7 +79,7 @@ Mismas reglas: nadie es culpable hasta que lo dice una sentencia, y cada frasco 
 - **El banco húngaro (2023):** Vox pidió 6,5 millones a un banco húngaro cercano al Gobierno de Orbán. Anticorrupción lo miró en 2025 y lo archivó: el préstamo se devolvió y no vio delito. *(Fiscalía Anticorrupción, 2025)* Etiqueta: ARCHIVADO.
   ABASCAL: Los bancos españoles no me querían. Los húngaros, sí. Será por el idioma.
 - **Las huchas:** el Tribunal de Cuentas multó a Vox con 862.000 euros: decía que el dinero de las huchas de los puestos eran donativos ilegales en efectivo. En junio de 2026 el Supremo anuló la multa: no se probó. *(Tribunal Supremo, 3-6-2026)* Etiqueta: ANULADO. Esto también se cuenta.
-- **Los proveedores:** Vox paga casi 27.000 euros al mes a la empresa del asesor de Abascal, una sociedad sin empleados. Y la mujer de Abascal cobra 63.600 euros al año de una editorial de la misma familia empresarial. *(El Confidencial; El Español, marzo de 2026)* Vox dice que el Tribunal de Cuentas revisó esos contratos sin ver irregularidades. PP y PSOE piden que audite su fundación. Etiqueta: SIN CAUSA. PREGUNTAS ABIERTAS.
+- **Los proveedores:** Vox paga casi 27.000 euros al mes a la empresa del asesor de Abascalón, una sociedad sin empleados. Y la mujer de Abascalón cobra 63.600 euros al año de una editorial de la misma familia empresarial. *(El Confidencial; El Español, marzo de 2026)* Vox dice que el Tribunal de Cuentas revisó esos contratos sin ver irregularidades. PP y PSOE piden que audite su fundación. Etiqueta: SIN CAUSA. PREGUNTAS ABIERTAS.
 - **La DANA:** Revuelta, una asociación juvenil cercana a Vox, recogió donativos para los afectados de Valencia. Dos miembros de Vox la denunciaron por quedarse parte del dinero, y Vox la denunció también. La Fiscalía de Madrid archivó la denuncia en abril de 2026. *(El Español, 21-4-2026)* Etiqueta: ARCHIVADO.
 - **Un diputado:** en 2024, un diputado de Vox en Castilla-La Mancha fue condenado a seis meses por administración desleal, por un negocio privado entre dos empresas, no por dinero público. *(Juzgado de lo Penal, 2024)* Etiqueta: CONDENADO.
 - **Los que se fueron:** Vidal-Quadras, Espinosa de los Monteros, Macarena Olona… casi todos los que levantaron Vox ya no están. Varios salieron criticando que el partido no explicaba bien sus cuentas. Etiqueta: SIN CAUSA.
@@ -87,7 +87,7 @@ Mismas reglas: nadie es culpable hasta que lo dice una sentencia, y cada frasco 
 Lección del Decano: que no haya condenas es un dato a favor. Pero el estudio de la Universidad de Barcelona del episodio anterior ya lo decía: la corrupción crece con el tiempo y con el poder. Vox lleva poco tiempo y ha tenido poco poder. ¿Cómo sabremos qué haría con mucho?
 
 ## 7. Lo que promete ahora (8:00-8:40)
-[Abascal en un atril. Detrás, una muralla que crece ladrillo a ladrillo.]
+[Abascalón en un atril. Detrás, una muralla que crece ladrillo a ladrillo.]
 
 Para el 29 de noviembre, Vox pone la inmigración en el centro: «prioridad nacional» en ayudas y vivienda, más expulsiones y menos impuestos. *(Precampaña de Vox; El Independiente)*
 ABASCAL: Yo prometo mano dura. Lo de cómo se paga, ya si eso, después.
@@ -121,7 +121,6 @@ En el próximo episodio de Españistán: el bipartidismo. Por qué en Españist�
 - **Revuelta:** si hay alguna causa judicial nueva después de abril de 2026.
 - **Diputado de Castilla-La Mancha:** si la condena es firme (Vox dijo que la recurría).
 - **Gobiernos de 2026:** fechas de los pactos de Extremadura, Aragón y Castilla y León.
-- **Nombre del protagonista:** decidir el nombre de sátira.
 
 ## Fuentes
 - Encuestas de octubre de 2026: https://www.moncloa.com/2026/10/12/encuesta-vox-record-historico-3446977/ y https://www.elindependiente.com/espana/2026/10/11/encuestas-blindan-abascal-carrera-generales-inmigracion-vivienda/
