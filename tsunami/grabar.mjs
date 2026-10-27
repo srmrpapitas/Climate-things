@@ -29,16 +29,18 @@ const { dur, fps, sonidos } = await p.evaluate(() => ({ dur: __peli.dur, fps: __
 const N = Math.round(dur * fps), mudo = salida.replace(/\.mp4$/, '.mudo.mp4');
 
 // vídeo: cada captura va por una tubería a ffmpeg (jpeg de calidad alta → H.264)
-const ff = spawn('ffmpeg', ['-v', 'error', '-y', '-f', 'image2pipe', '-framerate', String(fps), '-c:v', 'mjpeg', '-i', '-',
+// SOLO_SONIDO=1: si ya existe el vídeo mudo (p. ej. falló la mezcla), no se vuelve a renderizar
+const soloSonido = process.env.SOLO_SONIDO && fs.existsSync(mudo);
+const ff = soloSonido ? null : spawn('ffmpeg', ['-v', 'error', '-y', '-f', 'image2pipe', '-framerate', String(fps), '-c:v', 'mjpeg', '-i', '-',
   '-c:v', 'libx264', '-preset', 'slow', '-crf', '17', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', mudo], { stdio: ['pipe', 'inherit', 'inherit'] });
 const t0 = Date.now();
-for (let i = 0; i < N; i++) {
+for (let i = 0; i < (soloSonido ? 0 : N); i++) {
   await p.evaluate(t => __peli.ir(t), i / fps);
   const img = await p.locator('#stage').screenshot({ type: 'jpeg', quality: 95 });
   if (!ff.stdin.write(img)) await new Promise(ok => ff.stdin.once('drain', ok));
   if (i % 15 === 0) { const s = (Date.now() - t0) / 1000; console.log(`${i}/${N} · ${(s / (i + 1)).toFixed(1)} s/fotograma · quedan ${Math.round(s / (i + 1) * (N - i - 1) / 60)} min`); }
 }
-ff.stdin.end(); await new Promise(ok => ff.on('close', ok));
+if (ff) { ff.stdin.end(); await new Promise(ok => ff.on('close', ok)); }
 await nav.close();
 
 // sonido: cada pista a su tiempo, con su ganancia y su filtro; se corta a la duración del vídeo

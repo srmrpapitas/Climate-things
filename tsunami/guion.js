@@ -49,29 +49,29 @@ export const OLAS = [
 // sonidos de fondo y efectos (las rutas son relativas a tsunami/). gan: volumen; filtro: filtros de ffmpeg
 export const EFECTOS = [
   // el cuarto bajo el agua (todo apagado con lowpass)
-  { src: '../audio/sfx/dron.mp3', t: 0, gan: .45, filtro: 'lowpass=f=500,atrim=0:6.4,afade=t=out:st=5.6:d=.8' },
-  { src: '../audio/sfx/ola.mp3', t: 0, gan: .3, filtro: 'lowpass=f=350,atrim=0:6.3,afade=t=out:st=5.5:d=.8' },
+  { src: '../audio/sfx/dron.mp3', t: 0, gan: .45, filtro: 'lowpass=f=500,atrim=0:6.4,afade=t=out:st=5.6:d=0.8' },
+  { src: '../audio/sfx/ola.mp3', t: 0, gan: .3, filtro: 'lowpass=f=350,atrim=0:6.3,afade=t=out:st=5.5:d=0.8' },
   { src: '../audio/sfx/impacto.mp3', t: 4.25, gan: .9, filtro: 'lowpass=f=900' },
   { src: '../audio/sfx/whoosh.mp3', t: 4.4, gan: .5 },
   // rebobinado: el whoosh al revés y más agudo, con una subida
   { src: '../audio/sfx/whoosh.mp3', t: 6.25, gan: .7, filtro: 'areverse,asetrate=60000,aresample=48000' },
-  { src: '../audio/sfx/riser.mp3', t: 6.3, gan: .35, filtro: 'areverse,atrim=0:2,afade=t=out:st=1.6:d=.4' },
+  { src: '../audio/sfx/riser.mp3', t: 6.3, gan: .35, filtro: 'areverse,atrim=0:2,afade=t=out:st=1.6:d=0.4' },
   { src: '../audio/sfx/whoosh.mp3', t: 7.8, gan: .6 },
   // playa: olas tranquilas, se retira el mar (subida), llega la ola con gritos
-  { src: '../audio/sfx/ola.mp3', t: 8.1, gan: .55, filtro: 'afade=t=in:d=.4' },
+  { src: '../audio/sfx/ola.mp3', t: 8.1, gan: .55, filtro: 'afade=t=in:d=0.4' },
   { src: '../audio/sfx/ola.mp3', t: 15.9, gan: .35, filtro: 'atrim=0:2' },
   { src: '../audio/sfx/riser.mp3', t: 12.6, gan: .4 },
   { src: '../audio/sfx/terremoto.mp3', t: 15.9, gan: .5, filtro: 'afade=t=in:d=1' },
   { src: '../audio/sfx/panico.mp3', t: 17.6, gan: .35, filtro: 'afade=t=out:st=4.5:d=1.5' },
   { src: '../audio/sfx/ola.mp3', t: 18.0, gan: .9 },
-  { src: '../audio/sfx/derrumbe.mp3', t: 22.6, gan: .7, filtro: 'afade=t=out:st=1.4:d=.6' },
+  { src: '../audio/sfx/derrumbe.mp3', t: 22.6, gan: .7, filtro: 'afade=t=out:st=1.4:d=0.6' },
   { src: '../audio/sfx/impacto.mp3', t: 24.2, gan: .8 },
   // el cuarto otra vez (20 m): agua por encima, el cristal cruje
-  { src: '../audio/sfx/dron.mp3', t: 24.6, gan: .45, filtro: 'lowpass=f=500,atrim=0:12,afade=t=out:st=11.4:d=.6' },
+  { src: '../audio/sfx/dron.mp3', t: 24.6, gan: .45, filtro: 'lowpass=f=500,atrim=0:12,afade=t=out:st=11.4:d=0.6' },
   { src: '../audio/sfx/ola.mp3', t: 24.6, gan: .35, filtro: 'lowpass=f=300' },
   { src: '../audio/sfx/ola.mp3', t: 32.6, gan: .3, filtro: 'lowpass=f=300,atrim=0:4' },
-  { src: '../audio/sfx/cristales.mp3', t: 29.95, gan: .55, filtro: 'atrim=0:.9,afade=t=out:st=.5:d=.4' },
-  { src: '../audio/sfx/cristales.mp3', t: 33.4, gan: .4, filtro: 'atrim=0:.7,afade=t=out:st=.4:d=.3' },
+  { src: '../audio/sfx/cristales.mp3', t: 29.95, gan: .55, filtro: 'atrim=0:0.9,afade=t=out:st=0.5:d=0.4' },
+  { src: '../audio/sfx/cristales.mp3', t: 33.4, gan: .4, filtro: 'atrim=0:0.7,afade=t=out:st=0.4:d=0.3' },
   { src: '../audio/sfx/whoosh.mp3', t: 36.3, gan: .55 },
   // la ciudad desde la planta 45 (detrás del cristal)
   { src: '../audio/sfx/ciudad.mp3', t: 36.6, gan: .35, filtro: 'lowpass=f=2500,atrim=0:5,afade=t=out:st=4:d=1' },
