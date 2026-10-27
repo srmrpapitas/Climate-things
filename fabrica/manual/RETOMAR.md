@@ -1,4 +1,9 @@
-# Retomar Españistán ep. 2 (leer al abrir una sesión nueva)
+# Retomar Españistán (leer al abrir una sesión nueva)
+
+**Estado a 27-10-2026: ep. 3 terminado** (Acascar y Vox, 10 min, HD en `videos/espanistan-03/`). Rama con todo: `claude/new-session-k0kf29`.
+**Siguiente: ep. 4, el bipartidismo** → seguir `CAPITULO-SIGUIENTE.md` (procedimiento al día). Lo de abajo es el historial del ep. 2.
+
+---
 
 Estado a 26-10-2026. Rama de trabajo: la que indique la sesión. Si no tiene esto, traer `claude/quirky-thompson-xa9rrz`.
 El contenedor es nuevo en cada sesión: **lo que no está en git hay que reinstalarlo** (VoiceStudio, Whisper, PhotoCraft).

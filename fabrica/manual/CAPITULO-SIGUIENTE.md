@@ -1,12 +1,18 @@
 # Españistán · cómo hacer el capítulo siguiente (pegar esto en una conversación nueva)
 
-> **Para Claude:** estás en el repo `srmrpapitas/Climate-things`, rama `claude/quirky-thompson-xa9rrz`. Lee este archivo y
-> `fabrica/manual/COMO-HACER-UN-VIDEO.md`. El modelo a copiar es el **ep. 2**: `fabrica/videos/espanistan-02-sombras/`
-> (`escenas.json` + `hacer_escenas.py`). No cambies el estilo: ya está aprobado. Trabaja con Sonnet si puedes.
-> Antes de empezar: `sh fabrica/instalar_todo.sh` (Whisper) (instala Whisper y OpenCV en `/home/user/qw`).
+> **Para Claude:** estás en el repo `srmrpapitas/Climate-things`. Todo el trabajo está en la rama `claude/new-session-k0kf29`
+> (si la rama de la sesión no lo tiene: `git fetch origin claude/new-session-k0kf29` y llevar la rama de trabajo a ese commit).
+> Lee este archivo y `fabrica/manual/COMO-HACER-UN-VIDEO.md`. El modelo a copiar es el **ep. 3**: `fabrica/videos/espanistan-03-sombras/`
+> (`hacer_escenas.py` → `escenas.json`). No cambies el estilo: ya está aprobado.
+> **Nada más empezar**, en segundo plano: `tmux new -d -s inst "sh fabrica/instalar_todo.sh --flux > /tmp/inst.log 2>&1"`
+> (Whisper + OpenCV + FLUX local, ≈ 20 min). Mientras, guion y voces.
+> El usuario autoriza a terminar el capítulo solo, sin preguntar en cada paso; hablarle en español, corto y sin tecnicismos.
 
 ## La serie
-- 15 vídeos. Ep. 1 Sanchís (hecho), ep. 2 Feijolo y el PP (hecho), **ep. 3 Acascar (Abascal, Vox)** (guion: `historias/espanistan/03-abascal.md`), ep. 4 el bipartidismo (enfoque del usuario: partidocracia, listas cerradas, quienes mandan no necesitan tus votos ni los puedes elegir)…
+- 15 vídeos. Ep. 1 Sanchís (hecho), ep. 2 Feijolo y el PP (hecho), ep. 3 Acascar = Abascal y Vox (hecho, 27-10-2026, 10 min),
+  **ep. 4 el bipartidismo** (enfoque del usuario: España es una partidocracia; listas cerradas: no eliges a las personas,
+  y quienes mandan dependen de su partido y no de tus votos; por qué no funciona)…
+- Nombres de sátira (los elige el usuario): Sánchez = **Sanchís**, Feijóo = **Feijolo**, Abascal = **Acascar**. Para uno nuevo, preguntar.
 - País ficticio con **datos reales y fuentes**; la palabra **exacta** de cada sentencia (presunción de inocencia: nadie es culpable sin sentencia).
 - **Nunca** decir a quién votar. Lo bueno también se cuenta.
 - El **Decano** (profesor platónico, pelo loco, gafas redondas, candil y lupa) guía; **un filósofo por bloque** con su frase.
@@ -71,34 +77,62 @@
    - Coste igual (se paga por letra); son más llamadas, pero se lanzan todas a la vez.
 3. **Voz del protagonista**: buscar en `creative_list_voices` (`es`, acento `peninsular`, `characters_animation`).
    - Feijolo = «Johnny The Rogue» `HMCmDsbKeaSZp5LMOYKR` (`eleven_v3`, etiquetas `[confident]` `[sly]` `[chuckles]`).
+   - Acascar = «Leónidas - Legendary Spartan Warrior» `YKrm0N1EAM9Bw27j8kuD` (`eleven_v3`, 1 toma, ≈450 cr. por 5 frases). Frases en `fabrica/herramientas/guion_espanistan-03-abascal.txt`.
    - **Todas sus frases en una sola llamada**, separadas por líneas en blanco.
    - Cortar con Whisper (`fabrica/manual/herramientas/tiempos.py`) y `ffmpeg`, como en `audio/voz/es/espanistan-02/feijolo/`.
 4. **Retratos del protagonista**: 1 imagen Seedream 5 lite 2×2 (≈212 cr.) con perfil estricto, parejas boca cerrada/abierta, papel blanco a grafito.
-   - Prompt en `historias/espanistan/retratos/feijolo/` (ver el de `perfil_lapiz`).
-   - Recortar y alinear con ECC (`p1_*`, `p2_*`).
-5. **Escenarios — GRATIS con FLUX local** (decisión del usuario, 26-10-2026): `sh fabrica/instalar_todo.sh --flux` (una vez) y
-   `sh fabrica/manual/herramientas/escenario.sh historias/espanistan/sombras/epNN/ESCENA.png "qué sale" [semilla]` (≈ 15 min/imagen, en segundo plano;
-   el estilo va ya dentro del script). Probar 2 semillas en las escenas clave. ElevenLabs (Seedream 5 lite, ≈212 cr.) solo si FLUX no da el resultado.
-   Antes: 5–7 imágenes de teatro de sombras (Seedream 5 lite, 16:9 2K, ≈212 cr. cada una).
-   - Prompt base en `historias/espanistan/sombras/ep02/` (copiar el párrafo de estilo).
-   - Pedir «figures clearly separated, not overlapping».
-6. **Piezas**: por escena, un JSON con cajas (medidas sobre la imagen a 889 px de ancho, `"ref": 889`): `caja`, `cuello` (separa la cabeza), `pivote`, `tipo` (`figura|grupo|objeto|brazo|baston|iconos`), `padre`.
-   - Recortar con `/home/user/qw/bin/python -I fabrica/manual/herramientas/sombras.py ESCENA.webp ESCENA.json ESCENA --ancho 2560`.
-   - Mirar `ESCENA/previa.jpg`.
-7. **Montaje**: copiar `fabrica/videos/espanistan-02-sombras/hacer_escenas.py` y adaptarlo (voces, planos, acciones, capas de datos).
-   - Generar con `/home/user/qw/bin/python -I fabrica/generar.py fabrica/videos/espanistan-NN-sombras/escenas.json`.
+   - Prompt que funcionó (ep. 3): `historias/espanistan/retratos/acascar/prompt.txt`.
+   - Cortar y alinear con ECC: `/home/user/qw/bin/python -I fabrica/manual/herramientas/cortar_rejilla.py rejilla.png CARPETA` → `p1_*`, `p2_*`.
+   - En el ep. 3 bastaron 2 parejas: p1 y p2 alternando lado (1 / −1) y zoom distinto en cada frase.
+5. **Escenarios — GRATIS con FLUX local**: escribir `historias/espanistan/sombras/epNN/escenas.txt` (una línea por escena: `nombre|qué sale`, en inglés,
+   describiendo de izquierda a derecha quién está y qué hace) y lanzar el lote en tmux:
+   `tmux new -d -s escenas "sh fabrica/manual/herramientas/escenarios_lote.sh historias/espanistan/sombras/epNN/escenas.txt > /tmp/escenas.log 2>&1"`.
+   - Espera sola a que acabe la instalación; ≈ 15–25 min por escena (12 escenas ≈ 4 h). Si se corta, relanzar: salta las hechas.
+   - Pone sola el **pergamino** (`pergamino.py`): `epNN/nombre.webp` listo para recortar; el crudo queda en `epNN/flux/`.
+   - FLUX a veces no dibuja lo pedido (ep. 3: ni muralla ni casetas de playa). No repetir: **adaptar las acciones a lo que salió**.
+   - Se pueden reutilizar escenarios de otros episodios (el ep. 3 usa `tribunal` del ep. 2: copiar carpeta, `.webp` y `.json`).
+   - Ejemplo de 12 escenas: `historias/espanistan/sombras/ep03/escenas.txt`.
+6. **Piezas** (hacerlo con cada escena según sale, mientras FLUX hace la siguiente):
+   - Mirar la escena a 1280 px (`ffmpeg -i ESCENA.webp -vf scale=1280:-1 /tmp/esc.jpg`) y escribir `ESCENA.json` con `"ref": 1280`:
+     `caja` [x0, y0, x1, y1], `cuello` (y que separa la cabeza), `pivote`, `tipo` (`figura|grupo|objeto|brazo|baston|iconos`).
+   - Lo que deba moverse aparte (llave, mazo, lupa, bandera) va **primero** en la lista: cada pieza se queda los píxeles que nadie cogió antes.
+   - Cajas ajustadas: si una caja pisa el suelo o una roca oscura, ese trozo se mueve con la pieza.
+   - Recortar: `/home/user/qw/bin/python -I fabrica/manual/herramientas/sombras.py ESCENA.webp ESCENA.json ESCENA --ancho 2560` y mirar `ESCENA/previa.jpg`.
+   - `--auto` falla cuando las figuras tocan el suelo (salen 0 piezas): usar cajas a mano. Para renombrar piezas de `--auto`: `renombra_piezas.py`.
+   - Ejemplos: los 12 `.json` de `historias/espanistan/sombras/ep03/`.
+7. **Montaje**: copiar `fabrica/videos/espanistan-03-sombras/hacer_escenas.py` (y su `.gitignore`) y adaptarlo: lista de voces, planos, acciones, partículas, capas.
+   - `python3 hacer_escenas.py && /home/user/qw/bin/python -I ../../generar.py escenas.json` (desde la carpeta del vídeo).
+   - Los tiempos de Whisper se guardan en `tiempos/NN.json` (uno por voz). **Comprobar que ninguno sale vacío**: si una voz es silencio, Whisper devuelve `[]`.
+   - **Prueba en seco** antes de tener todos los escenarios: cambiar en una copia de `escenas.json` los que faltan por `tribunal` y generar; así salen los fallos de anclas pronto.
 8. **Render a prueba de reinicios** (la nube recicla la máquina cuando el chat está inactivo): en tmux,
    `tmux new -d -s render "cd fabrica/videos/espanistan-NN-sombras && python3 ../../manual/herramientas/render_partes.py . out/espanistan-NN.mp4; sleep 900"`.
    Renderiza en trozos de 90 s guardados en disco; si se corta, relanzar el mismo comando y sigue donde iba. Programar con `send_later` una comprobación cada ~45 min.
 9. **Revisar**: `npx hyperframes@0.8.204 check`; **una** tanda de capturas con `snapshot --at t1,t2,…`; el render va con `render_partes.py` (paso 8).
-10. **Subir** al repo (commit + push); el `.mp4` va en `out/` (no se sube); pasárselo al usuario.
+10. **Entregar en HD** (el usuario lo descarga desde GitHub): partir sin recomprimir en trozos < 95 MB y subirlos a `videos/espanistan-NN/`:
+    `ffmpeg -i out/espanistan-NN.mp4 -c copy -map 0 -f segment -segment_time 80 -reset_timestamps 1 videos/espanistan-NN/espanistan-NN_parte%d.mp4`
+    (renombrar para que empiecen en 1), más `lista.txt` y `LEEME.txt` para unirlos (copiar los de `videos/espanistan-03/`).
+    Comprobar que unidos dan la duración entera. GitHub avisa de archivos > 50 MB pero los acepta (< 100 MB).
+    Pasar al usuario el enlace `https://github.com/srmrpapitas/Climate-things/tree/<rama>/videos/espanistan-NN`.
+
+## Trampas que costaron tiempo en el ep. 3
+- **Cortar audio con fundido**: poner `-ss` y `-t` **antes** de `-i`. Con `-ss` después, el `afade` usa el tiempo del archivo original y deja el trozo en silencio.
+- Las voces se piden todas a la vez; ElevenLabs encola las que pasan del límite («concurrency limit») y las hace solas: no repetir la llamada.
+- Los enlaces de descarga de ElevenLabs caducan en 2 h: bajar los audios en cuanto estén.
+- Una frase del guion puede quedar inexacta al montar (ep. 3: «de aquella mesa, hoy solo queda Ortega Lara», pero Acascar también sigue).
+  Releer el guion buscando estas cosas **antes** de generar la voz.
+- No usar `Bash sleep` para esperar: vigilar con Monitor (escenarios, render) y programar con `send_later` una comprobación de seguridad.
 
 ## Tipos de plano del generador
 - `teatro` (`escena`, `cam`/`cam2` [x, y, zoom] en 1280×720, `zooms`, `acciones`).
 - `retrato` (`img`, `lado`, `z`, `y`).
 - `decano`, `cueva`, `imagen`.
 - Capas: `dato` · `cita` · `frasco` · `nota` · `barras` · `lista` · `comparacion` · `linea` · `pines` · `sello` · `titulo` · `suscribete`.
-- Acciones: `asiente` · `niega` · `alza` · `saluda` · `salta` · `tiembla` · `inclina` · `golpea` · `balancea` · `crece` · `avanza` · `aparece` · `desaparece` (con `g` = cuánto).
+- Acciones que vuelven a su sitio: `asiente` · `niega` · `alza` · `saluda` · `salta` · `tiembla` · `inclina` · `golpea` · `balancea` · `crece` · `avanza` (con `g` = cuánto).
+- Acciones que **se quedan hechas** (la escena evoluciona, ep. 3): `entra` (desde fuera de cuadro; antes no se ve) · `sale` · `camina` · `arrastra` · `cae` · `sube` · `gira` · `late` · `aparece` · `desaparece`.
+  Se suman: para que alguien se vaya y vuelva, `sale` g=−900 y luego `camina` g=+900 (no `entra`, que lo esconde desde el principio).
+- `particulas` del plano: `lluvia` · `chispas` · `humo` · `monedas` · `papeles` · `pajaros` · `estrellas` · `polvo` (`en`, `hasta`, `n`, `zona` [x0, y0, x1, y1] en 1280×720, `sube` = segundos hasta la intensidad máxima).
+  Siempre hay un polvo suave flotando; la cámara del teatro respira sola y el telón hace parallax.
+- `barras` admite `unidad` (`''` para escaños, por defecto ` %`).
 
 ## Presupuesto por capítulo (créditos ElevenLabs; ver `PLAN-10-SEMANA.md`)
 - Narrador ≈ 7.000 (o ≈ 3.500 con `eleven_flash_v2_5`).
