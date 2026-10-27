@@ -97,4 +97,35 @@
     g.fillStyle = N; g.beginPath(); g.moveTo(-20, -20); g.lineTo(1300, -20); g.lineTo(1300, 40);
     for (let x = 1300; x >= -20; x -= 64) g.quadraticCurveTo(x - 32, 78, x - 64, 40); g.closePath(); g.fill();
   };
+  // ---------- planos `jack` (a lo Samurai Jack): color plano, sin pergamino ----------
+  D.plano = (g, t, d) => {                       // cielo de un color con pinceladas horizontales quietas (d.color, d.raya, d.luz)
+    g.fillStyle = d.color || '#b3201a'; g.fillRect(-900, -600, 3100, 2000);
+    for (let i = 0; i < 70; i++) { const y = -200 + 1100 * A(i + 3), x = -500 + 2200 * A(i + 7), l = 300 + 900 * A(i + 11), w = 4 + 26 * A(i + 13);
+      g.fillStyle = A(i + 17) < .55 ? (d.raya || 'rgba(70,6,6,.22)') : (d.luz || 'rgba(255,90,60,.14)');
+      g.beginPath(); g.moveTo(x, y); g.bezierCurveTo(x + l * .3, y - w * .6, x + l * .7, y - w * .4, x + l, y + w * .2);
+      g.bezierCurveTo(x + l * .7, y + w * .5, x + l * .3, y + w * .7, x + 10, y + w); g.closePath(); g.fill(); }
+  };
+  D.trono = (g, t, d) => {                       // trono de respaldo alto con picos (los gobiernos autonómicos)
+    const e = d.escala || 1; g.save(); g.translate(d.x, d.y || 600); g.scale(e, e); g.fillStyle = color(d);
+    g.fillRect(-34, -70, 68, 12); g.fillRect(-30, -58, 8, 58); g.fillRect(22, -58, 8, 58); g.fillRect(-36, -96, 8, 30); g.fillRect(28, -96, 8, 30);
+    g.beginPath(); g.moveTo(-30, -70); g.lineTo(-30, -190); g.lineTo(-18, -214); g.lineTo(-8, -196); g.lineTo(0, -228); g.lineTo(8, -196); g.lineTo(18, -214); g.lineTo(30, -190); g.lineTo(30, -70); g.closePath(); g.fill();
+    hueco(g, () => { g.moveTo(0, -176); g.lineTo(10, -150); g.lineTo(0, -124); g.lineTo(-10, -150); g.closePath(); }); g.restore(); };
+  D.mesa = (g, t, d) => {                        // mesa larga con sentados que se levantan y se van (d.sillas: [{ en }], en = cuándo se va; sin en, silla vacía)
+    const e = d.escala || 1; g.save(); g.translate(d.x || 640, d.y || 600); g.scale(e, e); const sillas = d.sillas || [], n = sillas.length, paso = 150;
+    sillas.forEach((q, i) => { const x = (i - (n - 1) / 2) * paso; g.fillStyle = color(d);
+      g.fillRect(x - 30, -170, 8, 170); g.fillRect(x - 30, -70, 60, 9); g.fillRect(x + 22, -70, 8, 70);   // silla
+      const k = q.en == null ? 1 : T.clamp((t - q.en) / .6); if (k >= 1) return;
+      g.save(); g.globalAlpha = 1 - k; g.translate(x + 40 * k, -70 - 20 * Math.sin(Math.PI * Math.min(k * 2, 1)));
+      g.beginPath(); g.moveTo(-26, 0); g.lineTo(-30, -78); g.lineTo(-8, -96); g.lineTo(20, -92); g.lineTo(24, -40); g.lineTo(30, 0); g.closePath(); g.fill();   // tronco
+      g.beginPath(); g.ellipse(4, -116, 15, 19, 0, 0, TAU); g.fill(); g.restore(); });
+    g.fillStyle = color(d); g.fillRect(-n * paso / 2 - 30, -84, n * paso + 60, 14); for (const x of [-n * paso / 2 - 10, n * paso / 2 + 4]) g.fillRect(x, -70, 8, 70);
+    g.restore(); };
+  D.pinchos = (g, t, d) => {                     // matorral de púas negras en primer término, que se dobla con el viento
+    const y = d.y || 720, e = d.escala || 1; g.fillStyle = color(d);
+    for (let i = 0; i < (d.n || 22); i++) { const x = -200 + i * (1700 / (d.n || 22)) + 50 * A(i), h = (60 + 130 * A(i + 5)) * e, w = (14 + 22 * A(i + 9)) * e,
+        dob = (A(i + 2) < .5 ? -1 : 1) * (.4 + .5 * A(i + 4)) + .06 * Math.sin(t * 2.2 + i);
+      g.beginPath(); g.moveTo(x - w, y + 20); g.quadraticCurveTo(x - w * .3 + dob * h * .3, y - h * .5, x + dob * h * .8, y - h);
+      g.quadraticCurveTo(x + w * .2 + dob * h * .3, y - h * .4, x + w, y + 20); g.closePath(); g.fill(); }
+    g.fillRect(-400, y, 2100, 400);
+  };
 })();

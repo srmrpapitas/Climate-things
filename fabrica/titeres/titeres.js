@@ -13,6 +13,7 @@ const T = (() => {
   const mezcla = (a, b, k) => a + (b - a) * k;
   const dir = (a, l) => [l * Math.sin(a), l * Math.cos(a)];         // ángulo 0 = hacia abajo; + = hacia delante
   const NEGRO = '#0b0705';
+  let ANGULOSO = false;                                               // planos `jack`: miembros en cuña, sin puntas redondas
 
   // peso de un gesto: entra con rebote, se mantiene y sale suave; antes de entrar hay una pequeña anticipación
   function peso(t, a, b, entra = .32, sale = .35) {
@@ -50,13 +51,13 @@ const T = (() => {
 
   // ---------- la pose de un fotograma ----------
   function pose(ac, t) {
-    const p = ac.p, s = p.semilla || 1, r = recorrido(ac, t), r2 = recorrido(ac, t - 1 / 24), r3 = recorrido(ac, t - .2);
+    const p = ac.p, s = p.semilla || 1, q = ac.quieto ? 0 : 1, r = recorrido(ac, t), r2 = recorrido(ac, t - 1 / 24), r3 = recorrido(ac, t - .2);
     const vel = (r.x - r2.x) * 24, anda = clamp(Math.abs(vel) / (90 * p.alto)), velAtras = (r2.x - r3.x) / .18;
     const o = { x: r.x, y: 0, f: r.f, fase: r.fase, anda, vel: vel * Math.sign(r.mira), velAtras: velAtras * Math.sign(r.mira),
-      inclina: .07 * anda + (p.encorvado || 0) + .015 * ruido(t * .7, s), cabeza: .03 * ruido(t * .9, s + 2), boca: 0, aplasta: 1,
+      inclina: .07 * anda + (p.encorvado || 0) + .015 * q * ruido(t * .7, s), cabeza: .03 * q * ruido(t * .9, s + 2), boca: 0, aplasta: 1,
       parpadea: (u => u < .12 || (azar(Math.floor((t + azar(s) * 4) / (3.2 + azar(s + 1))) + s) < .3 && u > .26 && u < .36))((t + azar(s) * 4) % (3.2 + azar(s + 1))),
-      respira: Math.sin(t * 1.9 + s), hombros: 0, cabezaAncho: 1, cejas: .15 * ruido(t * .6, s + 7),
-      ojos: .5 * Math.sin(t * .7 + s) * (Math.sin(t * .23 + s) > 0), activos: [] };
+      respira: Math.sin(t * 1.9 + s), hombros: 0, cabezaAncho: 1, cejas: .15 * q * ruido(t * .6, s + 7),
+      ojos: .5 * q * Math.sin(t * .7 + s) * (Math.sin(t * .23 + s) > 0), activos: [], agacha: 0, dorsal: 0, tumbado: 0, trepaW: 0, dy: 0 };
     // vista (perfil / frente / espalda): al cambiar, el títere se estrecha y se da la vuelta como una carta
     let vista = ac.vista || 'perfil', cambio = -9, antes = vista;
     for (const a of ac.acciones) if (a.hace === 'vista' && t >= a.en - .15) { antes = vista; vista = a.a; cambio = a.en - .15; }
@@ -69,23 +70,44 @@ const T = (() => {
     o.cerca = [.12 - .42 * sw + .03 * ruido(t, s + 4), .22 + .25 * anda, p.mano || 'abierta'];
     o.lejos = [.1 + .42 * sw + .03 * ruido(t, s + 5), .2 + .25 * anda, p.manoLejos || 'abierta'];
     for (const a of ac.acciones) gesto(a, t, o, s);
+    // cadena del cuerpo: el brazo que se estira hacia delante arrastra el pecho; al agacharse, el tronco se inclina para no caerse
+    o.dorsal += .1 * clamp((o.cerca[0] - .9) / 1.2, -1, 1) - .06 * clamp(-o.lejos[0] / 1.2);
+    o.inclina += .35 * o.agacha;
     const habla = o.activos.find(a => a.hace === 'habla'), libre = !o.activos.some(a => a.hace !== 'habla' && a.hace !== 'asiente' && a.hace !== 'niega');
     if (habla && libre && o.anda < .2) {                                 // la mano acompaña lo que dice, con golpes de énfasis
       const w = habla.w, golpe = Math.max(0, Math.sin(t * 4.3 + s)) ** 3;
       brazo(o, 'cerca', .75 + .25 * Math.sin(t * 1.7 + s) + .18 * golpe, 1.05 - .35 * golpe, 'abierta', w * .85);
       o.cabeza += .06 * w * golpe; o.cejas += .35 * w * golpe; o.inclina += .02 * w * golpe;
     }
-    if (o.anda < .2) { o.cabeza += .05 * Math.sin(t * .31 + s * 2) * (Math.sin(t * .13 + s) > .3); o.inclina += .012 * o.respira; o.x += 2.5 * Math.sin(t * .4 + s); }
+    if (o.anda < .2 && q) { o.cabeza += .05 * Math.sin(t * .31 + s * 2) * (Math.sin(t * .13 + s) > .3); o.inclina += .012 * o.respira; o.x += 2.5 * Math.sin(t * .4 + s); }
     if (!pose.dentro) {                                                  // arrastre: el antebrazo llega un poco después que el brazo
       pose.dentro = true; const atras = pose(ac, t - .09); pose.dentro = false;
       for (const b of ['cerca', 'lejos']) o[b][1] = mezcla(o[b][1], atras[b][1] + (o[b][0] - atras[b][0]) * -.6, .45);
     }
     return o;
   }
-  const brazo = (o, cual, sH, sC, mano, w) => { const b = o[cual]; o[cual] = [mezcla(b[0], sH, w), mezcla(b[1], sC, w), w > .5 && mano ? mano : b[2]]; };
+  const brazo = (o, cual, sH, sC, mano, w, mu = 0) => { const b = o[cual]; o[cual] = [mezcla(b[0], sH, w), mezcla(b[1], sC, w), w > .5 && mano ? mano : b[2], mezcla(b[3] || 0, mu, w)]; };   // mu: ángulo de la muñeca
   function gesto(a, t, o, s) {
-    const hasta = a.hasta ?? a.en + 1.2, [w, ant] = peso(t, a.en, hasta), u = t - a.en;
+    const hasta = a.hasta ?? a.en + 1.2, [w, ant] = peso(t, a.en, hasta, a.entra ?? .32, a.sale ?? .35), u = t - a.en;
     if (a.hace === 'desenmascara' && t >= a.en) o.corteMascara = a.en;
+    if (a.hace === 'coge' && t >= a.en) o['obj' + (a.mano || 'cerca')] = a.que;            // coger / soltar un objeto (daga, bandera…)
+    if (a.hace === 'suelta' && t >= a.en) o['obj' + (a.mano || 'cerca')] = null;
+    if (a.hace === 'clavada' && t >= a.en) o.clavada = true;                              // lleva una daga clavada en la espalda
+    if (a.hace === 'tirita' && t >= a.en) o.tirita = true;
+    if (a.hace === 'trepa' && t >= a.en) {                                // trepar: sube por una pendiente (dx, dy) con manos y pies; arriba se queda
+      const k = clamp((t - a.en) / (a.hasta - a.en)), pasos = a.pasos ?? 6, c = TAU * k * pasos, w2 = Math.min(1, k * 6, (1 - k) * 6);
+      o.x += (a.dx || 0) * k; o.dy += (a.dy || 0) * k - 10 * Math.abs(Math.sin(c / 2)) * w2;
+      if (k < 1) { o.trepaW = w2; o.trepaFase = k * pasos; o.inclina += .72 * w2; o.agacha = Math.max(o.agacha, .3 * w2);
+        brazo(o, 'cerca', 2.15 + .55 * Math.sin(c), -.35 - .35 * Math.sin(c), 'agarra', w2, .3); brazo(o, 'lejos', 2.15 - .55 * Math.sin(c), -.35 + .35 * Math.sin(c), 'agarra', w2, .3);
+        o.cabeza -= .35 * w2; o.cejas -= .5 * w2; o.boca = Math.max(o.boca, .25 * w2 * (Math.sin(c) > .6)); }
+    }
+    if (a.hace === 'apunala' && t > a.en - .5 && t < (a.hasta ?? a.en + 1.5)) {             // puñalada: arma arriba y atrás, golpe seco, aguanta y suelta
+      const u2 = t - a.en, sal = rampa(t, (a.hasta ?? a.en + 1.5) - .4, a.hasta ?? a.en + 1.5); let h, c, m, d;
+      if (u2 < 0) { const k = suave((u2 + .5) / .5); h = mezcla(.4, 3.0, k); c = mezcla(.3, 1.2, k); m = mezcla(0, .6, k); d = -.2 * k; o.inclina -= .08 * k; o.agacha = Math.max(o.agacha, .1 * k); }
+      else if (u2 < .09) { const k = u2 / .09; h = mezcla(3.0, 1.2, k); c = mezcla(1.2, .5, k); m = mezcla(.6, -.3, k); d = mezcla(-.2, .3, k); o.inclina += .14 * k; o.impacto = true; }
+      else { h = 1.2; c = .5; m = -.3; d = .3; o.inclina += .14; o.agacha = Math.max(o.agacha, .15); }
+      const v = 1 - sal; brazo(o, 'cerca', h, c, 'agarra', v, m); o.dorsal += d * v; o.cejas -= .8 * v; o.ojos = -.3 * v; return;
+    }
     if (a.hace === 'corta' && t > a.en - .45 && t < (a.hasta ?? a.en + 1.2)) { o.activos.push({ hace: 'corta', w: 1, u }); }
     if (w === 0 && ant === 0 && a.hace !== 'salta' && !(a.hace === 'corta' && t > a.en - .45 && t < (a.hasta ?? a.en + 1.2))) return;
     o.activos.push({ hace: a.hace, w, ant, u, h: a.h, c: a.c });
@@ -110,6 +132,21 @@ const T = (() => {
       case 'asiente': o.cabeza += .2 * w * Math.max(0, Math.sin(u * 8)); break;
       case 'niega': o.cabezaAncho = 1 - .3 * w * Math.abs(Math.sin(u * 9)); o.cabeza += .04 * w; break;
       case 'inclina': o.inclina += .45 * w; o.cabeza += .2 * w; break;
+      case 'mano': {                                                  // dar la mano: el brazo se estira, la mano de canto, y se agita (sincronizada entre los dos)
+        const agita = .1 * Math.sin(u * 13) * clamp((u - .45) / .2) * clamp((hasta - .4 - t) / .2);
+        brazo(o, 'cerca', 1.38 + agita + (a.h || 0), .12 - agita * .6, 'estrecha', w, -.15 + agita); o.inclina += .05 * w; o.dorsal += .05 * w; o.cabeza -= .04 * w; break; }
+      case 'esconde': brazo(o, 'lejos', -.7, -.95, 'agarra', w, .2); o.dorsal -= .03 * w; break;   // la mano de atrás, a la espalda (con lo que lleve)
+      case 'repta': {                                                 // reptar: tumbado, tira con los antebrazos y empuja con las rodillas (anda con `camina`)
+        const c = TAU * o.fase, r1 = .5 + .5 * Math.sin(c), r2 = .5 + .5 * Math.sin(c + Math.PI);
+        o.tumbado = Math.max(o.tumbado, w); o.inclina = mezcla(o.inclina, 1.4 + .04 * Math.sin(2 * c), w); o.dorsal -= (.14 + .05 * r1) * w;
+        o.cabeza = mezcla(o.cabeza, .1 + .06 * Math.sin(2 * c), w); o.cejas -= .6 * w; o.boca = Math.max(o.boca, .3 * w * r1);
+        brazo(o, 'cerca', mezcla(.3, 1.2, r1), mezcla(1.3, .4, r1), 'abierta', w, .6); brazo(o, 'lejos', mezcla(.3, 1.2, r2), mezcla(1.3, .4, r2), 'abierta', w, .6); break; }
+      case 'agacha': o.agacha = Math.max(o.agacha, (a.g ?? .5) * w); break;
+      case 'recibe': {                                                // recibe una puñalada: se arquea, se le doblan las rodillas, la mano busca la espalda
+        const k = clamp(u / .12), sacude = Math.exp(-u * 3) * Math.sin(u * 22);
+        o.dorsal -= (.32 * k - .06 * sacude) * w; o.inclina -= .06 * k * w; o.cabeza -= (.28 * k + .05 * sacude) * w; o.agacha = Math.max(o.agacha, (.18 + .12 * clamp((u - .3) / .5)) * w);
+        brazo(o, 'cerca', .55 + .2 * sacude, .5, 'abierta', w, .5); brazo(o, 'lejos', -1.6 + .15 * Math.sin(u * 3), 1.9, 'abierta', w * clamp((u - .2) / .3), -.4);
+        o.boca = Math.max(o.boca, .7 * w); o.cejas += 1.1 * w; o.ojos = .2 * w; o.x += 10 * clamp(u / .4) * w + 3 * Math.sin(u * 5) * w * (u > .4); break; }
       case 'brazos': brazo(o, 'cerca', a.h ?? 1.2, a.c ?? .3, a.mano, w); if (a.h2 != null) brazo(o, 'lejos', a.h2, a.c2 ?? .3, a.mano, w); break;
       case 'habla': o.boca = Math.max(o.boca, w * clamp(.55 + .45 * Math.sin(t * 17 + s) * Math.sin(t * 5.3 + s * 2) + .25 * Math.sin(t * 29))); break;
       case 'salta': { const k = clamp(u / .55); if (u > -.15 && u < .7) { o.y -= 70 * Math.sin(Math.PI * k) * (k < 1); o.aplasta = u < 0 ? 1 - .12 * Math.sin(Math.PI * (u + .15) / .15) : u > .55 ? 1 - .15 * Math.sin(Math.PI * (u - .55) / .15) : 1.06; } break; }
@@ -119,6 +156,9 @@ const T = (() => {
   // ---------- dibujo de un títere (coordenadas locales: mira a la derecha, pies en y = 0) ----------
   function miembro(g, a, b, w0, w1) {
     const ang = Math.atan2(b[1] - a[1], b[0] - a[0]), nx = Math.sin(ang), ny = -Math.cos(ang);
+    if (ANGULOSO) { const ux = Math.cos(ang), uy = Math.sin(ang);       // hexágono: puntas en pico, como recortes de papel
+      g.beginPath(); g.moveTo(a[0] + nx * w0, a[1] + ny * w0); g.lineTo(b[0] + nx * w1, b[1] + ny * w1); g.lineTo(b[0] + ux * w1 * .7, b[1] + uy * w1 * .7);
+      g.lineTo(b[0] - nx * w1, b[1] - ny * w1); g.lineTo(a[0] - nx * w0, a[1] - ny * w0); g.lineTo(a[0] - ux * w0 * .7, a[1] - uy * w0 * .7); g.closePath(); g.fill(); return; }
     g.beginPath(); g.moveTo(a[0] + nx * w0, a[1] + ny * w0); g.lineTo(b[0] + nx * w1, b[1] + ny * w1);
     g.arc(b[0], b[1], w1, ang - Math.PI / 2, ang + Math.PI / 2); g.lineTo(a[0] - nx * w0, a[1] - ny * w0);
     g.arc(a[0], a[1], w0, ang + Math.PI / 2, ang + 3 * Math.PI / 2); g.fill();
@@ -135,20 +175,34 @@ const T = (() => {
       if (u < .5) return [C / 4 - C * u, 0, 0];
       const k = (u - .5) / .5; return [-C / 4 + C / 2 * suave(k), -20 * A * Math.sin(Math.PI * k) * o.anda, .35 * Math.sin(Math.PI * k) * o.anda];
     });
-    const caderaY = -(L1 + L2) * .965 + 5 * o.anda * (.5 + .5 * Math.cos(2 * TAU * o.fase)) + o.y;
+    if (o.tumbado > 0) pies.forEach((q, i) => {                          // tumbado: piernas estiradas detrás, rodillas al suelo, punta del pie clavada
+      const u = TAU * (o.fase + i * .5), ti = [-(L1 + L2) * .8 + 24 * A * Math.sin(u), 0, -1.35];
+      for (let j = 0; j < 3; j++) q[j] = mezcla(q[j], ti[j], o.tumbado); });
+    if (o.trepaW > 0) pies.forEach((q, i) => {                           // trepando: un pie sube mientras el otro empuja
+      const sn = Math.sin(TAU * o.trepaFase + i * Math.PI), ti = [(i ? -8 : 22) * A + 10 * A * sn, -34 * A * (.5 + .5 * sn), .45];
+      for (let j = 0; j < 3; j++) q[j] = mezcla(q[j], ti[j], o.trepaW); });
+    const caderaY = mezcla(-(L1 + L2) * (.965 - .32 * o.agacha) + 5 * o.anda * (.5 + .5 * Math.cos(2 * TAU * o.fase)), -24 * A * G - 4 * A * Math.abs(Math.sin(TAU * o.fase)), o.tumbado) + o.y;
     g.save(); g.translate(o.x, 0); g.scale(o.f * (p.escala || 1) * o.z * o.giroVista, (p.escala || 1) * o.z * o.aplasta); g.fillStyle = g.strokeStyle = NEGRO;
-    const [pc, pl] = pies, cad = [0, caderaY];
+    const [pc, pl] = pies, cad = [-26 * A * o.agacha, caderaY];
     const rod = pie => ik(0, caderaY, pie[0], pie[1] - 6 * A, L1, L2);
     // lo de atrás, un poco más claro para que se lea
     g.fillStyle = '#2a1a10'; pierna(g, cad, rod(pl), pl, p, A); g.fillStyle = NEGRO;
-    const inc = o.inclina, largo = 112 * A, cuello = [cad[0] + Math.sin(inc) * largo, cad[1] - Math.cos(inc) * largo + o.hombros * .3];
-    const hombro = [cad[0] + Math.sin(inc) * (largo - 10), cad[1] - Math.cos(inc) * (largo - 10) - o.hombros];
-    g.fillStyle = '#2a1a10'; brazoDib(g, hombro, o.lejos, p, t, o, false, A); g.fillStyle = NEGRO;
+    // columna: cadera → espalda media (inc) → espalda alta (inc + dorsal); el cuello sale de arriba
+    const inc = o.inclina, sup = inc + o.dorsal, largo = 112 * A, medio = [cad[0] + Math.sin(inc) * largo * .5, cad[1] - Math.cos(inc) * largo * .5];
+    const cuello = [medio[0] + Math.sin(sup) * largo * .5, medio[1] - Math.cos(sup) * largo * .5 + o.hombros * .3];
+    const hombro0 = [medio[0] + Math.sin(sup) * (largo * .5 - 10), medio[1] - Math.cos(sup) * (largo * .5 - 10) - o.hombros];
+    // el hombro sube cuando el brazo se alza y se adelanta o se retrasa con él
+    const hombro = b => [hombro0[0] + 6 * A * clamp(b[0] / 1.6, -1, 1), hombro0[1] - 9 * A * clamp((b[0] - 1) / 1.6)];
+    g.fillStyle = '#2a1a10'; brazoDib(g, hombro(o.lejos), o.lejos, p, t, o, false, A); g.fillStyle = NEGRO;
     pierna(g, cad, rod(pc), pc, p, A);
-    ropa(g, p, t, o, cad, inc, largo, G, A, pies);
-    g.save(); g.translate(cuello[0], cuello[1]); g.rotate(o.cabeza + inc * .4); g.scale(o.cabezaAncho * (p.cabeza || 1) * A, (p.cabeza || 1) * A);
+    ropa(g, p, t, o, cad, inc, largo, G, A, pies, medio);
+    if (o.clavada || o.tirita) {                                         // la daga clavada (o la tirita) en la espalda alta
+      const e = [-27 * G * A * (p.hombros || 1) * 1.02, -largo * .28], q = [medio[0] + e[0] * Math.cos(sup) - e[1] * Math.sin(sup), medio[1] + e[0] * Math.sin(sup) + e[1] * Math.cos(sup)];
+      enColor(g, o, o.clavada && !o.tirita ? dagaClavada : tiritaColor, q, -sup, A);
+    }
+    g.save(); g.translate(cuello[0], cuello[1]); g.rotate(o.cabeza + sup * .4 * (1 - o.tumbado)); g.scale(o.cabezaAncho * (p.cabeza || 1) * A, (p.cabeza || 1) * A);
     cabeza(g, p, t, o); g.restore();
-    brazoDib(g, hombro, o.cerca, p, t, o, true, A);
+    brazoDib(g, hombro(o.cerca), o.cerca, p, t, o, true, A);
     g.restore();
   }
   function pierna(g, cad, rod, pie, p, A) {
@@ -158,23 +212,44 @@ const T = (() => {
     g.beginPath(); g.moveTo(-9 * A, -6 * A); g.quadraticCurveTo(22 * A, -9 * A, 26 * A, 2 * A); g.lineTo(26 * A, 6 * A); g.lineTo(-11 * A, 6 * A); g.closePath(); g.fill();
     g.restore();
   }
-  function brazoDib(g, hombro, [sH, sC, mano], p, t, o, cerca, A) {
+  function brazoDib(g, hombro, [sH, sC, mano, mun = 0], p, t, o, cerca, A) {
     const [ax, ay] = dir(sH, 62 * A), codo = [hombro[0] + ax, hombro[1] + ay];
-    const [bx, by] = dir(sH + sC, 56 * A), mu = [codo[0] + bx, codo[1] + by], ang = sH + sC;
+    const [bx, by] = dir(sH + sC, 56 * A), mu = [codo[0] + bx, codo[1] + by], ang = sH + sC + mun;   // la mano gira en la muñeca
     const w = 12 * A * (p.grueso || 1);
     miembro(g, hombro, codo, w + 1, w - 2); miembro(g, codo, mu, w - 2, w - 4);
     if (p.ropa === 'traje' || p.ropa === 'tunica') hueco(g, () => circulo(g, mu[0] - bx * .12, mu[1] - by * .12, 1.6 * A));   // botón del puño
-    g.save(); g.translate(mu[0], mu[1]); g.rotate(-ang);
-    g.beginPath();
-    if (mano === 'puno') { g.arc(0, 8 * A, 9 * A, 0, TAU); }
-    else if (mano === 'indice') { g.arc(0, 7 * A, 8 * A, 0, TAU); g.fill(); g.beginPath(); g.moveTo(-2.5 * A, 8 * A); g.lineTo(-1.5 * A, 26 * A); g.lineTo(2.5 * A, 26 * A); g.lineTo(3 * A, 8 * A); }
-    else { g.ellipse(0, 10 * A, 7 * A, 12 * A, 0, 0, TAU); g.fill(); g.beginPath(); g.ellipse(6 * A, 5 * A, 3 * A, 7 * A, -.6, 0, TAU); }
-    g.fill(); g.restore();
+    g.save(); g.translate(mu[0], mu[1]); g.rotate(-ang); manoDib(g, mano, A, t); g.restore();
+    if (cerca) { const m = g.getTransform().transformPoint(new DOMPoint(mu[0] + Math.sin(ang) * 16 * A, mu[1] + Math.cos(ang) * 16 * A)); o.manoPx = [m.x, m.y]; }
     if (cerca && o.tajo != null && o.tajo > -.02 && o.tajo < .4) enColor(g, o, (gg, tt) => estela(gg, o.tajo, A), hombro, 0, A);
-    const objeto = cerca ? p.objeto : p.objetoLejos;
+    const propio = cerca ? o.objcerca : o.objlejos, objeto = propio !== undefined ? propio : cerca ? p.objeto : p.objetoLejos;
     if (objeto && OBJETOS[objeto]) OBJETOS[objeto](g, mu, ang, t, o, A);
   }
-  function ropa(g, p, t, o, cad, inc, largo, G, A, pies) {
+  // manos con dedos (origen en la muñeca, +y a lo largo de la mano, +x hacia el pulgar)
+  function manoDib(g, mano, A, t) {
+    const dedo = (x0, y0, x1, y1, w) => { g.lineWidth = w * A; g.lineCap = 'round'; g.beginPath(); g.moveTo(x0 * A, y0 * A); g.lineTo(x1 * A, y1 * A); g.stroke(); };
+    g.strokeStyle = g.fillStyle; g.beginPath();
+    if (mano === 'puno' || mano === 'agarra') {                       // puño cerrado: nudillos marcados y el pulgar por encima
+      g.moveTo(-7 * A, 2 * A); g.lineTo(7 * A, 2 * A); g.lineTo(9 * A, 12 * A); g.lineTo(6 * A, 18 * A); g.lineTo(-6 * A, 18 * A); g.lineTo(-9 * A, 10 * A); g.closePath(); g.fill();
+      dedo(6, 6, 2, 13, 4.2); if (mano === 'puno') hueco(g, () => { for (let i = 0; i < 3; i++) g.rect(-6 * A, (8 + i * 3.4) * A, 6 * A, .9 * A); }); }
+    else if (mano === 'estrecha') {                                   // de canto, para dar la mano: dedos juntos y el pulgar arriba
+      g.moveTo(-6 * A, 1 * A); g.lineTo(6 * A, 1 * A); g.lineTo(6 * A, 14 * A); g.lineTo(-6 * A, 15 * A); g.closePath(); g.fill();
+      for (let i = 0; i < 4; i++) dedo(-4.5 + i * 2.6, 13, -4.2 + i * 2.6, 27 - Math.abs(i - 1.2) * 2, 3); dedo(5, 5, 11, 14, 3.6); }
+    else if (mano === 'indice') {
+      g.moveTo(-7 * A, 2 * A); g.lineTo(7 * A, 2 * A); g.lineTo(8 * A, 13 * A); g.lineTo(-7 * A, 15 * A); g.closePath(); g.fill();
+      dedo(3, 12, 3, 30, 3.4); dedo(5, 5, 10, 10, 3.6); }
+    else {                                                            // abierta: palma y cinco dedos un poco separados
+      g.moveTo(-7 * A, 1 * A); g.lineTo(7 * A, 1 * A); g.lineTo(7 * A, 14 * A); g.lineTo(-7 * A, 14 * A); g.closePath(); g.fill();
+      for (let i = 0; i < 4; i++) dedo(-5 + i * 3.3, 13, -7 + i * 4.4, 26 - Math.abs(i - 1.3) * 2.5, 2.9); dedo(6, 4, 13, 10, 3.4); }
+  }
+  // ropa con la espalda en dos tramos: de la cadera al medio gira con `inc`; del medio arriba, además con `dorsal`
+  function ropa(g, p, t, o, cad, inc, largo, G, A, pies, medio) {
+    if (!medio || Math.abs(o.dorsal) < .005) return ropaTramo(g, p, t, o, cad, inc, largo, G, A, pies);
+    const m = g.getTransform(), corte = (arriba, f) => { g.save(); g.translate(cad[0], cad[1]); g.rotate(inc); g.beginPath();
+      arriba ? g.rect(-900, -2000, 1800, 2000 - largo * .5 + 4 * A) : g.rect(-900, -largo * .5, 1800, 3000); g.setTransform(m); g.clip(); f(); g.restore(); };
+    corte(false, () => ropaTramo(g, p, t, o, cad, inc, largo, G, A, pies));
+    corte(true, () => { g.translate(medio[0], medio[1]); g.rotate(o.dorsal); g.translate(-medio[0], -medio[1]); ropaTramo(g, p, t, o, cad, inc, largo, G, A, pies); });
+  }
+  function ropaTramo(g, p, t, o, cad, inc, largo, G, A, pies) {
     const w = 27 * G * A, bar = (p.barriga || 0) * 18 * A, lag = clamp(o.velAtras / 200, -1, 1);
     g.save(); g.translate(cad[0], cad[1]); g.rotate(inc); g.scale(1 + .012 * o.respira, 1 + .008 * o.respira);
     // tronco: espalda curva, pecho y barriga
@@ -338,6 +413,20 @@ const T = (() => {
     g.fillStyle = '#7d1010'; g.fillRect(-3.2 * A, -12 * A, 6.4 * A, 26 * A); g.fillStyle = '#e2b24a'; for (let k = 0; k < 4; k++) g.fillRect(-3.2 * A, -9 * A + k * 6 * A, 6.4 * A, 1.4 * A);
     g.fillStyle = oro; g.beginPath(); g.arc(0, -15 * A, 5.5 * A, 0, TAU); g.fill(); g.fillStyle = 'rgba(255,255,255,.7)'; g.beginPath(); g.arc(-1.6 * A, -16.5 * A, 1.6 * A, 0, TAU); g.fill();
   }
+  // daga «RUPTURA» a lo Jack: hoja plana de marfil con un filo, puño negro y guarda roja. En la mano atraviesa el puño; la hoja sale por el meñique
+  function dagaColor(g, t, A, soloPunta) {
+    g.save(); g.translate(0, 10 * A);
+    g.fillStyle = '#16100c'; g.fillRect(-4 * A, -4 * A, 22 * A, 8 * A); g.beginPath(); g.arc(19 * A, 0, 4.5 * A, 0, TAU); g.fill();   // puño y pomo
+    g.fillStyle = '#8f1410'; g.fillRect(-8 * A, -9 * A, 4 * A, 18 * A);                                              // guarda
+    const L = soloPunta ? 14 : 62;
+    g.fillStyle = '#efe7d6'; g.beginPath(); g.moveTo(-8 * A, -4 * A); g.lineTo(-(8 + L * .86) * A, -3 * A); g.lineTo(-(8 + L) * A, .5 * A); g.lineTo(-(8 + L * .86) * A, 4 * A); g.lineTo(-8 * A, 4 * A); g.closePath(); g.fill();
+    g.fillStyle = '#a69d8e'; g.beginPath(); g.moveTo(-8 * A, .6 * A); g.lineTo(-(8 + L) * A, .5 * A); g.lineTo(-(8 + L * .86) * A, 4 * A); g.lineTo(-8 * A, 4 * A); g.closePath(); g.fill();
+    if (!soloPunta) { g.save(); g.translate(-38 * A, -.2 * A); g.scale(-1, 1); g.font = `700 ${5.2 * A}px Georgia, serif`; g.textAlign = 'center'; g.fillStyle = '#9b1510'; g.fillText('RUPTURA', 0, 0); g.restore(); }
+    g.restore();
+  }
+  const dagaClavada = (g, t, A) => { g.rotate(3.75); g.translate(16 * A, -10 * A); dagaColor(g, t, A, true); };   // la punta entra hacia delante y abajo; se ve el puño y un trozo de hoja
+  function tiritaColor(g, t, A) { g.fillStyle = '#eadbc0'; for (const r of [.7, -.7]) { g.save(); g.rotate(r); g.fillRect(-14 * A, -4 * A, 28 * A, 8 * A); g.restore(); }
+    g.fillStyle = 'rgba(120,80,50,.5)'; g.fillRect(-3 * A, -3 * A, 6 * A, 6 * A); }
   function estela(g, u, A) {                                          // media luna de luz que deja la espada al cortar
     const R = (62 + 56 + 120) * A, a0 = 3.15, a1 = mezcla(3.15, .75, clamp(u / .12)), al = clamp(1 - (u - .05) / .3);
     if (a1 >= a0 - .01) return; g.save(); g.globalCompositeOperation = 'lighter';
@@ -373,6 +462,10 @@ const T = (() => {
   function pintaColores(g, lista, t) { for (const c of lista || []) { g.save(); g.setTransform(c.m); g.translate(c.mu[0], c.mu[1]); g.rotate(-c.ang); c.f(g, t, c.A); g.restore(); } }
   const OBJETOS = {
     espada(g, mu, ang, t, o, A) { enColor(g, o, espadaColor, mu, ang, A); },
+    arrastra(g, mu, ang, t, o, A) {                                   // bandera arrastrada por el suelo: el palo detrás y la tela a ras de tierra
+      const fin = [mu[0] - 200 * A, -4 * A]; g.lineWidth = 5 * A; g.beginPath(); g.moveTo(mu[0], mu[1] + 6 * A); g.lineTo(fin[0], fin[1]); g.stroke();
+      DECORADO_TELA(g, fin[0] + 70 * A, fin[1] - 34 * A + 6 * Math.sin(t * 5), 70 * A, 30 * A, t, -1); },
+    daga(g, mu, ang, t, o, A) { enColor(g, o, dagaColor, mu, ang, A); },
     candil(g, mu, ang, t, o, A) {                                       // cuelga y se balancea con retraso
       const pen = .12 * Math.sin(t * 2.6) - .5 * clamp(o.velAtras / 150, -1, 1), c = [mu[0] + 34 * A * Math.sin(pen), mu[1] + 10 * A + 34 * A * Math.cos(pen)];
       g.lineWidth = 2; g.beginPath(); g.moveTo(mu[0], mu[1] + 10 * A); g.lineTo(c[0], c[1]); g.stroke();
@@ -405,15 +498,17 @@ const T = (() => {
     const cam = t => {                                                 // [x, y, zoom] interpolados entre las claves, más el pulso de la mano
       const c = def.camara || [[0, 640, 360, 1]]; let a = c[0], b = c[0], k = 0;
       for (let i = 0; i < c.length; i++) if (t >= c[i][0]) { a = c[i]; b = c[i + 1] || c[i]; k = b === a ? 0 : suave((t - a[0]) / (b[0] - a[0])); }
-      return [mezcla(a[1], b[1], k) + 4 * Math.sin(t * .37) + 2 * Math.sin(t * 1.1), mezcla(a[2], b[2], k) + 3 * Math.sin(t * .29), mezcla(a[3], b[3], k)];
+      const pulso = def.quieto ? 0 : 1;
+      return [mezcla(a[1], b[1], k) + pulso * (4 * Math.sin(t * .37) + 2 * Math.sin(t * 1.1)), mezcla(a[2], b[2], k) + pulso * 3 * Math.sin(t * .29), mezcla(a[3], b[3], k)];
     };
     const pinta = function (t) {
       t = Math.floor(t * (def.fps || 12) + 1e-6) / (def.fps || 12);  // animación «a doses»: 12 dibujos por segundo
+      ANGULOSO = !!def.jack;
       const [cx, cy, z] = cam(t), luz = .88 + .05 * Math.sin(t * 5.3) + .04 * Math.sin(t * 11.7 + 1);
       g.setTransform(S, 0, 0, S, 0, 0); g.fillStyle = '#000'; g.fillRect(0, 0, W, H);
       const matriz = par => [z * S, 0, 0, z * S, (W / 2 - (640 + (cx - 640) * par) * z) * S, (H / 2 - (360 + (cy - 360) * par) * z) * S];
       const capaCam = par => g.setTransform(...matriz(par));
-      capaCam(.3); g.filter = `brightness(${luz})`; if (fondo && fondo.complete) g.drawImage(fondo, -120, -80, W + 240, H + 160); g.filter = 'none';
+      capaCam(.3); g.filter = `brightness(${luz})`; if (!def.jack && fondo && fondo.complete) g.drawImage(fondo, -120, -80, W + 240, H + 160); g.filter = 'none';
       // lo lejano (par < 0,6) se dibuja a un tercio de resolución y se agranda: desenfoque de cine casi gratis
       const lg = lejos.getContext('2d'); let hayLejos = false;
       const vuelca = () => { if (!hayLejos) return; g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingQuality = 'high'; g.drawImage(lejos, 0, 0, lienzo.width, lienzo.height); g.restore(); lg.setTransform(1, 0, 0, 1, 0, 0); lg.clearRect(0, 0, lejos.width, lejos.height); hayLejos = false; };
@@ -424,13 +519,15 @@ const T = (() => {
       vuelca(); capaCam(1);
       capaCam(1);
       // títeres, en su propia capa para que los calados dejen ver el pergamino
-      K.setTransform(1, 0, 0, 1, 0, 0); K.clearRect(0, 0, capa.width, capa.height); K.setTransform(...matriz(1)); const luces = [], colores = [];
+      K.setTransform(1, 0, 0, 1, 0, 0); K.clearRect(0, 0, capa.width, capa.height); K.setTransform(...matriz(1)); const luces = [], colores = []; let hayImpacto = false;
       for (const ac of def.actores || []) {
+        if (def.quieto) ac.quieto = true;
         const o = pose(ac, t), racha = (def.viento || 0) * (1 + .3 * Math.sin(t * 2.7) + .15 * Math.sin(t * 6.1 + 1));
         o.vf = -racha; o.vl = o.vista === 'perfil' ? -racha * Math.sign(o.f || 1) : -racha;
-        K.save(); K.translate(0, (def.suelo || 600) + (ac.y || 0));             // ac.y: subido a algo (negativo) o hundido
+        K.save(); K.translate(0, (def.suelo || 600) + (ac.y || 0) + o.dy);             // ac.y: subido a algo (negativo) o hundido
         K.globalAlpha = ac.p.tono ?? 1; dibuja(K, ac, t, o); K.restore();
         colores.push(...(o.colores || []));
+        if (o.impacto) hayImpacto = true; ac._o = o;
         for (const l of o.luces || []) luces.push([o.x + l[0] * o.f * (ac.p.escala || 1), (def.suelo || 600) + (ac.y || 0) + l[1] * (ac.p.escala || 1)]);
       }
       g.setTransform(1, 0, 0, 1, 0, 0);
@@ -438,11 +535,17 @@ const T = (() => {
         h.globalCompositeOperation = 'source-in'; h.fillStyle = 'rgb(255,190,110)'; h.fillRect(0, 0, halo.width, halo.height);
         g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = (def.contraluz ?? .5) * luz; g.imageSmoothingQuality = 'high'; g.drawImage(halo, 0, 0, capa.width, capa.height); g.restore(); }
       if (def.borde !== 0) {                                              // doble contraluz: borde frío por un lado y cálido por el otro
-        const r = borde.getContext('2d'), [c1, c2] = def.bordes || ['rgb(110,235,235)', 'rgb(255,178,96)'], d = 3.2 * S * z * (def.borde ?? 1);
+        const r = borde.getContext('2d'), [c1, c2] = def.bordes || ['rgb(110,235,235)', 'rgb(255,178,96)'], d = 3.2 * S * Math.min(z, 1.2) * (def.borde ?? 1), op = .85 * clamp(1.6 - .45 * z, .25, 1);   // de cerca el borde no se separa: no hay doble figura
         for (const [col, dx] of [[c1, -d], [c2, d]]) { r.globalCompositeOperation = 'copy'; r.drawImage(capa, 0, 0); r.globalCompositeOperation = 'source-in'; r.fillStyle = col; r.fillRect(0, 0, borde.width, borde.height);
-          g.save(); g.globalAlpha = .85; g.drawImage(borde, dx, -d * .4); g.restore(); }
+          g.save(); g.globalAlpha = op; g.drawImage(borde, dx, -d * .4); g.restore(); }
       }
-      g.drawImage(capa, 0, 0); capaCam(1);
+      g.drawImage(capa, 0, 0);
+      if (def.figura) {                                                   // dos tonos a lo Jack: gris plano y franja negra en el lado de la sombra
+        const r = borde.getContext('2d'), d = (def.sombra ?? 10) * S * z * (def.luzDe === 'derecha' ? 1 : -1);
+        r.globalCompositeOperation = 'copy'; r.drawImage(capa, d, -Math.abs(d) * .5); r.globalCompositeOperation = 'source-in'; r.fillStyle = def.figura; r.fillRect(0, 0, borde.width, borde.height);
+        r.globalCompositeOperation = 'destination-in'; r.drawImage(capa, 0, 0); r.globalCompositeOperation = 'source-over'; g.drawImage(borde, 0, 0);
+      }
+      capaCam(1);
       for (const d of def.delante || []) if (DECORADOS[d.tipo]) DECORADOS[d.tipo](g, t, d);
       g.globalCompositeOperation = 'lighter';
       for (const [lx, ly] of luces.concat((def.luces || []).map(l => [l[0], l[1]]))) {
@@ -451,6 +554,7 @@ const T = (() => {
       }
       g.globalCompositeOperation = 'source-over';
       PARTICULAS(g, t, def);
+      if (hayImpacto) { g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'difference'; g.fillStyle = '#fff'; g.fillRect(0, 0, lienzo.width, lienzo.height); g.restore(); }   // fotograma de impacto: la imagen se invierte
       g.setTransform(S, 0, 0, S, 0, 0);
       pinta.colores = colores;
       for (let i = 0; i < 260; i++) { const r = azar(i * 7 + Math.floor(t * 24) * 131); g.fillStyle = r < .5 ? 'rgba(255,240,210,.05)' : 'rgba(0,0,0,.07)';
