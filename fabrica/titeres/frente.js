@@ -143,7 +143,12 @@
     else { hueco(g, () => { g.moveTo(-an, y - 1); g.quadraticCurveTo(0, y + 1, an, y - 1); g.quadraticCurveTo(0, y + ab + 2, -an, y - 1); }); g.fillRect(-an * .6, y - .6, an * 1.2, .9); }
     if (p.barba === 'bigote' || p.barba === 'corta') { g.beginPath(); g.moveTo(-11, -21); g.quadraticCurveTo(0, -27, 11, -21); g.quadraticCurveTo(0, -23.5, -11, -21); g.fill();
       g.beginPath(); g.moveTo(-12, -21.5); g.quadraticCurveTo(-6, -26, 0, -24); g.quadraticCurveTo(6, -26, 12, -21.5); g.quadraticCurveTo(6, -23, 0, -22); g.quadraticCurveTo(-6, -23, -12, -21.5); g.fill(); }
+    if (p.rostro === 'anguloso') hueco(g, () => { for (const l of [-1, 1]) {   // cejas gruesas que bajan hacia la nariz y pómulos
+      g.moveTo(l * 16, -54.5); g.lineTo(l * 3, -50.5); g.lineTo(l * 3, -48.6); g.lineTo(l * 16, -52.4);
+      g.moveTo(l * 17, -36); g.quadraticCurveTo(l * 13, -31, l * 8, -30); g.lineTo(l * 8, -29.2); g.quadraticCurveTo(l * 13.5, -30, l * 18, -35.4); } });
     PELO_FRENTE[p.pelo || 'corto'](g, t, o, p, false);
+    if (p.cinta) cintaFrente(g, t, o, false);
+    if (p.mascara) T.enColor(g, o, (gg, tt) => T.mascara(gg, tt, o, false, p.mascara), [0, 0], 0, 1);
     if (p.sombrero) SOMBRERO_FRENTE[p.sombrero](g);
   }
   function cabezaEspalda(g, p, t, o) {
@@ -151,6 +156,7 @@
     for (const l of [-1, 1]) { g.beginPath(); g.ellipse(l * 25, -42, 5, 9, 0, 0, TAU); g.fill(); }
     cara(g, p, 23, 0);
     PELO_FRENTE[p.pelo || 'corto'](g, t, o, p, true);
+    if (p.cinta) cintaFrente(g, t, o, true);
     if (p.sombrero) SOMBRERO_FRENTE[p.sombrero](g);
   }
   // pelo visto de frente (o de espaldas, que tapa más)
@@ -169,8 +175,21 @@
       g.beginPath(); g.moveTo(b[0] - 5, b[1]); g.quadraticCurveTo((b[0] + q[0]) / 2 + 6 * Math.sin(mu * 4), (b[1] + q[1]) / 2, q[0], q[1]); g.lineTo(b[0] + 5, b[1] + 2); g.fill(); } },
     mono(g, t, o, p, esp) { PELO_FRENTE.corto(g, t, o, p, esp); g.beginPath(); g.ellipse(0, -78, 12, 10, 0, 0, TAU); g.fill(); hueco(g, () => g.ellipse(0, -78, 5, 2.5, 0, 0, TAU)); },
     coleta(g, t, o, p, esp) { PELO_FRENTE.corto(g, t, o, p, esp); g.save(); g.translate(esp ? 0 : 22, -52); g.rotate(.15 * Math.sin(t * 2.2 + p.semilla)); g.beginPath(); g.moveTo(-4, 0); g.quadraticCurveTo(10, 20, 2, 44); g.quadraticCurveTo(-6, 20, 4, 0); g.fill(); g.restore(); },
+    samurai(g, t, o, p, esp) { PELO_FRENTE.peinado(g, t, o, p, esp);
+      g.beginPath(); g.ellipse(0, -84, 9, 7, 0, 0, TAU); g.fill();                       // moño
+      const v = o.vf || 0; g.beginPath(); g.moveTo(-3, -88); g.quadraticCurveTo(v * 30, -104, v * 40 + 4 * Math.sin(t * 9), -96); g.lineTo(v * 36 + 3, -92); g.quadraticCurveTo(v * 20, -98, 3, -87); g.fill();
+      for (let k = 0; k < 8; k++) { const l = 20 + 26 * azar(k + 3), lado = k < 4 ? -1 : 1, y0 = -66 + (k % 4) * 9, fl = Math.sin(t * 10 + k * 1.9);   // mechones sueltos
+        g.beginPath(); g.moveTo(lado * 22, y0); g.quadraticCurveTo(lado * 26 + v * l * .7, y0 + 12 + fl * 3, lado * 24 + v * l * 1.4, y0 + l * (1 - Math.abs(v) * .6) + fl * 4);
+        g.lineTo(lado * 21 + v * l * 1.3, y0 + l * (1 - Math.abs(v) * .6) + fl * 4 - 3); g.quadraticCurveTo(lado * 22 + v * l * .5, y0 + 9, lado * 19, y0 - 2); g.fill(); } },
     calvo(g, t, o, p) { for (const l of [-1, 1]) { g.beginPath(); g.moveTo(l * 25, -34); g.quadraticCurveTo(l * 27, -50, l * 21, -54); g.lineTo(l * 20, -36); g.fill(); } },
   };
+  function cintaFrente(g, t, o, esp) {
+    if (!esp) hueco(g, () => { g.moveTo(-24, -58); g.quadraticCurveTo(0, -61, 24, -58); g.lineTo(24, -56.4); g.quadraticCurveTo(0, -59.4, -24, -56.4); });
+    const v = o.vf || 0, lado = v < 0 ? -1 : 1;                      // las puntas salen por el lado hacia el que sopla
+    for (let k = 0; k < 2; k++) { const fl = Math.sin(t * 13 + k * 2), x0 = lado * 24, y0 = -57 + k * 3, l = 34 + 10 * k;
+      g.beginPath(); g.moveTo(x0, y0 - 3); g.quadraticCurveTo(x0 + lado * l * .5, y0 + 4 + fl * 5, x0 + lado * l * (.4 + Math.abs(v)), y0 + 16 + fl * 8 - Math.abs(v) * 10 + k * 5);
+      g.lineTo(x0 + lado * l * (.4 + Math.abs(v)) - lado * 2, y0 + 21 + fl * 8 - Math.abs(v) * 10 + k * 5); g.quadraticCurveTo(x0 + lado * l * .5, y0 + 9 + fl * 5, x0, y0 + 3); g.fill(); }
+  }
   const SOMBRERO_FRENTE = {
     gorra(g) { g.beginPath(); g.moveTo(-26, -58); g.bezierCurveTo(-26, -86, 26, -86, 26, -58); g.closePath(); g.fill(); g.beginPath(); g.ellipse(0, -58, 26, 5, 0, 0, TAU); g.fill(); },
     chistera(g) { g.fillRect(-34, -66, 68, 7); g.fillRect(-22, -114, 44, 50); hueco(g, () => g.rect(-21, -76, 42, 4)); },

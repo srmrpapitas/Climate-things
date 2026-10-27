@@ -3,13 +3,21 @@
 //   nariz (tamaño), narizForma: recta | aguilena | respingona | gruesa   menton: marcado | redondo | doble   arrugas: 0–1
 //   ropa: traje | tunica | vestido     pelo: corto | peinado | entradas | loco | mono | coleta | calvo
 //   barba: corta | larga | bigote      gafas: redondas | cuadradas    sombrero: gorra | chistera | boina
+//   rostro: anguloso (cejas gruesas, pómulos)   cinta: true   pelo samurai (moño + mechones al viento)   objeto espada (en color real)
 //   estilizado (a lo Samurai Jack): piernas (largo), hombros (ancho), cintura (estrecha < 1), jirones (bajo de la túnica al viento)
 //   objeto (mano de delante) / objetoLejos (mano de atrás): candil | lupa | bandera | baston | papel
 const PERSONAJES = {
+  // EL ELEGIDO: el protagonista que sigue toda la serie. Héroe sin nombre, moño y cinta al viento, túnica con jirones y la única
+  // cosa en color real de todo el teatro: su espada de Toledo (acero, oro y rojo).
+  elegido: { rostro: 'anguloso', ropa: 'tunica', pelo: 'samurai', cinta: true, barba: 'corta', nariz: 1, narizForma: 'recta', menton: 'marcado',
+             alto: 1.12, grueso: 1, piernas: 1.18, hombros: 1.25, cintura: .78, jirones: true, objeto: 'espada', semilla: 21 },
   decano:  { ropa: 'tunica', pelo: 'loco', gafas: 'redondas', nariz: 1.3, narizForma: 'aguilena', arrugas: 1, alto: 1.04, grueso: .95, encorvado: .05, piernas: 1.1, hombros: 1.05, cintura: .85, jirones: true, objeto: 'lupa', objetoLejos: 'candil', semilla: 3 },
-  acascar: { ropa: 'traje', pelo: 'corto', barba: 'corta', nariz: 1, narizForma: 'recta', menton: 'marcado', alto: 1.08, grueso: 1.1, piernas: 1.12, hombros: 1.22, cintura: .8, semilla: 7 },
-  sanchis: { ropa: 'traje', pelo: 'peinado', nariz: 1.05, narizForma: 'recta', menton: 'marcado', alto: 1.16, grueso: 1, piernas: 1.15, hombros: 1.15, cintura: .82, semilla: 11 },
+  acascar: { rostro: 'anguloso', ropa: 'traje', pelo: 'corto', barba: 'corta', nariz: 1, narizForma: 'recta', menton: 'marcado', alto: 1.08, grueso: 1.1, piernas: 1.12, hombros: 1.22, cintura: .8, semilla: 7 },
+  sanchis: { rostro: 'anguloso', ropa: 'traje', pelo: 'peinado', nariz: 1.05, narizForma: 'recta', menton: 'marcado', alto: 1.16, grueso: 1, piernas: 1.15, hombros: 1.15, cintura: .82, semilla: 11 },
   feijolo: { ropa: 'traje', pelo: 'entradas', nariz: 1.1, narizForma: 'gruesa', menton: 'doble', arrugas: .6, alto: 1.02, grueso: 1.05, barriga: .4, piernas: 1.06, hombros: 1.1, cintura: .95, semilla: 13 },
+  // el Vendehúmos: político genérico (no es nadie real) con la máscara de las promesas
+  vendehumos: { ropa: 'traje', pelo: 'peinado', sombrero: 'chistera', barba: 'bigote', nariz: 1.2, narizForma: 'respingona', menton: 'doble', alto: 1.04, grueso: 1.15,
+                barriga: .7, piernas: 1.05, hombros: 1.05, mascara: 'PROMESAS', semilla: 31 },
 };
 // gente del pueblo: variaciones deterministas (la misma n da siempre la misma persona)
 function ciudadano(n, extra = {}) {

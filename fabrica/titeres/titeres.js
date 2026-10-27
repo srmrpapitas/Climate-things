@@ -85,7 +85,9 @@ const T = (() => {
   const brazo = (o, cual, sH, sC, mano, w) => { const b = o[cual]; o[cual] = [mezcla(b[0], sH, w), mezcla(b[1], sC, w), w > .5 && mano ? mano : b[2]]; };
   function gesto(a, t, o, s) {
     const hasta = a.hasta ?? a.en + 1.2, [w, ant] = peso(t, a.en, hasta), u = t - a.en;
-    if (w === 0 && ant === 0 && a.hace !== 'salta') return;
+    if (a.hace === 'desenmascara' && t >= a.en) o.corteMascara = a.en;
+    if (a.hace === 'corta' && t > a.en - .45 && t < (a.hasta ?? a.en + 1.2)) { o.activos.push({ hace: 'corta', w: 1, u }); }
+    if (w === 0 && ant === 0 && a.hace !== 'salta' && !(a.hace === 'corta' && t > a.en - .45 && t < (a.hasta ?? a.en + 1.2))) return;
     o.activos.push({ hace: a.hace, w, ant, u, h: a.h, c: a.c });
     switch (a.hace) {
       case 'puno': o.cejas -= .6 * w; brazo(o, 'cerca', 2.3 + .08 * Math.sin(t * 11) + .5 * ant, .7, 'puno', w); o.inclina -= .06 * w; o.cabeza -= .05 * w; break;
@@ -97,6 +99,14 @@ const T = (() => {
       case 'encoge': o.cejas += .8 * w; brazo(o, 'cerca', .45, 1.7, 'abierta', w); brazo(o, 'lejos', .4, 1.75, 'abierta', w); o.hombros = 8 * w; o.cabeza += .18 * w; break;
       case 'piensa': o.cejas += .4 * w * Math.sin(t * 1.3); o.ojos = .8 * w; brazo(o, 'cerca', .55, 2.45, 'puno', w); o.cabeza += .16 * w + .03 * Math.sin(t * 2) * w; o.inclina += .04 * w; break;
       case 'golpea': brazo(o, 'cerca', 1.25 + .65 * Math.max(0, Math.sin(u * 7)) + .4 * ant, .5, 'puno', w); o.inclina += .06 * w; break;
+      case 'corta': {                                                  // tajo: arma atrás, corta en diagonal y aguanta
+        const u2 = t - a.en; let h, c;
+        if (u2 < 0) { const k = suave((u2 + .4) / .4); h = mezcla(.4, 3.15, k); c = mezcla(.3, .5, k); o.inclina -= .1 * k; }
+        else if (u2 < .12) { const k = u2 / .12; h = mezcla(3.15, .75, k); c = mezcla(.5, -.15, k); o.inclina += .2 * k; }
+        else { h = .75; c = -.15; o.inclina += .2; }
+        if (u2 > -.4) { o.cerca = [mezcla(o.cerca[0], h, Math.max(w, u2 < .12 ? 1 : 0)), mezcla(o.cerca[1], c, Math.max(w, u2 < .12 ? 1 : 0)), 'puno']; o.tajo = u2; }
+        o.cejas -= .7; break; }
+      case 'desenmascara': o.corteMascara = a.en; o.cejas += 1.1 * w; o.boca = Math.max(o.boca, .55 * w); o.ojos = -.6 * w; break;
       case 'asiente': o.cabeza += .2 * w * Math.max(0, Math.sin(u * 8)); break;
       case 'niega': o.cabezaAncho = 1 - .3 * w * Math.abs(Math.sin(u * 9)); o.cabeza += .04 * w; break;
       case 'inclina': o.inclina += .45 * w; o.cabeza += .2 * w; break;
@@ -160,6 +170,7 @@ const T = (() => {
     else if (mano === 'indice') { g.arc(0, 7 * A, 8 * A, 0, TAU); g.fill(); g.beginPath(); g.moveTo(-2.5 * A, 8 * A); g.lineTo(-1.5 * A, 26 * A); g.lineTo(2.5 * A, 26 * A); g.lineTo(3 * A, 8 * A); }
     else { g.ellipse(0, 10 * A, 7 * A, 12 * A, 0, 0, TAU); g.fill(); g.beginPath(); g.ellipse(6 * A, 5 * A, 3 * A, 7 * A, -.6, 0, TAU); }
     g.fill(); g.restore();
+    if (cerca && o.tajo != null && o.tajo > -.02 && o.tajo < .4) enColor(g, o, (gg, tt) => estela(gg, o.tajo, A), hombro, 0, A);
     const objeto = cerca ? p.objeto : p.objetoLejos;
     if (objeto && OBJETOS[objeto]) OBJETOS[objeto](g, mu, ang, t, o, A);
   }
@@ -265,7 +276,17 @@ const T = (() => {
       g.moveTo(19, -27); g.quadraticCurveTo(12, -24, 11, -18); g.lineTo(11.8, -18); g.quadraticCurveTo(13, -23.5, 19.5, -26.2);
     });
     if (p.gafas) { g.lineWidth = 2.4; g.beginPath(); circulo(g, 13, -42, p.gafas === 'redondas' ? 8.5 : 7); g.moveTo(5, -43); g.lineTo(-4, -40); g.stroke(); }
+    if (p.rostro === 'anguloso') hueco(g, () => {                       // cara angulosa: ceja gruesa y caída hacia la nariz, pómulo marcado
+      g.moveTo(5, -51.5); g.lineTo(21, -46.5); g.lineTo(21, -44.6); g.lineTo(6, -48.6);
+      g.moveTo(1, -35); g.quadraticCurveTo(8, -31, 15, -29.5); g.lineTo(15, -28.6); g.quadraticCurveTo(8, -30, 1, -33.8); });
     PELO[p.pelo || 'corto'](g, t, o, sw, p);
+    if (p.mascara) enColor(g, o, (gg, tt) => mascara(gg, tt, o, true, p.mascara), [0, 0], 0, 1);
+    if (p.cinta) {                                                      // cinta en la frente con dos puntas que ondean al viento
+      hueco(g, () => { g.moveTo(-20, -55); g.quadraticCurveTo(2, -60, 22, -54); g.lineTo(22, -52.6); g.quadraticCurveTo(2, -58.4, -20, -53.5); });
+      for (let k = 0; k < 2; k++) { const v = (o.vl || 0) * 46 - 14, fl = Math.sin(t * 13 + k * 2), y0 = -54 + k * 4;
+        g.beginPath(); g.moveTo(-24, y0 - 3); g.quadraticCurveTo(-24 + v * .5, y0 + 4 + fl * 5, -24 + v - 6 * k, y0 + 10 + fl * 9 + k * 6);
+        g.lineTo(-24 + v - 6 * k, y0 + 15 + fl * 9 + k * 6); g.quadraticCurveTo(-24 + v * .5, y0 + 9 + fl * 5, -24, y0 + 3); g.fill(); }
+    }
     if (p.sombrero) SOMBREROS[p.sombrero](g, t, o);
   }
   const PELO = {
@@ -282,6 +303,13 @@ const T = (() => {
       hueco(g, () => g.ellipse(-6, 0, 5, 3, .4, 0, TAU)); g.restore(); },
     coleta(g, t, o, sw) { PELO.corto(g); g.save(); g.translate(-24, -50); g.rotate(.5 + sw * .8 - .3 * clamp(o.vel / 150, -1, 1) - (o.vl || 0) * 1.2); g.beginPath(); g.moveTo(-4, -5); g.quadraticCurveTo(-14, 20, -4, 44); g.quadraticCurveTo(8, 20, 6, -4); g.fill(); g.restore(); },
     calvo() {},
+    samurai(g, t, o, sw) {                                             // pelo recogido en un moño, con mechones sueltos que el viento arrastra
+      PELO.peinado(g, t);
+      g.save(); g.translate(-6, -74); g.rotate(-.2 + .08 * Math.sin(t * 3) - (o.vl || 0) * .3); g.beginPath(); g.ellipse(0, 0, 8, 6, 0, 0, TAU); g.fill();
+      g.beginPath(); g.moveTo(-2, -4); g.quadraticCurveTo(-10 + (o.vl || 0) * 20, -18, -16 + (o.vl || 0) * 30, -10 + 3 * Math.sin(t * 9)); g.lineTo(-12 + (o.vl || 0) * 28, -6); g.quadraticCurveTo(-6, -10, 2, -2); g.fill(); g.restore();
+      for (let k = 0; k < 6; k++) { const v = o.vl || 0, l = 22 + 18 * azar(k + 3), y0 = -60 + k * 6, fl = Math.sin(t * 10 + k * 1.9);
+        g.beginPath(); g.moveTo(-22, y0); g.quadraticCurveTo(-24 + v * l * .6, y0 + 10 + fl * 3, -22 + v * l * 1.3 - (1 - Math.abs(v)) * 6, y0 + l * (1 - Math.abs(v) * .7) + fl * 4);
+        g.lineTo(-19 + v * l * 1.2, y0 + l * (1 - Math.abs(v) * .7) + fl * 4 - 3); g.quadraticCurveTo(-20 + v * l * .5, y0 + 8, -18, y0 - 2); g.fill(); } },
   };
   const SOMBREROS = {
     gorra(g) { g.beginPath(); g.moveTo(-24, -52); g.quadraticCurveTo(-18, -78, 8, -74); g.quadraticCurveTo(24, -70, 22, -56); g.lineTo(40, -54); g.lineTo(38, -50); g.closePath(); g.fill(); },
@@ -289,7 +317,62 @@ const T = (() => {
     boina(g) { g.beginPath(); g.ellipse(0, -64, 28, 10, -.15, 0, TAU); g.fill(); g.fillRect(-2, -78, 4, 8); },
   };
   // objetos que se llevan en la mano (mu = muñeca, ang = ángulo del antebrazo)
+  // objetos en color real: no se pintan en la capa de siluetas; se apuntan y la escena los dibuja al final (T.pintaColores)
+  const enColor = (g, o, f, mu, ang, A) => { (o.colores = o.colores || []).push({ m: g.getTransform(), f, mu, ang, A }); };
+  function espadaColor(g, t, A) {                                      // espada de Toledo: hoja de acero pulido, guarda de oro, puño rojo
+    const L = 132 * A, y0 = 18 * A;
+    g.save(); g.globalCompositeOperation = 'lighter'; const gl = g.createLinearGradient(-20 * A, 0, 20 * A, 0);
+    gl.addColorStop(0, 'rgba(160,210,255,0)'); gl.addColorStop(.5, 'rgba(190,225,255,.28)'); gl.addColorStop(1, 'rgba(160,210,255,0)');
+    g.fillStyle = gl; g.fillRect(-20 * A, y0, 40 * A, L + 10 * A); g.restore();
+    const hj = g.createLinearGradient(-4 * A, 0, 4 * A, 0); hj.addColorStop(0, '#6f7c89'); hj.addColorStop(.45, '#f6f9ff'); hj.addColorStop(.55, '#c9d3dd'); hj.addColorStop(1, '#55616d');
+    g.fillStyle = hj; g.beginPath(); g.moveTo(-4 * A, y0); g.lineTo(4 * A, y0); g.lineTo(3 * A, y0 + L * .9); g.lineTo(0, y0 + L); g.lineTo(-3 * A, y0 + L * .9); g.closePath(); g.fill();
+    g.strokeStyle = 'rgba(70,80,95,.9)'; g.lineWidth = 1.1 * A; g.beginPath(); g.moveTo(0, y0 + 4 * A); g.lineTo(0, y0 + L * .55); g.stroke();   // vaceo
+    const u = ((t * .45) % 1.4) / 1.4;                                 // destello que recorre la hoja
+    if (u < .75) { const y = y0 + L * u / .75, br = g.createLinearGradient(0, y - 14 * A, 0, y + 14 * A); br.addColorStop(0, 'rgba(255,255,255,0)'); br.addColorStop(.5, 'rgba(255,255,255,.95)'); br.addColorStop(1, 'rgba(255,255,255,0)');
+      g.fillStyle = br; g.fillRect(-4 * A, y - 14 * A, 8 * A, 28 * A); }
+    if (((t * .45) % 1.4) > 1.1) { const k = Math.sin(Math.PI * (((t * .45) % 1.4) - 1.1) / .3); g.save(); g.translate(0, y0 + L); g.fillStyle = `rgba(255,255,255,${k})`;
+      for (let r = 0; r < 4; r++) { g.rotate(Math.PI / 4); g.fillRect(-.8 * A, -14 * A * k, 1.6 * A, 28 * A * k); } g.restore(); }
+    const oro = g.createLinearGradient(0, 12 * A, 0, 20 * A); oro.addColorStop(0, '#fff1a8'); oro.addColorStop(.5, '#d9a62e'); oro.addColorStop(1, '#7a5310');
+    g.fillStyle = oro; g.beginPath(); g.moveTo(-20 * A, 14 * A); g.quadraticCurveTo(0, 20 * A, 20 * A, 14 * A); g.lineTo(21 * A, 19 * A); g.quadraticCurveTo(0, 23 * A, -21 * A, 19 * A); g.closePath(); g.fill();
+    for (const l of [-1, 1]) { g.beginPath(); g.arc(l * 21 * A, 12 * A, 3.6 * A, 0, TAU); g.fill(); }
+    g.fillStyle = '#7d1010'; g.fillRect(-3.2 * A, -12 * A, 6.4 * A, 26 * A); g.fillStyle = '#e2b24a'; for (let k = 0; k < 4; k++) g.fillRect(-3.2 * A, -9 * A + k * 6 * A, 6.4 * A, 1.4 * A);
+    g.fillStyle = oro; g.beginPath(); g.arc(0, -15 * A, 5.5 * A, 0, TAU); g.fill(); g.fillStyle = 'rgba(255,255,255,.7)'; g.beginPath(); g.arc(-1.6 * A, -16.5 * A, 1.6 * A, 0, TAU); g.fill();
+  }
+  function estela(g, u, A) {                                          // media luna de luz que deja la espada al cortar
+    const R = (62 + 56 + 120) * A, a0 = 3.15, a1 = mezcla(3.15, .75, clamp(u / .12)), al = clamp(1 - (u - .05) / .3);
+    if (a1 >= a0 - .01) return; g.save(); g.globalCompositeOperation = 'lighter';
+    for (const [r, wdt, c] of [[R, 26 * A, `rgba(150,220,255,${.35 * al})`], [R, 9 * A, `rgba(255,255,255,${.9 * al})`]]) {
+      g.beginPath(); for (let k = 0; k <= 20; k++) { const a = mezcla(a0, a1, k / 20), ww = wdt * Math.sin(Math.PI * k / 20); g.lineTo(Math.sin(a) * (r + ww), Math.cos(a) * (r + ww)); }
+      for (let k = 20; k >= 0; k--) { const a = mezcla(a0, a1, k / 20); g.lineTo(Math.sin(a) * (r - wdt * .3), Math.cos(a) * (r - wdt * .3)); } g.closePath(); g.fillStyle = c; g.fill(); }
+    g.restore();
+  }
+  // máscara de teatro (la mentira): marfil, sonrisa pintada y un rótulo; al cortarla, sus dos mitades caen girando
+  function mascara(g, t, o, perfil, texto) {
+    const forma = () => { g.beginPath();
+      if (perfil) { g.moveTo(2, -70); g.quadraticCurveTo(22, -72, 25, -50); g.lineTo(26, -42); g.lineTo(36, -29); g.lineTo(26, -24); g.lineTo(27, -14); g.quadraticCurveTo(24, -2, 14, 0); g.quadraticCurveTo(4, -2, 0, -14); g.quadraticCurveTo(-4, -44, 2, -70); }
+      else { g.moveTo(0, -76); g.bezierCurveTo(30, -76, 30, -30, 22, -14); g.quadraticCurveTo(0, 6, -22, -14); g.bezierCurveTo(-30, -30, -30, -76, 0, -76); } g.closePath(); };
+    const pinta = () => {
+      const gr = g.createLinearGradient(-20, -70, 25, 0); gr.addColorStop(0, '#f3ead6'); gr.addColorStop(1, '#bfae8c'); forma(); g.fillStyle = gr; g.fill();
+      g.lineWidth = 1.6; g.strokeStyle = '#4a3418'; g.stroke(); g.fillStyle = '#1a0f07';
+      const ojos = perfil ? [[14, -44]] : [[-10, -46], [10, -46]];
+      for (const [x, y] of ojos) { g.beginPath(); g.ellipse(x, y, 5.5, 3.2, perfil ? .1 : (x < 0 ? .25 : -.25), 0, TAU); g.fill(); }
+      g.strokeStyle = '#9c1d14'; g.lineWidth = 2.6; g.beginPath(); if (perfil) { g.moveTo(10, -16); g.quadraticCurveTo(20, -10, 27, -19); } else { g.moveTo(-13, -22); g.quadraticCurveTo(0, -8, 13, -22); } g.stroke();
+      g.fillStyle = 'rgba(200,70,60,.35)'; for (const [x, y] of perfil ? [[12, -30]] : [[-14, -30], [14, -30]]) { g.beginPath(); g.arc(x, y, 5, 0, TAU); g.fill(); }
+      if (texto) { g.save(); g.translate(perfil ? 12 : 0, -60); if (g.getTransform().a < 0) g.scale(-1, 1);   // que el rótulo no salga al revés
+        g.fillStyle = '#5a3a18'; g.font = '700 6.5px Georgia, serif'; g.textAlign = 'center'; g.fillText(texto, 0, 0); g.restore(); }
+    };
+    const c = o.corteMascara;
+    if (c == null || t < c) { pinta(); return; }
+    const u = t - c; if (u > 2.2) return;
+    for (const lado of [-1, 1]) {                                        // dos mitades, cortadas en diagonal, que caen
+      g.save(); g.translate(lado * 14 * u, 260 * u * u - 20 * u); g.rotate(lado * 1.8 * u);
+      g.beginPath(); if (lado < 0) { g.moveTo(-60, -90); g.lineTo(60, -90); g.lineTo(60, -50); g.lineTo(-60, -20); } else { g.moveTo(-60, -20); g.lineTo(60, -50); g.lineTo(60, 20); g.lineTo(-60, 20); }
+      g.closePath(); g.clip(); pinta(); g.restore();
+    }
+  }
+  function pintaColores(g, lista, t) { for (const c of lista || []) { g.save(); g.setTransform(c.m); g.translate(c.mu[0], c.mu[1]); g.rotate(-c.ang); c.f(g, t, c.A); g.restore(); } }
   const OBJETOS = {
+    espada(g, mu, ang, t, o, A) { enColor(g, o, espadaColor, mu, ang, A); },
     candil(g, mu, ang, t, o, A) {                                       // cuelga y se balancea con retraso
       const pen = .12 * Math.sin(t * 2.6) - .5 * clamp(o.velAtras / 150, -1, 1), c = [mu[0] + 34 * A * Math.sin(pen), mu[1] + 10 * A + 34 * A * Math.cos(pen)];
       g.lineWidth = 2; g.beginPath(); g.moveTo(mu[0], mu[1] + 10 * A); g.lineTo(c[0], c[1]); g.stroke();
@@ -324,7 +407,7 @@ const T = (() => {
       for (let i = 0; i < c.length; i++) if (t >= c[i][0]) { a = c[i]; b = c[i + 1] || c[i]; k = b === a ? 0 : suave((t - a[0]) / (b[0] - a[0])); }
       return [mezcla(a[1], b[1], k) + 4 * Math.sin(t * .37) + 2 * Math.sin(t * 1.1), mezcla(a[2], b[2], k) + 3 * Math.sin(t * .29), mezcla(a[3], b[3], k)];
     };
-    return function (t) {
+    const pinta = function (t) {
       t = Math.floor(t * (def.fps || 12) + 1e-6) / (def.fps || 12);  // animación «a doses»: 12 dibujos por segundo
       const [cx, cy, z] = cam(t), luz = .88 + .05 * Math.sin(t * 5.3) + .04 * Math.sin(t * 11.7 + 1);
       g.setTransform(S, 0, 0, S, 0, 0); g.fillStyle = '#000'; g.fillRect(0, 0, W, H);
@@ -341,13 +424,14 @@ const T = (() => {
       vuelca(); capaCam(1);
       capaCam(1);
       // títeres, en su propia capa para que los calados dejen ver el pergamino
-      K.setTransform(1, 0, 0, 1, 0, 0); K.clearRect(0, 0, capa.width, capa.height); K.setTransform(...matriz(1)); const luces = [];
+      K.setTransform(1, 0, 0, 1, 0, 0); K.clearRect(0, 0, capa.width, capa.height); K.setTransform(...matriz(1)); const luces = [], colores = [];
       for (const ac of def.actores || []) {
         const o = pose(ac, t), racha = (def.viento || 0) * (1 + .3 * Math.sin(t * 2.7) + .15 * Math.sin(t * 6.1 + 1));
         o.vf = -racha; o.vl = o.vista === 'perfil' ? -racha * Math.sign(o.f || 1) : -racha;
-        K.save(); K.translate(0, def.suelo || 600);
+        K.save(); K.translate(0, (def.suelo || 600) + (ac.y || 0));             // ac.y: subido a algo (negativo) o hundido
         K.globalAlpha = ac.p.tono ?? 1; dibuja(K, ac, t, o); K.restore();
-        for (const l of o.luces || []) luces.push([o.x + l[0] * o.f * (ac.p.escala || 1), (def.suelo || 600) + l[1] * (ac.p.escala || 1)]);
+        colores.push(...(o.colores || []));
+        for (const l of o.luces || []) luces.push([o.x + l[0] * o.f * (ac.p.escala || 1), (def.suelo || 600) + (ac.y || 0) + l[1] * (ac.p.escala || 1)]);
       }
       g.setTransform(1, 0, 0, 1, 0, 0);
       if (def.contraluz !== 0) { const h = halo.getContext('2d'); h.globalCompositeOperation = 'copy'; h.drawImage(capa, 0, 0, halo.width, halo.height);
@@ -368,11 +452,13 @@ const T = (() => {
       g.globalCompositeOperation = 'source-over';
       PARTICULAS(g, t, def);
       g.setTransform(S, 0, 0, S, 0, 0);
+      pinta.colores = colores;
       for (let i = 0; i < 260; i++) { const r = azar(i * 7 + Math.floor(t * 24) * 131); g.fillStyle = r < .5 ? 'rgba(255,240,210,.05)' : 'rgba(0,0,0,.07)';
         g.fillRect(azar(i * 3 + Math.floor(t * 24)) * W, azar(i * 5 + 1 + Math.floor(t * 24)) * H, 1.5 + 2 * r, 1.5 + 2 * r); }
       g.fillStyle = `rgba(0,0,0,${.03 + .03 * azar(Math.floor(t * 12))})`; g.fillRect(0, 0, W, H);
       const v = g.createRadialGradient(640, 380, 300, 640, 380, 820); v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,.72)'); g.fillStyle = v; g.fillRect(0, 0, W, H);
     };
+    return pinta;
   }
   function PARTICULAS(g, t, def) {
     const lista = [{ tipo: 'polvo', n: 45 }].concat(def.particulas || []);
@@ -388,11 +474,13 @@ const T = (() => {
         if (q.tipo === 'papeles' || q.tipo === 'confeti') { const vida = 3 + 2 * r3, u = ((t + r1 * vida) % vida) / vida, x = x0 + r2 * zw + 60 * Math.sin(u * 5 + i), y = y0 + u * zh;
           g.save(); g.translate(x, y); g.rotate(u * 9 + i); g.scale(1, Math.sin(t * 7 + i)); g.fillStyle = q.tipo === 'papeles' ? 'rgba(240,228,200,.9)' : NEGRO;
           const s = q.tipo === 'papeles' ? 12 : 5; g.fillRect(-s, -s * 1.3, 2 * s, 2.6 * s); g.restore(); }
+        if (q.tipo === 'estrellas') { const b = .35 + .65 * Math.abs(Math.sin(t * (1 + r3) + i * 3)); g.fillStyle = r3 < .3 ? `rgba(140,240,240,${b})` : `rgba(255,240,210,${b})`;
+          g.beginPath(); g.arc(x0 + r1 * zw, y0 + r2 * zh, .8 + 1.4 * r3, 0, TAU); g.fill(); }
         if (q.tipo === 'hojas') { const vida = 5 + 3 * r3, u = ((t + r1 * vida) % vida) / vida, x = x0 + u * zw, y = y0 + r2 * zh + 40 * Math.sin(u * 7 + i);
           g.save(); g.translate(x, y); g.rotate(t * 3 + i); g.fillStyle = NEGRO; g.beginPath(); g.ellipse(0, 0, 7, 3, 0, 0, TAU); g.fill(); g.restore(); }
       }
     }
   }
   const DECORADOS = {};
-  return { escena, pose, DECORADOS, OBJETOS, PELO, SOMBREROS, tela: DECORADO_TELA, azar, ruido, suave, clamp, mezcla, rebote, peso, ik, miembro, hueco, circulo, dir, NEGRO, TAU };
+  return { escena, pose, pintaColores, enColor, mascara, DECORADOS, OBJETOS, PELO, SOMBREROS, tela: DECORADO_TELA, azar, ruido, suave, clamp, mezcla, rebote, peso, ik, miembro, hueco, circulo, dir, NEGRO, TAU };
 })();

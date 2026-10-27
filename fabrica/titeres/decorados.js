@@ -70,6 +70,17 @@
     g.beginPath(); g.moveTo(-14, -78); g.quadraticCurveTo(-58, -60, -50, -18); g.quadraticCurveTo(-44, 0, 0, 0); g.quadraticCurveTo(44, 0, 50, -18); g.quadraticCurveTo(58, -60, 14, -78); g.closePath(); g.fill();
     g.fillRect(-16, -90, 32, 12); g.beginPath(); g.moveTo(-10, -90); g.lineTo(-22, -104); g.lineTo(0, -96); g.lineTo(22, -104); g.lineTo(10, -90); g.fill();
     hueco(g, () => { g.font = '700 46px Georgia, serif'; g.textAlign = 'center'; g.fillText('€', 0, -20); g.textAlign = 'left'; }); g.restore(); };
+  D.horizonte = (g, t, d) => {                  // llanura nocturna con el horizonte encendido y brasas, y torres lejanas
+    const y = d.y || 520, gr = g.createLinearGradient(0, y - 70, 0, y + 30); gr.addColorStop(0, 'rgba(255,90,40,0)'); gr.addColorStop(.7, `rgba(255,96,48,${.55 + .1 * Math.sin(t * 3)})`); gr.addColorStop(1, 'rgba(255,150,70,.9)');
+    g.fillStyle = gr; g.fillRect(-400, y - 70, 2100, 100);
+    g.fillStyle = N; for (let i = 0; i < 60; i++) { const x = -300 + i * 32 + 10 * A(i), h = 6 + 22 * A(i + 3); g.fillRect(x, y - h, 3 + 4 * A(i + 7), h + 2); }
+    for (const [x, h] of d.torres || [[300, 150]]) { g.beginPath(); g.moveTo(x - 14, y); g.lineTo(x - 8, y - h); g.lineTo(x - 18, y - h - 16); g.lineTo(x, y - h - 6); g.lineTo(x + 18, y - h - 16); g.lineTo(x + 8, y - h); g.lineTo(x + 14, y); g.fill(); }
+    g.fillRect(-400, y, 2100, 400);
+    g.fillStyle = 'rgba(255,140,60,.9)'; for (let i = 0; i < 30; i++) { const u = ((t * (.2 + .3 * A(i + 9)) + A(i)) % 1); g.beginPath(); g.arc(-200 + 1700 * A(i + 40), y - 10 - u * 160, 1.5 * (1 - u) + .5, 0, TAU); g.fill(); }
+    g.strokeStyle = 'rgba(255,120,60,.25)'; g.lineWidth = 1.2; for (let i = -8; i <= 8; i++) { g.beginPath(); g.moveTo(640 + i * 30, y + 2); g.lineTo(640 + i * 260, y + 220); g.stroke(); } };
+  D.roca = (g, t, d) => { const x = d.x, y = d.y || 600, e = d.escala || 1; g.save(); g.translate(x, y); g.scale(e, e); g.fillStyle = color(d);
+    g.beginPath(); g.moveTo(-160, 10); g.lineTo(-130, -40); g.lineTo(-70, -62); g.lineTo(-20, -90); g.lineTo(40, -84); g.lineTo(90, -60); g.lineTo(150, -30); g.lineTo(180, 10); g.closePath(); g.fill();
+    hueco(g, () => { g.moveTo(-60, -50); g.lineTo(-30, -66); g.lineTo(-28, -64); g.lineTo(-58, -48); g.moveTo(50, -60); g.lineTo(80, -44); g.lineTo(78, -42); g.lineTo(48, -58); }); g.restore(); };
   D.molino = (g, t, d) => { const x = d.x, y = d.y || 520; g.fillStyle = color(d); g.beginPath(); g.moveTo(x - 26, y); g.lineTo(x - 14, y - 120); g.lineTo(x + 14, y - 120); g.lineTo(x + 26, y); g.fill();
     g.save(); g.translate(x, y - 120); g.rotate(t * .6); for (let i = 0; i < 4; i++) { g.rotate(TAU / 4); g.fillRect(-3, 0, 6, 90); g.fillRect(3, 20, 18, 66); } g.restore(); };
   D.nubes = (g, t, d) => { g.fillStyle = color(d);
