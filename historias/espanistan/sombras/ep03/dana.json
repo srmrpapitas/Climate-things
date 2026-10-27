@@ -1,0 +1,11 @@
+{"ref": 1280, "umbral": 60, "piezas": [
+ {"nombre": "cajas", "caja": [744, 382, 886, 622], "tipo": "objeto"},
+ {"nombre": "carrito", "caja": [568, 526, 776, 630], "tipo": "objeto"},
+ {"nombre": "empuja", "caja": [818, 266, 978, 620], "cuello": 330},
+ {"nombre": "v1", "caja": [0, 282, 126, 614], "cuello": 340},
+ {"nombre": "v2", "caja": [154, 266, 294, 618], "cuello": 330},
+ {"nombre": "v3", "caja": [254, 256, 420, 630], "cuello": 320},
+ {"nombre": "v4", "caja": [406, 252, 582, 624], "cuello": 305},
+ {"nombre": "carro2", "caja": [1043, 523, 1172, 582], "tipo": "objeto"},
+ {"nombre": "vigia", "caja": [1194, 426, 1242, 586], "cuello": 452}
+]}
