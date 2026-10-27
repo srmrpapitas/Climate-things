@@ -114,6 +114,24 @@
     Comprobar que unidos dan la duración entera. GitHub avisa de archivos > 50 MB pero los acepta (< 100 MB).
     Pasar al usuario el enlace `https://github.com/srmrpapitas/Climate-things/tree/<rama>/videos/espanistan-NN`.
 
+## Audios y tiempos por palabra (cómo encaja todo)
+1. **Un audio por frase del guion** (narrador): la línea N de `guion_espanistan-NN.txt` → `audio/voz/es/espanistan-NN/NN.mp3`
+   (01.mp3, 02.mp3…), normalizado sin cambiar la velocidad. Bajarlos en cuanto estén (los enlaces caducan en 2 h).
+2. **Frases del protagonista**: todas en una llamada, cortadas después con Whisper + `ffmpeg` (`-ss`/`-t` antes de `-i`)
+   → `audio/voz/es/espanistan-NN/<personaje>/f1_xxx.mp3`… Comprobar volumen de cada trozo (`volumedetect`: ninguno a −91 dB).
+3. **Lista de voces** en `hacer_escenas.py`, en el orden en que suenan: cada frase del narrador es
+   `{"archivo": ".../07.mp3", "lineas": "7"}` y cada frase del protagonista `{"archivo": ".../f2.mp3", "texto": "…", "quien": "acascar"}`,
+   metida justo detrás de la línea que le da paso («Acascar lo dice sin rodeos.»). Pausa: 0,6–1 s entre frases (`"pausa"`).
+   Generar la lista con un bucle, no a mano (ver `V` en `fabrica/videos/espanistan-03-sombras/hacer_escenas.py`).
+4. **Tiempos por palabra**: `generar.py` pasa Whisper a cada voz (`tiempos/NN.json`, NN = posición en la lista de voces,
+   se hace una vez y se guarda) y alinea cada palabra del guion con su instante. De ahí salen:
+   - los **subtítulos** (trozos de ≤ 8 palabras, las de `negrita` en dorado; las del protagonista en cursiva);
+   - las **anclas** `"B:palabras"` de planos, capas, acciones y partículas: B = número de la voz en la lista (1, 2, 3…),
+     palabras tal cual en el guion (`"#2"` = la segunda vez que aparecen). Con audios por frase, B ya no es el número de
+     línea en cuanto hay frases del protagonista intercaladas: imprimir la lista numerada antes de escribir anclas.
+   - la **boca** del Decano y del retrato (volumen fotograma a fotograma).
+5. Si un ancla no existe, `generar.py` para con «Ancla no encontrada»: corregir la palabra y volver a generar (segundos).
+
 ## Trampas que costaron tiempo en el ep. 3
 - **Cortar audio con fundido**: poner `-ss` y `-t` **antes** de `-i`. Con `-ss` después, el `afade` usa el tiempo del archivo original y deja el trozo en silencio.
 - Las voces se piden todas a la vez; ElevenLabs encola las que pasan del límite («concurrency limit») y las hace solas: no repetir la llamada.
