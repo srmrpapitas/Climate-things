@@ -1,0 +1,9 @@
+{"ref": 1280, "umbral": 60, "piezas": [
+ {"nombre": "llave", "caja": [476, 230, 652, 304], "tipo": "objeto", "pivote": [600, 268]},
+ {"nombre": "reina", "caja": [180, 178, 338, 642], "cuello": 268},
+ {"nombre": "dama", "caja": [338, 244, 504, 642], "cuello": 300},
+ {"nombre": "joven", "caja": [548, 216, 748, 646], "cuello": 292},
+ {"nombre": "pila", "caja": [748, 384, 838, 646], "tipo": "objeto"},
+ {"nombre": "escribiente", "caja": [832, 234, 1000, 646], "cuello": 300},
+ {"nombre": "sacos", "caja": [1025, 518, 1175, 646], "tipo": "objeto"}
+]}

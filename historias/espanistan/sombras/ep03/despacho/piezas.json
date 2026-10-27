@@ -1,0 +1,149 @@
+{
+ "llave": {
+  "caja": [
+   952,
+   460,
+   346,
+   149
+  ],
+  "tipo": "objeto",
+  "pivote": [
+   1200,
+   536
+  ]
+ },
+ "reina": {
+  "caja": [
+   360,
+   536,
+   317,
+   749
+  ],
+  "tipo": "figura",
+  "pivote": [
+   518,
+   1285
+  ]
+ },
+ "reina_c": {
+  "caja": [
+   360,
+   356,
+   317,
+   180
+  ],
+  "tipo": "cabeza",
+  "pivote": [
+   502,
+   536
+  ],
+  "padre": "reina"
+ },
+ "dama": {
+  "caja": [
+   676,
+   600,
+   333,
+   685
+  ],
+  "tipo": "figura",
+  "pivote": [
+   842,
+   1285
+  ]
+ },
+ "dama_c": {
+  "caja": [
+   690,
+   488,
+   263,
+   112
+  ],
+  "tipo": "cabeza",
+  "pivote": [
+   742,
+   600
+  ],
+  "padre": "dama"
+ },
+ "joven": {
+  "caja": [
+   1096,
+   584,
+   401,
+   709
+  ],
+  "tipo": "figura",
+  "pivote": [
+   1296,
+   1293
+  ]
+ },
+ "joven_c": {
+  "caja": [
+   1348,
+   439,
+   142,
+   145
+  ],
+  "tipo": "cabeza",
+  "pivote": [
+   1396,
+   584
+  ],
+  "padre": "joven"
+ },
+ "pila": {
+  "caja": [
+   1496,
+   768,
+   181,
+   525
+  ],
+  "tipo": "objeto",
+  "pivote": [
+   1586,
+   1293
+  ]
+ },
+ "escribiente": {
+  "caja": [
+   1666,
+   600,
+   335,
+   693
+  ],
+  "tipo": "figura",
+  "pivote": [
+   1832,
+   1293
+  ]
+ },
+ "escribiente_c": {
+  "caja": [
+   1664,
+   468,
+   337,
+   132
+  ],
+  "tipo": "cabeza",
+  "pivote": [
+   1834,
+   600
+  ],
+  "padre": "escribiente"
+ },
+ "sacos": {
+  "caja": [
+   2050,
+   1036,
+   301,
+   257
+  ],
+  "tipo": "objeto",
+  "pivote": [
+   2200,
+   1293
+  ]
+ }
+}
