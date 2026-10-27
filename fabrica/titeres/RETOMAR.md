@@ -21,6 +21,13 @@
   - Con ella **corta la máscara de los mentirosos**: el Vendehúmos, un político genérico que no es nadie real, lleva la máscara de PROMESAS.
 - Grabar: `python3 -m http.server 8765` (raíz) y `node fabrica/titeres/grabar.mjs NOMBRE out/NOMBRE.mp4` (≈ 4 s por segundo de vídeo).
 
+## Hecho el 27-10-2026 (tarde)
+- Estilo **a lo Samurai Jack** en los planos `jack: true`: color plano, figura en dos tonos, cámara quieta, gestos secos.
+- Esqueleto nuevo: espalda en tres tramos, hombros, rodillas, muñecas y dedos; dar la mano, daga y puñalada, reptar, trepar.
+- Transiciones: viento, cuervos, papeletas, humo, tinta y tajo. Cambio de escena = transición; dentro de la escena, cortes secos.
+- Historia del ep. 3: `historias/espanistan/03-acascar-historia.md`. Actos hechos (sin voz): 4 `desierto`, 5 `subida`, 6 `mano-daga`.
+- Siguiente: **prueba de voces** (≈ 500 créditos, ver punto 2) en un chat con la cuenta buena de ElevenLabs; luego actos 1, 2, 3 y 7.
+
 ## Lo que pidió el usuario y falta
 1. **Mejor animación de movimiento** (lo último que pidió).
    - Que hombros, torso y cuello se muevan encadenados y con lógica: cuando el brazo sube, el hombro se levanta y el pecho gira; el cuello sigue al torso y la cabeza llega después.
