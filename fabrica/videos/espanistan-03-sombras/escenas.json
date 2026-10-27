@@ -274,9 +274,9 @@
    "acciones": [
     {
      "pieza": "jinete",
-     "hace": "alza",
+     "hace": "balancea",
      "en": "1:Este es Acascar",
-     "g": 5,
+     "g": 1.2,
      "hasta": "1:el tercer partido"
     },
     {
@@ -1183,9 +1183,9 @@
     },
     {
      "pieza": "jinete",
-     "hace": "alza",
+     "hace": "balancea",
      "en": "6:Acascar tiene",
-     "g": 5
+     "g": 1.2
     },
     {
      "pieza": "ave",
@@ -1725,32 +1725,81 @@
      "hasta": "14:Los bancos"
     }
    ],
+   "particulas": [
+    {
+     "tipo": "monedas",
+     "en": "13:seis millones",
+     "hasta": "13:Anticorrupción",
+     "n": 30,
+     "zona": [
+      640,
+      300,
+      840,
+      620
+     ]
+    },
+    {
+     "tipo": "humo",
+     "n": 10,
+     "zona": [
+      1080,
+      300,
+      1160,
+      470
+     ]
+    }
+   ],
    "acciones": [
     {
      "pieza": "banquero",
      "hace": "inclina",
      "en": "13:Vox pidió",
-     "g": 6
-    },
-    {
-     "pieza": "saco",
-     "hace": "arrastra",
-     "en": "13:seis millones",
-     "g": -160,
+     "g": 8,
      "hasta": "13:Anticorrupción"
     },
     {
-     "pieza": "cola",
+     "pieza": "bestia",
+     "hace": "late",
+     "en": "13:seis millones",
+     "g": 0.08,
+     "hasta": "13:Anticorrupción"
+    },
+    {
+     "pieza": "q5",
      "hace": "camina",
-     "en": "13:Anticorrupción",
-     "g": 120,
-     "hasta": "13:Acascar tiene"
+     "en": "13:banco húngaro",
+     "g": 50,
+     "hasta": "13:Vox pidió"
+    },
+    {
+     "pieza": "q4",
+     "hace": "camina",
+     "en": "13:cercano al Gobierno",
+     "g": 60,
+     "hasta": "13:Anticorrupción"
+    },
+    {
+     "pieza": "q3",
+     "hace": "camina",
+     "en": "13:cercano al Gobierno",
+     "g": 60,
+     "hasta": "13:Anticorrupción"
+    },
+    {
+     "pieza": "banquero",
+     "hace": "niega",
+     "en": "13:no vio delito"
+    },
+    {
+     "pieza": "q2",
+     "hace": "salta",
+     "en": "13:archivado"
     },
     {
      "pieza": "barco",
-     "hace": "arrastra",
+     "hace": "balancea",
      "en": "13:Segundo frasco",
-     "g": 400,
+     "g": 3,
      "hasta": "14:Los bancos"
     }
    ]
@@ -1787,12 +1836,12 @@
      "tipo": "monedas",
      "en": "15:Tercer frasco",
      "hasta": "15:Cuarto frasco",
-     "n": 25,
+     "n": 28,
      "zona": [
-      200,
-      100,
-      700,
-      500
+      520,
+      140,
+      740,
+      420
      ]
     }
    ],
@@ -1817,11 +1866,44 @@
    ],
    "acciones": [
     {
+     "pieza": "lampara",
+     "hace": "balancea",
+     "en": "15:Tercer frasco",
+     "g": 4,
+     "hasta": "15:Cuarto frasco"
+    },
+    {
+     "pieza": "hucha",
+     "hace": "late",
+     "en": "15:las huchas",
+     "g": 0.1,
+     "hasta": "15:El Tribunal"
+    },
+    {
+     "pieza": "mujer2",
+     "hace": "inclina",
+     "en": "15:las huchas",
+     "g": 5,
+     "hasta": "15:El Tribunal"
+    },
+    {
+     "pieza": "lupa",
+     "hace": "alza",
+     "en": "15:El Tribunal de Cuentas",
+     "g": 20,
+     "hasta": "15:En junio"
+    },
+    {
      "pieza": "juez",
      "hace": "inclina",
      "en": "15:multó",
-     "g": 6,
+     "g": 4,
      "hasta": "15:En junio"
+    },
+    {
+     "pieza": "escriba",
+     "hace": "asiente",
+     "en": "15:donativos ilegales"
     },
     {
      "pieza": "juez",
@@ -1829,8 +1911,18 @@
      "en": "15:anuló la multa"
     },
     {
-     "pieza": "gente",
+     "pieza": "mujer1",
      "hace": "salta",
+     "en": "15:Esto también"
+    },
+    {
+     "pieza": "mujer2",
+     "hace": "salta",
+     "en": "15:Esto también"
+    },
+    {
+     "pieza": "hada",
+     "hace": "saluda",
      "en": "15:Esto también"
     }
    ]
@@ -1928,7 +2020,13 @@
    "particulas": [
     {
      "tipo": "lluvia",
-     "n": 140
+     "n": 160
+    },
+    {
+     "tipo": "lluvia",
+     "en": "15:Revuelta",
+     "n": 90,
+     "sube": 4
     }
    ],
    "capas": [
@@ -1946,24 +2044,70 @@
    ],
    "acciones": [
     {
-     "pieza": "voluntarios",
+     "pieza": "v1",
      "hace": "camina",
-     "en": "15:recogió donativos",
-     "g": 180,
+     "en": "15:Quinto frasco",
+     "g": 120,
      "hasta": "15:Dos miembros"
     },
     {
-     "pieza": "carro",
+     "pieza": "v2",
+     "hace": "camina",
+     "en": "15:Quinto frasco",
+     "g": 120,
+     "hasta": "15:Dos miembros"
+    },
+    {
+     "pieza": "v3",
+     "hace": "camina",
+     "en": "15:Revuelta",
+     "g": 110,
+     "hasta": "15:Dos miembros"
+    },
+    {
+     "pieza": "v4",
+     "hace": "camina",
+     "en": "15:Revuelta",
+     "g": 100,
+     "hasta": "15:Dos miembros"
+    },
+    {
+     "pieza": "carrito",
      "hace": "arrastra",
      "en": "15:recogió donativos",
-     "g": 140,
+     "g": 90,
      "hasta": "15:La Fiscalía"
     },
     {
-     "pieza": "balcon",
-     "hace": "tiembla",
-     "en": "15:quedarse parte",
-     "g": 1.5
+     "pieza": "empuja",
+     "hace": "inclina",
+     "en": "15:recogió donativos",
+     "g": -4,
+     "hasta": "15:La Fiscalía"
+    },
+    {
+     "pieza": "cajas",
+     "hace": "arrastra",
+     "en": "15:recogió donativos",
+     "g": 90,
+     "hasta": "15:La Fiscalía"
+    },
+    {
+     "pieza": "vigia",
+     "hace": "niega",
+     "en": "15:quedarse parte"
+    },
+    {
+     "pieza": "v2",
+     "hace": "asiente",
+     "en": "15:archivó la denuncia"
+    },
+    {
+     "pieza": "carro2",
+     "hace": "balancea",
+     "en": "15:Quinto frasco",
+     "g": 2,
+     "hasta": "15:Sexto frasco"
     }
    ]
   },
@@ -2124,6 +2268,17 @@
      "tipo": "papeles",
      "en": "16:menos impuestos",
      "n": 20
+    },
+    {
+     "tipo": "polvo",
+     "en": "16:más expulsiones",
+     "n": 50,
+     "zona": [
+      60,
+      520,
+      700,
+      650
+     ]
     }
    ],
    "capas": [
@@ -2153,21 +2308,75 @@
      "pieza": "orador",
      "hace": "golpea",
      "en": "16:Vox pone",
+     "hasta": "16:Acascar lo tiene",
+     "g": 10
+    },
+    {
+     "pieza": "guardia",
+     "hace": "alza",
+     "en": "16:prioridad nacional",
+     "g": 10,
+     "hasta": "16:menos impuestos"
+    },
+    {
+     "pieza": "publico",
+     "hace": "salta",
+     "en": "16:prioridad nacional",
      "hasta": "16:Acascar lo tiene"
     },
     {
-     "pieza": "muro",
-     "hace": "sube",
-     "en": "16:más expulsiones",
-     "g": 40,
-     "hasta": "16:Acascar lo tiene"
-    },
-    {
-     "pieza": "viajeros",
+     "pieza": "c1",
      "hace": "camina",
      "en": "16:más expulsiones",
-     "g": 260,
+     "g": -200,
      "hasta": "17:Yo"
+    },
+    {
+     "pieza": "c2",
+     "hace": "camina",
+     "en": "16:más expulsiones",
+     "g": -200,
+     "hasta": "17:Yo"
+    },
+    {
+     "pieza": "c3",
+     "hace": "camina",
+     "en": "16:más expulsiones",
+     "g": -180,
+     "hasta": "17:Yo"
+    },
+    {
+     "pieza": "c4",
+     "hace": "camina",
+     "en": "16:más expulsiones",
+     "g": -160,
+     "hasta": "17:Yo"
+    },
+    {
+     "pieza": "viejo",
+     "hace": "camina",
+     "en": "16:más expulsiones",
+     "g": -150,
+     "hasta": "17:Yo"
+    },
+    {
+     "pieza": "maleta",
+     "hace": "camina",
+     "en": "16:más expulsiones",
+     "g": -150,
+     "hasta": "17:Yo"
+    },
+    {
+     "pieza": "nina",
+     "hace": "camina",
+     "en": "16:menos impuestos",
+     "g": -140,
+     "hasta": "17:Yo"
+    },
+    {
+     "pieza": "guardia",
+     "hace": "asiente",
+     "en": "16:Acascar lo tiene"
     }
    ]
   },
@@ -2480,9 +2689,9 @@
     },
     {
      "pieza": "jinete",
-     "hace": "alza",
+     "hace": "balancea",
      "en": "20:suscríbete",
-     "g": 5
+     "g": 1.2
     },
     {
      "pieza": "m1",
