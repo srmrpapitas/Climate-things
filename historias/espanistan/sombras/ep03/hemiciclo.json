@@ -1,0 +1,14 @@
+{"ref": 1280, "umbral": 60, "piezas": [
+ {"nombre": "orador", "caja": [586, 284, 714, 638], "tipo": "figura", "pivote": [640, 638]},
+ {"nombre": "ponente", "caja": [846, 400, 996, 638], "tipo": "figura"},
+ {"nombre": "d1", "caja": [18, 368, 84, 638], "cuello": 412},
+ {"nombre": "d2", "caja": [86, 376, 162, 638], "cuello": 420},
+ {"nombre": "d3", "caja": [162, 364, 246, 638], "cuello": 410},
+ {"nombre": "d4", "caja": [254, 366, 352, 638], "cuello": 412},
+ {"nombre": "d5", "caja": [344, 368, 448, 638], "cuello": 410},
+ {"nombre": "d6", "caja": [460, 376, 526, 638], "cuello": 420},
+ {"nombre": "d7", "caja": [750, 366, 846, 638], "cuello": 405},
+ {"nombre": "d8", "caja": [1026, 390, 1120, 638], "cuello": 440},
+ {"nombre": "d9", "caja": [1120, 374, 1194, 638], "cuello": 420},
+ {"nombre": "d10", "caja": [1190, 380, 1254, 638], "cuello": 425}
+]}
