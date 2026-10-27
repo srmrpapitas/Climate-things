@@ -3,12 +3,13 @@
 //   nariz (tamaño), narizForma: recta | aguilena | respingona | gruesa   menton: marcado | redondo | doble   arrugas: 0–1
 //   ropa: traje | tunica | vestido     pelo: corto | peinado | entradas | loco | mono | coleta | calvo
 //   barba: corta | larga | bigote      gafas: redondas | cuadradas    sombrero: gorra | chistera | boina
+//   estilizado (a lo Samurai Jack): piernas (largo), hombros (ancho), cintura (estrecha < 1), jirones (bajo de la túnica al viento)
 //   objeto (mano de delante) / objetoLejos (mano de atrás): candil | lupa | bandera | baston | papel
 const PERSONAJES = {
-  decano:  { ropa: 'tunica', pelo: 'loco', gafas: 'redondas', nariz: 1.3, narizForma: 'aguilena', arrugas: 1, alto: 1, grueso: .95, encorvado: .05, objeto: 'lupa', objetoLejos: 'candil', semilla: 3 },
-  acascar: { ropa: 'traje', pelo: 'corto', barba: 'corta', nariz: 1, narizForma: 'recta', menton: 'marcado', alto: 1.06, grueso: 1.1, semilla: 7 },
-  sanchis: { ropa: 'traje', pelo: 'peinado', nariz: 1.05, narizForma: 'recta', menton: 'marcado', alto: 1.14, grueso: 1, semilla: 11 },
-  feijolo: { ropa: 'traje', pelo: 'entradas', nariz: 1.1, narizForma: 'gruesa', menton: 'doble', arrugas: .6, alto: 1, grueso: 1.05, barriga: .4, semilla: 13 },
+  decano:  { ropa: 'tunica', pelo: 'loco', gafas: 'redondas', nariz: 1.3, narizForma: 'aguilena', arrugas: 1, alto: 1.04, grueso: .95, encorvado: .05, piernas: 1.1, hombros: 1.05, cintura: .85, jirones: true, objeto: 'lupa', objetoLejos: 'candil', semilla: 3 },
+  acascar: { ropa: 'traje', pelo: 'corto', barba: 'corta', nariz: 1, narizForma: 'recta', menton: 'marcado', alto: 1.08, grueso: 1.1, piernas: 1.12, hombros: 1.22, cintura: .8, semilla: 7 },
+  sanchis: { ropa: 'traje', pelo: 'peinado', nariz: 1.05, narizForma: 'recta', menton: 'marcado', alto: 1.16, grueso: 1, piernas: 1.15, hombros: 1.15, cintura: .82, semilla: 11 },
+  feijolo: { ropa: 'traje', pelo: 'entradas', nariz: 1.1, narizForma: 'gruesa', menton: 'doble', arrugas: .6, alto: 1.02, grueso: 1.05, barriga: .4, piernas: 1.06, hombros: 1.1, cintura: .95, semilla: 13 },
 };
 // gente del pueblo: variaciones deterministas (la misma n da siempre la misma persona)
 function ciudadano(n, extra = {}) {

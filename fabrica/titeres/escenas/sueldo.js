@@ -35,34 +35,34 @@ window.ESCENA = {
     fuente: 'Comunidad de Madrid (transparencia) · Maldita.es' }],
   planos: [
     // 1 · general: la plaza; Acascar en el atril y la gente mirando
-    { desde: 0, decorado: plaza, delante: [{ tipo: 'atril', x: 900 }], luces: [[560, 314]], particulas: aire,
+    { desde: 0, viento: .25, decorado: plaza, delante: [{ tipo: 'atril', x: 900 }], luces: [[560, 314]], particulas: aire,
       actores: [
         ...[0, 1, 2, 3, 4, 5].map(i => ({ p: ciudadano(i + 20, { escala: .8, tono: .82 }), x: 110 + i * 64, mira: 1, acciones: [{ hace: 'asiente', en: 2 + i * .4, hasta: 3 + i * .4 }] })),
         { p: PERSONAJES.acascar, x: 960, mira: -1, acciones: [{ hace: 'saluda', en: 1.2, hasta: 3.2 }, { hace: 'asiente', en: 3.6, hasta: 4.6 }] }],
       camara: [[0, 640, 380, 1.0], [5.8, 760, 380, 1.18]] },
     // 2 · primer plano de frente: «mi sueldo es mío»
-    { desde: 5.8, decorado: [...cielo, { tipo: 'bandera', x: 860, par: .9, alto: 420, ancho: 170, tela: 110 }, { tipo: 'suelo', par: 1 }], delante: [{ tipo: 'atril', x: 640 }], particulas: aire,
+    { desde: 5.8, viento: .35, decorado: [...cielo, { tipo: 'bandera', x: 860, par: .9, alto: 420, ancho: 170, tela: 110 }, { tipo: 'suelo', par: 1 }], delante: [{ tipo: 'atril', x: 640 }], particulas: aire,
       actores: [{ p: PERSONAJES.acascar, x: 640, vista: 'frente', acciones: [H(1), { hace: 'golpea', en: 6.3, hasta: 7.6 }, { hace: 'puno', en: 7.8, hasta: 9.4 }] }],
       camara: [[5.8, 640, 300, 2.2], [9.4, 640, 290, 2.45]] },
     // 3 · desde la espalda de Acascar: la vecina se adelanta y le grita
-    { desde: 9.4, transicion: 'viento', tinte: 'rojo', decorado: [...cielo, { tipo: 'farola', x: 200, par: .9 }, { tipo: 'farola', x: 980, par: .9 }, { tipo: 'suelo', par: 1, y: 560 }], luces: [[200, 288], [980, 288]], particulas: aire,
+    { desde: 9.4, transicion: 'viento', tinte: 'rojo', viento: .8, decorado: [...cielo, { tipo: 'farola', x: 200, par: .9 }, { tipo: 'farola', x: 980, par: .9 }, { tipo: 'suelo', par: 1, y: 560 }], luces: [[200, 288], [980, 288]], particulas: aire,
       actores: [
         ...fila(.62, .78, [3]).map((a, k) => Object.assign(a, { acciones: [{ hace: k % 2 ? 'niega' : 'asiente', en: 10 + k * .15, hasta: 11.6 + k * .1 }] })),
         { p: Object.assign({}, vecina, { escala: .7 }), x: 430, vista: 'frente', acciones: [{ hace: 'acerca', en: 9.5, hasta: 10.3, a: 1.35 }, H(2), { hace: 'senala', en: 9.9, hasta: 11.9 }] },
         { p: PERSONAJES.acascar, x: 1020, vista: 'espalda', z: 1.75, acciones: [{ hace: 'encoge', en: 10.6, hasta: 12 }] }],
       camara: [[9.4, 640, 380, 1.05], [12, 560, 360, 1.25]] },
     // 4 · plano medio del público: el vecino de la gorra
-    { desde: 12, tinte: 'rojo', decorado: [...cielo, { tipo: 'farola', x: 980, par: .9 }, { tipo: 'suelo', par: 1, y: 560 }], luces: [[980, 288]], particulas: aire,
+    { desde: 12, tinte: 'rojo', viento: .7, decorado: [...cielo, { tipo: 'farola', x: 980, par: .9 }, { tipo: 'suelo', par: 1, y: 560 }], luces: [[980, 288]], particulas: aire,
       actores: [
         ...fila(.7, .7, [2, 3]).map((a, k) => Object.assign(a, { acciones: [{ hace: k % 3 ? 'asiente' : 'aplaude', en: 13.2 + k * .1, hasta: 14.5 }] })),
         { p: Object.assign({}, vecino, { escala: 1.05 }), x: 400, vista: 'frente', acciones: [H(3), { hace: 'puno', en: 12.3, hasta: 14.4 }] }],
       camara: [[12, 420, 330, 1.8], [14.5, 410, 320, 1.95]] },
     // 5 · primer plano de frente: «bueno... es vocación»
-    { desde: 14.5, decorado: [...cielo, { tipo: 'bandera', x: 860, par: .9, alto: 420, ancho: 170, tela: 110 }, { tipo: 'suelo', par: 1 }], delante: [{ tipo: 'atril', x: 640 }], particulas: aire,
+    { desde: 14.5, transicion: 'viento', viento: .4, decorado: [...cielo, { tipo: 'bandera', x: 860, par: .9, alto: 420, ancho: 170, tela: 110 }, { tipo: 'suelo', par: 1 }], delante: [{ tipo: 'atril', x: 640 }], particulas: aire,
       actores: [{ p: PERSONAJES.acascar, x: 640, vista: 'frente', acciones: [H(4), { hace: 'encoge', en: 14.8, hasta: 17 }] }],
       camara: [[14.5, 640, 290, 2.5], [17.2, 640, 290, 2.3]] },
     // 6 · los datos: el Decano llega con su candil, mira los dos sacos de dinero y señala
-    { desde: 17.2, transicion: 'viento', decorado: [...plaza.slice(0, 6), { tipo: 'farola', x: 560, par: 1 }, { tipo: 'suelo', par: 1 },
+    { desde: 17.2, transicion: 'viento', viento: .55, decorado: [...plaza.slice(0, 6), { tipo: 'farola', x: 560, par: 1 }, { tipo: 'suelo', par: 1 },
         { tipo: 'saco', x: 760, escala: 1.15, crece: .25, en: 18.5 }, { tipo: 'saco', x: 900, escala: .95, crece: .1, en: 23 }], luces: [[560, 314]], particulas: aire,
       actores: [
         { p: PERSONAJES.decano, x: -150, mira: 1, acciones: [{ hace: 'camina', en: 17.3, hasta: 20, a: 520 }, { hace: 'senala', en: 20.4, hasta: 22.4 }, { hace: 'asiente', en: 23, hasta: 24 },

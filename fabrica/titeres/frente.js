@@ -30,9 +30,9 @@
 
   T.dibujaFrente = function (g, ac, t, o) {
     const p = ac.p, A = p.alto, G = p.grueso || 1, s = p.semilla || 1, esp = o.vista === 'espalda', E = (p.escala || 1) * o.z;
-    const L1 = 80 * A, L2 = 78 * A, ph = TAU * o.faseFrente, lev = o.andaFrente;
+    const L1 = 80 * A * (p.piernas || 1), L2 = 78 * A * (p.piernas || 1), ph = TAU * o.faseFrente, lev = o.andaFrente, vf = (o.vf || 0) * (esp ? -1 : 1);
     g.save(); g.translate(o.x, 0); g.scale(E * o.giroVista, E * o.aplasta); g.fillStyle = g.strokeStyle = NEGRO;
-    const caderaY = -(L1 + L2) * .965 + 4 * lev * Math.abs(Math.sin(ph)) + o.y, hw = 15 * G * A;
+    const caderaY = -(L1 + L2) * .965 + 4 * lev * Math.abs(Math.sin(ph)) + o.y, hw = 15 * G * A * (p.cintura || 1);
     // piernas: de frente, la que da el paso sube la rodilla
     for (const lado of [-1, 1]) {
       const sube = lev * Math.max(0, Math.sin(ph + (lado > 0 ? 0 : Math.PI))) * 26 * A;
@@ -42,7 +42,7 @@
       g.beginPath(); g.ellipse(pie[0] + lado * 4 * A, pie[1] - 3 * A, 13 * A, 6 * A, 0, 0, TAU); g.fill();
     }
     // tronco y ropa
-    const largo = 112 * A, hom = 31 * G * A + 2 * o.hombros, top = caderaY - largo - o.hombros, bar = (p.barriga || 0) * 14 * A;
+    const largo = 112 * A, hom = 31 * G * A * (p.hombros || 1) + 2 * o.hombros, top = caderaY - largo - o.hombros, bar = (p.barriga || 0) * 14 * A;
     g.save(); g.translate(0, caderaY); g.rotate(.02 * Math.sin(t * 1.1 + s)); g.scale(1 + .015 * o.respira, 1 + .008 * o.respira);
     g.beginPath(); g.moveTo(-hw * 1.35 - bar, 6 * A); g.bezierCurveTo(-hw * 1.6 - bar, -largo * .4, -hom - 4, -largo * .75, -hom, -largo - o.hombros);
     g.quadraticCurveTo(0, -largo - 8 * A - o.hombros, hom, -largo - o.hombros); g.bezierCurveTo(hom + 4, -largo * .75, hw * 1.6 + bar, -largo * .4, hw * 1.35 + bar, 6 * A); g.closePath(); g.fill();
@@ -50,16 +50,20 @@
       g.beginPath(); g.moveTo(-hw * 1.45 - bar, -4 * A); g.lineTo(-hw * 1.5 - bar, 28 * A); g.lineTo(hw * 1.5 + bar, 28 * A); g.lineTo(hw * 1.45 + bar, -4 * A); g.fill();
       if (!esp) {
         hueco(g, () => { g.moveTo(-10 * A, -largo + 2 * A); g.lineTo(10 * A, -largo + 2 * A); g.lineTo(0, -largo * .5); g.closePath(); });   // camisa
-        g.beginPath(); g.moveTo(-3 * A, -largo + 6 * A); g.lineTo(3 * A, -largo + 6 * A); g.lineTo(4.5 * A, -largo * .58); g.lineTo(0, -largo * .52); g.lineTo(-4.5 * A, -largo * .58); g.closePath(); g.fill();   // corbata
+        const cv = vf * 22 * A * (.7 + .3 * Math.sin(t * 11)), cy = -Math.abs(vf) * 12 * A;   // corbata al viento
+        g.beginPath(); g.moveTo(-3 * A, -largo + 6 * A); g.lineTo(3 * A, -largo + 6 * A); g.quadraticCurveTo(4 * A + cv * .4, -largo * .75, 4.5 * A + cv, -largo * .58 + cy); g.lineTo(cv, -largo * .52 + cy); g.lineTo(-4.5 * A + cv, -largo * .58 + cy); g.quadraticCurveTo(-4 * A + cv * .4, -largo * .75, -3 * A, -largo + 6 * A); g.closePath(); g.fill();   // corbata
         g.beginPath(); g.moveTo(-3.5 * A, -largo + 3 * A); g.lineTo(3.5 * A, -largo + 3 * A); g.lineTo(2.5 * A, -largo + 8 * A); g.lineTo(-2.5 * A, -largo + 8 * A); g.fill();   // nudo
         hueco(g, () => { for (const l of [-1, 1]) { g.moveTo(l * 11 * A, -largo + 2 * A); g.lineTo(l * 1.5 * A, -largo * .48); g.lineTo(l * 2.5 * A, -largo * .47); g.lineTo(l * 12.5 * A, -largo + 3 * A); } });   // solapas
         hueco(g, () => { for (let k = 0; k < 2; k++) circulo(g, 0, -largo * (.4 - k * .14), 2 * A); g.rect(-hw * 1.3, -largo * .56, 9 * A, 2 * A); });   // botones y bolsillo
       } else hueco(g, () => { g.rect(-1 * A, -4 * A, 2 * A, 30 * A); });   // abertura de atrás
     }
     if (p.ropa === 'tunica') {
-      g.beginPath(); g.moveTo(-hom, -largo); g.lineTo(-hw * 2.6, -caderaY - 12 * A);
-      for (let k = 0; k <= 10; k++) g.lineTo(mezcla(-hw * 2.6, hw * 2.6, k / 10), -caderaY - 12 * A + (k % 2 ? 7 * A : 0) + 2 * Math.sin(t * 3 + k));
-      g.lineTo(hom, -largo); g.closePath(); g.fill();
+      const vt = vf * 20 * A, bajo = -caderaY - 12 * A;
+      g.beginPath(); g.moveTo(-hom, -largo); g.quadraticCurveTo(-hw * 2.2 + vt * .4, bajo * .5, -hw * 2.6 + vt, bajo);
+      for (let k = 0; k <= 10; k++) g.lineTo(mezcla(-hw * 2.6, hw * 2.6, k / 10) + vt, bajo + (k % 2 ? 7 * A : 0) + 2 * Math.sin(t * 3 + k));
+      g.quadraticCurveTo(hw * 2.2 + vt * .4, bajo * .5, hom, -largo); g.closePath(); g.fill();
+      if (p.jirones) for (let k = 0; k < 18; k++) { const x = mezcla(-hw * 2.6, hw * 2.6, (k + .5) / 18) + vt, l = (12 + 26 * azar(k + 7)) * A, an = vf * .9 + .35 * Math.sin(t * 8 + k * 1.7) * (.3 + Math.abs(vf));
+        g.beginPath(); g.moveTo(x - 4 * A, bajo); g.lineTo(x + 4 * A, bajo); g.lineTo(x + Math.sin(an) * l, bajo + Math.cos(an) * l); g.closePath(); g.fill(); }
       hueco(g, () => { for (let k = 0; k < 9; k++) circulo(g, mezcla(-hw * 2.3, hw * 2.3, (k + .5) / 9), -caderaY - 26 * A, 2.8 * A);
         if (!esp) for (let k = 0; k < 6; k++) circulo(g, 0, -largo * (.88 - k * .15), 2.2 * A); });
     }
@@ -160,8 +164,8 @@
       hueco(g, () => { g.moveTo(-10, -84); g.quadraticCurveTo(4, -92, 18, -76); g.lineTo(18, -74.6); g.quadraticCurveTo(4, -89, -10, -82.6); g.moveTo(-14, -78); g.quadraticCurveTo(0, -86, 12, -72); g.lineTo(12, -70.8); g.quadraticCurveTo(0, -83, -14, -76.8); }); },
     entradas(g, t, o, p, esp) { for (const l of [-1, 1]) { g.beginPath(); g.moveTo(l * 25, -36); g.quadraticCurveTo(l * 28, -62, l * 14, -70); g.quadraticCurveTo(l * 18, -56, l * 20, -36); g.fill(); }
       if (esp) { g.beginPath(); g.moveTo(-25, -40); g.quadraticCurveTo(0, -84, 25, -40); g.quadraticCurveTo(0, -16, -25, -40); g.fill(); } else { g.beginPath(); g.ellipse(0, -71, 5, 2.5, 0, 0, TAU); g.fill(); } },
-    loco(g, t, o, p) { for (let k = 0; k < 15; k++) { const a = Math.PI + k * Math.PI / 14, mu = .2 * Math.sin(t * 3 + k * 1.3), l = 18 + 14 * azar(k + 9);
-      const b = [22 * Math.cos(a), -46 + 26 * Math.sin(a)], q = [b[0] + l * Math.cos(a + mu), b[1] + l * Math.sin(a + mu)];
+    loco(g, t, o, p) { for (let k = 0; k < 15; k++) { const a = Math.PI + k * Math.PI / 14, mu = .2 * Math.sin(t * 3 + k * 1.3), v = o.vf || 0, l = (18 + 14 * azar(k + 9)) * (1 + .6 * Math.abs(v));
+      const b = [22 * Math.cos(a), -46 + 26 * Math.sin(a)], q = [b[0] + l * Math.cos(a + mu) + v * l * (1 + .25 * Math.sin(t * 10 + k)), b[1] + l * Math.sin(a + mu)];
       g.beginPath(); g.moveTo(b[0] - 5, b[1]); g.quadraticCurveTo((b[0] + q[0]) / 2 + 6 * Math.sin(mu * 4), (b[1] + q[1]) / 2, q[0], q[1]); g.lineTo(b[0] + 5, b[1] + 2); g.fill(); } },
     mono(g, t, o, p, esp) { PELO_FRENTE.corto(g, t, o, p, esp); g.beginPath(); g.ellipse(0, -78, 12, 10, 0, 0, TAU); g.fill(); hueco(g, () => g.ellipse(0, -78, 5, 2.5, 0, 0, TAU)); },
     coleta(g, t, o, p, esp) { PELO_FRENTE.corto(g, t, o, p, esp); g.save(); g.translate(esp ? 0 : 22, -52); g.rotate(.15 * Math.sin(t * 2.2 + p.semilla)); g.beginPath(); g.moveTo(-4, 0); g.quadraticCurveTo(10, 20, 2, 44); g.quadraticCurveTo(-6, 20, 4, 0); g.fill(); g.restore(); },

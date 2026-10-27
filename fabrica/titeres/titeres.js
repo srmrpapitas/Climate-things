@@ -118,7 +118,7 @@ const T = (() => {
 
   function dibuja(g, ac, t, o) {
     if (o.vista !== 'perfil' && T.dibujaFrente) return T.dibujaFrente(g, ac, t, o);
-    const p = ac.p, A = p.alto, G = p.grueso, L1 = 80 * A, L2 = 78 * A, C = 150 * A;
+    const p = ac.p, A = p.alto, G = p.grueso, L1 = 80 * A * (p.piernas || 1), L2 = 78 * A * (p.piernas || 1), C = 150 * A * (p.piernas || 1);
     // pies: cada uno apoyado mientras el cuerpo avanza; en el aire, sube y adelanta
     const pies = [0, .5].map(d => {
       const u = ((o.fase + d) % 1 + 1) % 1;
@@ -167,26 +167,32 @@ const T = (() => {
     const w = 27 * G * A, bar = (p.barriga || 0) * 18 * A, lag = clamp(o.velAtras / 200, -1, 1);
     g.save(); g.translate(cad[0], cad[1]); g.rotate(inc); g.scale(1 + .012 * o.respira, 1 + .008 * o.respira);
     // tronco: espalda curva, pecho y barriga
-    g.beginPath(); g.moveTo(-w * .9, 4 * A);
-    g.bezierCurveTo(-w * 1.15, -largo * .45, -w * 1.05, -largo * .85, -w * .45, -largo - o.hombros);
-    g.lineTo(w * .45, -largo - o.hombros);
-    g.bezierCurveTo(w * 1.05 + bar * .3, -largo * .8, w * 1.05 + bar, -largo * .35, w * .9 + bar * .6, 4 * A); g.closePath(); g.fill();
+    const H = p.hombros || 1, Ci = p.cintura || 1;                    // hombros y pecho anchos, cintura estrecha (silueta heroica)
+    g.beginPath(); g.moveTo(-w * .9 * Ci, 4 * A);
+    g.bezierCurveTo(-w * 1.1 * Ci, -largo * .45, -w * 1.08 * H, -largo * .85, -w * .5 * H, -largo - o.hombros);
+    g.lineTo(w * .5 * H, -largo - o.hombros);
+    g.bezierCurveTo(w * 1.12 * H + bar * .3, -largo * .78, w * 1.0 * Ci + bar, -largo * .35, w * .9 * Ci + bar * .6, 4 * A); g.closePath(); g.fill();
     if (p.ropa === 'traje') {
       // chaqueta con faldones que se quedan atrás al andar
-      const fal = -.25 * lag - .03 * Math.sin(t * 1.7 + (p.semilla || 0));
+      const fal = -.25 * lag - .03 * Math.sin(t * 1.7 + (p.semilla || 0)) + o.vl * (.45 + .12 * Math.sin(t * 9 + (p.semilla || 0)));
       g.beginPath(); g.moveTo(-w * .95, -6 * A); g.lineTo(-w * 1.05 + Math.sin(fal) * 30, 30 * A); g.lineTo(-w * .2, 26 * A); g.lineTo(w * .3, 30 * A);
       g.lineTo(w * .95 + bar * .6 + Math.sin(fal) * 20, 26 * A); g.lineTo(w * .9 + bar * .6, -6 * A); g.closePath(); g.fill();
       hueco(g, () => { g.moveTo(w * .15, -largo + 4 * A); g.lineTo(w * .85, -largo + 6 * A); g.lineTo(w * .55, -largo * .55); g.closePath(); });   // camisa
-      g.beginPath(); g.moveTo(w * .5, -largo + 8 * A); g.lineTo(w * .62, -largo + 10 * A); g.lineTo(w * .62, -largo * .62); g.lineTo(w * .52, -largo * .56); g.fill();   // corbata
+      const cv = o.vl * 26 * A * (.7 + .3 * Math.sin(t * 11)), cy = -Math.abs(o.vl) * 10 * A;   // corbata: con viento se levanta y ondea
+      g.beginPath(); g.moveTo(w * .5, -largo + 8 * A); g.lineTo(w * .62, -largo + 10 * A); g.quadraticCurveTo(w * .62 + cv * .4, -largo * .75, w * .62 + cv, -largo * .62 + cy); g.lineTo(w * .52 + cv, -largo * .56 + cy); g.quadraticCurveTo(w * .52 + cv * .4, -largo * .72, w * .5, -largo + 8 * A); g.fill();   // corbata
       hueco(g, () => { for (let i = 0; i < 2; i++) circulo(g, w * .78 + bar * .4, -largo * (.42 - i * .16), 2 * A); });
       hueco(g, () => { g.moveTo(-w * .6, -largo * .5); g.lineTo(-w * .3, -largo * .52); g.lineTo(-w * .32, -largo * .48); g.closePath(); });   // bolsillo
     }
     if (p.ropa === 'tunica') {
       // túnica hasta los tobillos: el bajo sigue a las piernas, con encaje calado
       g.rotate(-inc); const xs = pies.map(q => q[0]), x0 = Math.min(...xs) - 18 * A, x1 = Math.max(...xs) + 22 * A, bajo = -cad[1] - 14 * A;
-      g.beginPath(); g.moveTo(-w * .95, -10 * A); g.lineTo(x0 - 12 * lag * 20, bajo);
-      for (let i = 0; i <= 8; i++) { const u = i / 8, x = mezcla(x0 - 12 * lag * 20, x1, u); g.lineTo(x, bajo + (i % 2 ? 7 * A : 0) + 3 * Math.sin(t * 3 + i)); }
-      g.lineTo(w * .95, -10 * A); g.closePath(); g.fill();
+      const vt = o.vl * 22 * A, xa = x0 - 12 * lag * 20 + vt, xb = x1 + vt * .7;
+      g.beginPath(); g.moveTo(-w * .95, -10 * A); g.quadraticCurveTo(xa - vt * .3, bajo * .55, xa, bajo);
+      for (let i = 0; i <= 8; i++) { const u = i / 8, x = mezcla(xa, xb, u); g.lineTo(x, bajo + (i % 2 ? 7 * A : 0) + 3 * Math.sin(t * 3 + i)); }
+      g.quadraticCurveTo(xb - vt * .2, bajo * .55, w * .95, -10 * A); g.closePath(); g.fill();
+      if (p.jirones) for (let i = 0; i < 16; i++) {                      // jirones del bajo que el viento agita
+        const u = (i + .5) / 16, x = mezcla(xa, xb, u), l = (12 + 26 * azar(i + 7)) * A, an = o.vl * .9 + .35 * Math.sin(t * 8 + i * 1.7) * (.3 + Math.abs(o.vl));
+        g.beginPath(); g.moveTo(x - 4 * A, bajo); g.lineTo(x + 4 * A, bajo); g.lineTo(x + Math.sin(an) * l, bajo + Math.cos(an) * l); g.closePath(); g.fill(); }
       hueco(g, () => { for (let i = 0; i < 7; i++) { const x = mezcla(x0, x1, (i + .5) / 7); circulo(g, x, bajo - 14 * A, 3 * A); } });
       hueco(g, () => { for (let i = 0; i < 5; i++) circulo(g, w * .7, -largo * (.85 - i * .17) - 4 * A * 0, 2.2 * A); });
       g.rotate(inc);
@@ -227,7 +233,7 @@ const T = (() => {
     else { g.quadraticCurveTo(18, 12, 12, 13); g.quadraticCurveTo(0, 12, -10, 5); }
     g.lineTo(-10, 5); g.closePath(); g.fill();
     if (p.barba === 'corta' || p.barba === 'larga') {
-      const lg = p.barba === 'larga' ? 26 : 9, ba = sw * (p.barba === 'larga' ? .25 : .05);
+      const lg = p.barba === 'larga' ? 26 : 9, ba = sw * (p.barba === 'larga' ? .25 : .05) + (o.vl || 0) * (p.barba === 'larga' ? .7 : .15);
       g.beginPath(); g.moveTo(-14, -6); g.lineTo(20, 2); g.quadraticCurveTo(22, 10, 16, 15 + lg * .3);
       for (let i = 0; i <= 5; i++) { const x = 14 - i * 6, y = 13 + lg * (1 - i / 6) + (i % 2 ? 4 : 0); g.lineTo(x + Math.sin(ba) * (y - 5), y); }
       g.lineTo(-16, 4); g.closePath(); g.fill();
@@ -269,12 +275,12 @@ const T = (() => {
       g.quadraticCurveTo(18, -64, 8, -60); g.quadraticCurveTo(-6, -56, -12, -44); g.lineTo(-16, -28); g.closePath(); g.fill();
       hueco(g, () => { g.moveTo(-14, -66); g.quadraticCurveTo(0, -74, 14, -70); g.quadraticCurveTo(0, -71, -14, -64); }); },
     entradas(g) { g.beginPath(); g.moveTo(-22, -24); g.bezierCurveTo(-34, -48, -24, -66, -6, -67); g.quadraticCurveTo(-4, -60, -10, -52); g.lineTo(-14, -40); g.lineTo(-16, -26); g.closePath(); g.fill(); },
-    loco(g, t, o, sw) { for (let i = 0; i < 12; i++) { const a = -2.9 + i * .25, mu = .22 * Math.sin(t * 3 + i * 1.3) + sw * .6 * Math.sin(i), l = 26 + 16 * azar(i + 9);
-      const b = [-2 + 22 * Math.cos(a), -40 + 26 * Math.sin(a)], q = [b[0] + l * Math.cos(a + mu), b[1] + l * Math.sin(a + mu)];
+    loco(g, t, o, sw) { for (let i = 0; i < 12; i++) { const a = -2.9 + i * .25, mu = .22 * Math.sin(t * 3 + i * 1.3) + sw * .6 * Math.sin(i), l = (26 + 16 * azar(i + 9)) * (1 + .5 * Math.abs(o.vl || 0));
+      const b = [-2 + 22 * Math.cos(a), -40 + 26 * Math.sin(a)], q = [b[0] + l * Math.cos(a + mu) + (o.vl || 0) * l * (.9 + .25 * Math.sin(t * 10 + i)), b[1] + l * Math.sin(a + mu)];
       g.beginPath(); g.moveTo(b[0] - 5, b[1]); g.quadraticCurveTo((b[0] + q[0]) / 2 + 8 * Math.sin(mu * 4), (b[1] + q[1]) / 2, q[0], q[1]); g.lineTo(b[0] + 6, b[1] + 2); g.fill(); } },
     mono(g, t, o, sw) { PELO.corto(g); g.save(); g.translate(-22, -58); g.rotate(sw * .3); g.beginPath(); g.ellipse(-6, 0, 13, 11, 0, 0, TAU); g.fill();
       hueco(g, () => g.ellipse(-6, 0, 5, 3, .4, 0, TAU)); g.restore(); },
-    coleta(g, t, o, sw) { PELO.corto(g); g.save(); g.translate(-24, -50); g.rotate(.5 + sw * .8 - .3 * clamp(o.vel / 150, -1, 1)); g.beginPath(); g.moveTo(-4, -5); g.quadraticCurveTo(-14, 20, -4, 44); g.quadraticCurveTo(8, 20, 6, -4); g.fill(); g.restore(); },
+    coleta(g, t, o, sw) { PELO.corto(g); g.save(); g.translate(-24, -50); g.rotate(.5 + sw * .8 - .3 * clamp(o.vel / 150, -1, 1) - (o.vl || 0) * 1.2); g.beginPath(); g.moveTo(-4, -5); g.quadraticCurveTo(-14, 20, -4, 44); g.quadraticCurveTo(8, 20, 6, -4); g.fill(); g.restore(); },
     calvo() {},
   };
   const SOMBREROS = {
@@ -311,7 +317,8 @@ const T = (() => {
   function escena(def, lienzo, fondo) {
     const g = lienzo.getContext('2d'), W = 1280, H = 720, S = lienzo.width / W, capa = document.createElement('canvas'); capa.width = lienzo.width; capa.height = lienzo.height;
     const K = capa.getContext('2d'), halo = document.createElement('canvas'), lejos = document.createElement('canvas');
-    halo.width = capa.width / 10; halo.height = capa.height / 10; lejos.width = capa.width / 3; lejos.height = capa.height / 3;
+    halo.width = capa.width / 10; halo.height = capa.height / 10;
+    const borde = document.createElement('canvas'); borde.width = capa.width; borde.height = capa.height; lejos.width = capa.width / 3; lejos.height = capa.height / 3;
     const cam = t => {                                                 // [x, y, zoom] interpolados entre las claves, más el pulso de la mano
       const c = def.camara || [[0, 640, 360, 1]]; let a = c[0], b = c[0], k = 0;
       for (let i = 0; i < c.length; i++) if (t >= c[i][0]) { a = c[i]; b = c[i + 1] || c[i]; k = b === a ? 0 : suave((t - a[0]) / (b[0] - a[0])); }
@@ -336,7 +343,9 @@ const T = (() => {
       // títeres, en su propia capa para que los calados dejen ver el pergamino
       K.setTransform(1, 0, 0, 1, 0, 0); K.clearRect(0, 0, capa.width, capa.height); K.setTransform(...matriz(1)); const luces = [];
       for (const ac of def.actores || []) {
-        const o = pose(ac, t); K.save(); K.translate(0, def.suelo || 600);
+        const o = pose(ac, t), racha = (def.viento || 0) * (1 + .3 * Math.sin(t * 2.7) + .15 * Math.sin(t * 6.1 + 1));
+        o.vf = -racha; o.vl = o.vista === 'perfil' ? -racha * Math.sign(o.f || 1) : -racha;
+        K.save(); K.translate(0, def.suelo || 600);
         K.globalAlpha = ac.p.tono ?? 1; dibuja(K, ac, t, o); K.restore();
         for (const l of o.luces || []) luces.push([o.x + l[0] * o.f * (ac.p.escala || 1), (def.suelo || 600) + l[1] * (ac.p.escala || 1)]);
       }
@@ -344,6 +353,11 @@ const T = (() => {
       if (def.contraluz !== 0) { const h = halo.getContext('2d'); h.globalCompositeOperation = 'copy'; h.drawImage(capa, 0, 0, halo.width, halo.height);
         h.globalCompositeOperation = 'source-in'; h.fillStyle = 'rgb(255,190,110)'; h.fillRect(0, 0, halo.width, halo.height);
         g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = (def.contraluz ?? .5) * luz; g.imageSmoothingQuality = 'high'; g.drawImage(halo, 0, 0, capa.width, capa.height); g.restore(); }
+      if (def.borde !== 0) {                                              // doble contraluz: borde frío por un lado y cálido por el otro
+        const r = borde.getContext('2d'), [c1, c2] = def.bordes || ['rgb(110,235,235)', 'rgb(255,178,96)'], d = 3.2 * S * z * (def.borde ?? 1);
+        for (const [col, dx] of [[c1, -d], [c2, d]]) { r.globalCompositeOperation = 'copy'; r.drawImage(capa, 0, 0); r.globalCompositeOperation = 'source-in'; r.fillStyle = col; r.fillRect(0, 0, borde.width, borde.height);
+          g.save(); g.globalAlpha = .85; g.drawImage(borde, dx, -d * .4); g.restore(); }
+      }
       g.drawImage(capa, 0, 0); capaCam(1);
       for (const d of def.delante || []) if (DECORADOS[d.tipo]) DECORADOS[d.tipo](g, t, d);
       g.globalCompositeOperation = 'lighter';

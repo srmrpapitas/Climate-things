@@ -35,6 +35,9 @@ fotos y moverlas. Todo es reutilizable: una escena nueva = combinar personajes, 
   (rojo = momento tenso, cielo rojo con siluetas negras).
 - `voces: [{ en, dura, quien, texto, archivo }]` (subtítulos con el nombre en dorado; el audio se mezcla al grabar si el archivo existe) y
   `carteles: [{ en, hasta, titulo, filas: [[texto, valor, color]], fuente }]` (datos reales con su fuente). Ejemplo: `escenas/sueldo.js`.
+- Por plano: `viento` (0–1: pelo, barba, corbatas, faldones y túnicas ondean a rachas), `borde` (doble contraluz turquesa/cálido;
+  `0` lo quita) y `bordes: [color1, color2]`.
+- Protagonistas estilizados a lo Samurai Jack (fichas con `piernas`, `hombros`, `cintura`, `jirones`).
 - `camara`: `[segundo, x, y, zoom]`. **Dos claves en el mismo segundo = corte de plano** (plano general → medio → primer plano → contraplano).
 
 ## Ideas de estilo (el usuario: «como un corto de Netflix»)
