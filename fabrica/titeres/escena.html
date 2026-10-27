@@ -1,0 +1,21 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Teatro de títeres</title>
+<style>html,body{margin:0;background:#000}canvas{display:block;width:1280px;height:720px}</style></head>
+<body><canvas id="c" width="1280" height="720"></canvas>
+<script src="titeres.js"></script><script src="personajes.js"></script><script src="decorados.js"></script>
+<script>
+// Reproductor: escena.html?e=NOMBRE carga escenas/NOMBRE.js (que define window.ESCENA) y la reproduce en bucle.
+// Para grabar: fabrica/titeres/grabar.mjs (llama a window.dibuja(t) fotograma a fotograma).
+const nombre = new URLSearchParams(location.search).get('e') || 'mitin';
+const fondo = new Image(); fondo.src = '../../historias/espanistan/sombras/pergamino.png';
+window.listo = new Promise(r => {
+  const s = document.createElement('script'); s.src = `escenas/${nombre}.js`;
+  s.onload = () => { const lienzo = document.getElementById('c');
+    lienzo.width = 1920; lienzo.height = 1080;   // se dibuja directamente a 1080p
+    window.dibuja = T.escena(window.ESCENA, lienzo, fondo);
+    window.DURA = ESCENA.dura; window.FPS = ESCENA.fps || 12;
+    const fin = () => { r(); let t0 = null; const vivo = ts => { if (t0 === null) t0 = ts; if (!window.grabando) window.dibuja(((ts - t0) / 1000) % ESCENA.dura); requestAnimationFrame(vivo); }; requestAnimationFrame(vivo); };
+    fondo.complete ? fin() : (fondo.onload = fondo.onerror = fin); };
+  document.head.appendChild(s);
+});
+</script></body></html>
