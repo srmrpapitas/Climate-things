@@ -1,5 +1,11 @@
 # Retomar Españistán (leer al abrir una sesión nueva)
 
+**28-10-2026 (noche): EP. 4 EN MARCHA → leer primero `fabrica/titeres/CAPITULO-04-PLANOS.md` (plan, estado y siguiente paso).**
+- Guion aprobado: `historias/espanistan/04-bipartidismo.md` («Las dos familias»), narrador `fabrica/herramientas/guion_espanistan-04-8min.tsv`, personajes `guion_espanistan-04-personajes.txt`.
+- Animadas 4 de 11 secuencias con tiempos ESTIMADOS (aún sin voz). Rama `claude/espanistan-ep04`, sin commit.
+
+**28-10-2026: difusión del ep. 3 en curso** (shorts en YouTube hechos; falta X) → `fabrica/manual/DIFUSION-EP03.md`.
+
 **Estado a 27-10-2026: ep. 3 terminado** (Acascar y Vox, 10 min, HD en `videos/espanistan-03/`). Rama con todo: `claude/new-session-k0kf29`.
 **Siguiente: ep. 4, el bipartidismo** → seguir `CAPITULO-SIGUIENTE.md` (procedimiento al día). Lo de abajo es el historial del ep. 2.
 

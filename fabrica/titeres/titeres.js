@@ -101,6 +101,24 @@ const T = (() => {
         brazo(o, 'cerca', 2.15 + .55 * Math.sin(c), -.35 - .35 * Math.sin(c), 'agarra', w2, .3); brazo(o, 'lejos', 2.15 - .55 * Math.sin(c), -.35 + .35 * Math.sin(c), 'agarra', w2, .3);
         o.cabeza -= .35 * w2; o.cejas -= .5 * w2; o.boca = Math.max(o.boca, .25 * w2 * (Math.sin(c) > .6)); }
     }
+    if (a.hace === 'brinca' && t >= a.en - .3) {                       // salto grande hasta (x + dx, dy): se agacha, vuela encogido en parábola y cae con peso; allí se queda
+      const vuelo = (a.hasta ?? a.en + .8) - a.en, u = t - a.en, k = clamp(u / vuelo), alto = a.alto ?? 120, dx = a.dx || 0, dy = a.dy || 0;
+      o.x += dx * k; o.dy += dy * k - 4 * alto * k * (1 - k);
+      if (u < 0) { const p = Math.sin(Math.PI / 2 * clamp((u + .3) / .3)); o.agacha = Math.max(o.agacha, .55 * p); o.inclina += .25 * p; o.aplasta = 1 - .1 * p;
+        brazo(o, 'cerca', -.7, .5, 'abierta', p); brazo(o, 'lejos', -.8, .4, 'abierta', p); o.cejas -= .5 * p; }
+      else if (k < 1) { const e = Math.sin(Math.PI * k); o.agacha = Math.max(o.agacha, .4 * e); o.inclina += .12 * e; o.aplasta = 1 + .08 * (1 - k) * (k < .3);
+        brazo(o, 'cerca', mezcla(2.7, 1.3, k), .3, 'abierta', 1); brazo(o, 'lejos', mezcla(2.5, 1.1, k), .4, 'abierta', 1); o.cabeza -= .1; o.cejas -= .4; }
+      else if (u < vuelo + .35) { const c = Math.sin(Math.PI * (u - vuelo) / .35); o.agacha = Math.max(o.agacha, .5 * c); o.aplasta = 1 - .1 * c * (u - vuelo < .12); o.inclina += .18 * c;
+        brazo(o, 'cerca', 1.1, .5, 'abierta', c); brazo(o, 'lejos', .9, .6, 'abierta', c); }
+    }
+    if (a.hace === 'cuelga' && t >= a.en && t < (a.hasta ?? 1e9)) {     // colgado de una mano (la de atrás); la de la espada, suelta. `campana`: sigue su vaivén; `tirones`: tira hacia abajo
+      const u = t - a.en, w2 = clamp(u / .15) * clamp(((a.hasta ?? 1e9) - t) / .15);
+      const baja = tironCuerda(t, a.tirones);
+      if (a.campana) { const [ang, largo] = [vaivenCampana(t, a.campana), a.largo ?? 260]; o.x -= largo * Math.sin(ang); o.dy -= largo * (1 - Math.cos(ang)); o.inclina += .5 * ang; }   // la campana gira a derechas: la cuerda se va a la izquierda
+      o.dy += baja; o.x += 4 * Math.sin(u * 2.2);
+      brazo(o, 'lejos', 2.92, .1, 'agarra', w2); brazo(o, 'cerca', 1.05 + .15 * Math.sin(u * 2.2 + 1), .45, 'puno', w2);
+      o.agacha = Math.max(o.agacha, (.12 + .06 * Math.sin(u * 2.2 + 2)) * w2); o.cabeza -= .22 * w2; o.dorsal -= .06 * w2; o.cejas -= .5 * w2;
+    }
     if (a.hace === 'apunala' && t > a.en - .5 && t < (a.hasta ?? a.en + 1.5)) {             // puñalada: arma arriba y atrás, golpe seco, aguanta y suelta
       const u2 = t - a.en, sal = rampa(t, (a.hasta ?? a.en + 1.5) - .4, a.hasta ?? a.en + 1.5); let h, c, m, d;
       if (u2 < 0) { const k = suave((u2 + .5) / .5); h = mezcla(.4, 3.0, k); c = mezcla(.3, 1.2, k); m = mezcla(0, .6, k); d = -.2 * k; o.inclina -= .08 * k; o.agacha = Math.max(o.agacha, .1 * k); }
@@ -476,7 +494,7 @@ const T = (() => {
     lupa(g, mu, ang, t, o, A) { g.save(); g.translate(mu[0], mu[1]); g.rotate(-ang); g.fillRect(-3 * A, 8 * A, 6 * A, 26 * A); g.beginPath(); circulo(g, 0, 50 * A, 17 * A); g.fill();
       hueco(g, () => circulo(g, 0, 50 * A, 12 * A)); g.restore(); },
     bandera(g, mu, ang, t, o, A) { g.save(); g.translate(mu[0], mu[1]); g.rotate(-ang); g.fillRect(-2.5 * A, -40 * A, 5 * A, 150 * A); g.restore();
-      const top = [mu[0] - 40 * A * Math.sin(ang) * 0, mu[1]]; DECORADO_TELA(g, mu[0], mu[1] + 30 * A * 0 - 0, 70 * A, 44 * A, t, -1); },
+      const top = [mu[0] + 106 * A * Math.sin(ang), mu[1] + 106 * A * Math.cos(ang)]; DECORADO_TELA(g, top[0], top[1], 92 * A, 58 * A, t, -1); },   // la tela, en la punta del mástil
     baston(g, mu, ang, t, o, A) { g.lineWidth = 5 * A; g.beginPath(); g.moveTo(mu[0], mu[1] + 8 * A); g.lineTo(mu[0] + 6 * A, -2); g.stroke(); },
     papel(g, mu, ang, t, o, A) { g.save(); g.translate(mu[0], mu[1]); g.rotate(-ang + .3); g.fillRect(-14 * A, 10 * A, 28 * A, 36 * A); hueco(g, () => { for (let i = 0; i < 4; i++) g.rect(-9 * A, (16 + i * 7) * A, 18 * A, 2 * A); }); g.restore(); },
   };
@@ -502,7 +520,7 @@ const T = (() => {
       return [mezcla(a[1], b[1], k) + pulso * (4 * Math.sin(t * .37) + 2 * Math.sin(t * 1.1)), mezcla(a[2], b[2], k) + pulso * 3 * Math.sin(t * .29), mezcla(a[3], b[3], k)];
     };
     const pinta = function (t) {
-      t = Math.floor(t * (def.fps || 12) + 1e-6) / (def.fps || 12);  // animación «a doses»: 12 dibujos por segundo
+      t = Math.floor(t * (def.fps || 30) + 1e-6) / (def.fps || 30);  // 30 dibujos por segundo (el usuario quiere 30 fps en todo el capítulo)
       ANGULOSO = !!def.jack;
       const [cx, cy, z] = cam(t), luz = .88 + .05 * Math.sin(t * 5.3) + .04 * Math.sin(t * 11.7 + 1);
       g.setTransform(S, 0, 0, S, 0, 0); g.fillStyle = '#000'; g.fillRect(0, 0, W, H);
@@ -513,7 +531,8 @@ const T = (() => {
       const lg = lejos.getContext('2d'); let hayLejos = false;
       const vuelca = () => { if (!hayLejos) return; g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingQuality = 'high'; g.drawImage(lejos, 0, 0, lienzo.width, lienzo.height); g.restore(); lg.setTransform(1, 0, 0, 1, 0, 0); lg.clearRect(0, 0, lejos.width, lejos.height); hayLejos = false; };
       lg.setTransform(1, 0, 0, 1, 0, 0); lg.clearRect(0, 0, lejos.width, lejos.height);
-      for (const d of def.decorado || []) { const p = d.par ?? 1; if (!DECORADOS[d.tipo]) continue;
+      const visible = d => (d.desde == null || t >= d.desde) && (d.hasta == null || t < d.hasta);   // un decorado puede aparecer (desde) o irse (hasta)
+      for (const d of def.decorado || []) { const p = d.par ?? 1; if (!DECORADOS[d.tipo] || !visible(d)) continue;
         if (p < .6) { const m = matriz(p), f = lejos.width / lienzo.width; lg.setTransform(m[0] * f, 0, 0, m[3] * f, m[4] * f, m[5] * f); DECORADOS[d.tipo](lg, t, d); hayLejos = true; }
         else { vuelca(); capaCam(p); DECORADOS[d.tipo](g, t, d); } }
       vuelca(); capaCam(1);
@@ -546,7 +565,7 @@ const T = (() => {
         r.globalCompositeOperation = 'destination-in'; r.drawImage(capa, 0, 0); r.globalCompositeOperation = 'source-over'; g.drawImage(borde, 0, 0);
       }
       capaCam(1);
-      for (const d of def.delante || []) if (DECORADOS[d.tipo]) DECORADOS[d.tipo](g, t, d);
+      for (const d of def.delante || []) if (DECORADOS[d.tipo] && visible(d)) DECORADOS[d.tipo](g, t, d);
       g.globalCompositeOperation = 'lighter';
       for (const [lx, ly] of luces.concat((def.luces || []).map(l => [l[0], l[1]]))) {
         const gr = g.createRadialGradient(lx, ly, 2, lx, ly, 130); gr.addColorStop(0, `rgba(255,200,110,${.5 * luz})`); gr.addColorStop(1, 'rgba(255,170,80,0)');
@@ -557,8 +576,8 @@ const T = (() => {
       if (hayImpacto) { g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'difference'; g.fillStyle = '#fff'; g.fillRect(0, 0, lienzo.width, lienzo.height); g.restore(); }   // fotograma de impacto: la imagen se invierte
       g.setTransform(S, 0, 0, S, 0, 0);
       pinta.colores = colores;
-      for (let i = 0; i < 260; i++) { const r = azar(i * 7 + Math.floor(t * 24) * 131); g.fillStyle = r < .5 ? 'rgba(255,240,210,.05)' : 'rgba(0,0,0,.07)';
-        g.fillRect(azar(i * 3 + Math.floor(t * 24)) * W, azar(i * 5 + 1 + Math.floor(t * 24)) * H, 1.5 + 2 * r, 1.5 + 2 * r); }
+      for (let i = 0; i < 260; i++) { const r = azar(i * 7 + Math.floor(t * 30) * 131); g.fillStyle = r < .5 ? 'rgba(255,240,210,.05)' : 'rgba(0,0,0,.07)';
+        g.fillRect(azar(i * 3 + Math.floor(t * 30)) * W, azar(i * 5 + 1 + Math.floor(t * 30)) * H, 1.5 + 2 * r, 1.5 + 2 * r); }
       g.fillStyle = `rgba(0,0,0,${.03 + .03 * azar(Math.floor(t * 12))})`; g.fillRect(0, 0, W, H);
       const v = g.createRadialGradient(640, 380, 300, 640, 380, 820); v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,.72)'); g.fillStyle = v; g.fillRect(0, 0, W, H);
     };
@@ -589,10 +608,12 @@ const T = (() => {
     g.fillStyle = '#7d726a'; g.beginPath(); g.arc(19.5, -5.5, 1.2, 0, TAU); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.arc(19.9, -5.9, .45, 0, TAU); g.fill();   // ojo
     ala(false); g.restore();
   }
+  // valor de una curva [[segundo, valor], …] en t (lineal entre claves; antes de la primera y después de la última, se queda)
+  const curva = (cl, t) => { if (t <= cl[0][0]) return cl[0][1]; for (let i = 1; i < cl.length; i++) if (t < cl[i][0]) return mezcla(cl[i - 1][1], cl[i][1], (t - cl[i - 1][0]) / (cl[i][0] - cl[i - 1][0])); return cl[cl.length - 1][1]; };
   function PARTICULAS(g, t, def) {
     const lista = [{ tipo: 'polvo', n: 45 }].concat(def.particulas || []);
     for (const q of lista) {
-      const e = clamp((t - (q.en ?? -9)) / (q.sube || 1)) * clamp(((q.hasta ?? 1e9) - t) / .6); if (e <= 0) continue;
+      const e = clamp((t - (q.en ?? -9)) / (q.sube || 1)) * clamp(((q.hasta ?? 1e9) - t) / .6) * (q.fuerza ? curva(q.fuerza, t) : 1); if (e <= 0) continue;
       const [x0, y0, x1, y1] = q.zona || [0, 0, 1280, 720], zw = x1 - x0, zh = y1 - y0, n = Math.round((q.n || 40) * e);
       for (let i = 0; i < n; i++) {
         const r1 = azar(i + 1), r2 = azar(i + 101), r3 = azar(i + 201);
@@ -607,11 +628,32 @@ const T = (() => {
           const s = q.tipo === 'papeles' ? 12 : 5; g.fillRect(-s, -s * 1.3, 2 * s, 2.6 * s); g.restore(); }
         if (q.tipo === 'estrellas') { const b = .35 + .65 * Math.abs(Math.sin(t * (1 + r3) + i * 3)); g.fillStyle = r3 < .3 ? `rgba(140,240,240,${b})` : `rgba(255,240,210,${b})`;
           g.beginPath(); g.arc(x0 + r1 * zw, y0 + r2 * zh, .8 + 1.4 * r3, 0, TAU); g.fill(); }
+        if (q.tipo === 'lluvia') { const vida = .55 + .35 * r3, u = ((t + r1 * vida) % vida) / vida, cerca = .5 + r3, x = x0 + r2 * zw + (q.viento ?? 140) * u, y = y0 - 40 + u * (zh + 40);
+          g.strokeStyle = `rgba(${q.color || '210,225,240'},${(.18 + .3 * r3) * Math.min(1, e + .3)})`; g.lineWidth = .8 * cerca; g.beginPath(); g.moveTo(x, y); g.lineTo(x - .06 * (q.viento ?? 140) * cerca, y - 26 * cerca); g.stroke();
+          if (u > .9 && r1 < .35) { const k = (u - .9) * 10; g.strokeStyle = `rgba(${q.color || '210,225,240'},${.4 * (1 - k)})`; g.beginPath(); g.ellipse(x, y1 - 4 * r2, 4 + 8 * k, 1.5 + 2 * k, 0, Math.PI, 0); g.stroke(); } }
         if (q.tipo === 'hojas') { const vida = 5 + 3 * r3, u = ((t + r1 * vida) % vida) / vida, x = x0 + u * zw, y = y0 + r2 * zh + 40 * Math.sin(u * 7 + i);
           g.save(); g.translate(x, y); g.rotate(t * 3 + i); g.fillStyle = NEGRO; g.beginPath(); g.ellipse(0, 0, 7, 3, 0, 0, TAU); g.fill(); g.restore(); }
       }
     }
   }
   const DECORADOS = {};
-  return { cuervo, escena, pose, pintaColores, enColor, mascara, DECORADOS, OBJETOS, PELO, SOMBREROS, tela: DECORADO_TELA, azar, ruido, suave, clamp, mezcla, rebote, peso, ik, miembro, hueco, circulo, dir, NEGRO, TAU };
+  // ángulo de una campana que se toca en d.toca = [segundos]: cada toque la lanza y se calma sola (lo usan la campana y quien cuelga de ella)
+  const vaivenCampana = (t, d) => { let a = .015 * Math.sin(t * 1.3); for (const p of d.toca || []) { const v = t - p; if (v > 0) a += .32 * Math.exp(-v * 1.1) * Math.sin(v * 6.5); } return a; };
+  // cuánto baja la cuerda (y quien cuelga de ella) con cada tirón de `tirones`: tira seco y rebota
+  const tironCuerda = (t, tirones) => { let b = 0; for (const p of tirones || []) { const v = t - p; if (v > 0 && v < 1.6) b += v < .14 ? 30 * v / .14 : 30 * Math.exp(-(v - .14) * 5) * Math.cos((v - .14) * 13); } return b; };
+  // el audio de una escena del capítulo, en orden (window.TIEMPOS, de tiempos.py): números = bloques del narrador, 'f1'… = frases de Acascar,
+  // { espera: s } = silencio. Devuelve { voces, en: { b5, f1, … }, fin }. El narrador va sin subtítulo; los personajes, con el suyo.
+  function guion(lista, { desde = .8, pausa = .45, pausaFrase = .7 } = {}) {
+    const TI = window.TIEMPOS; if (!TI) throw new Error('falta escenas/tiempos.js: python3 fabrica/titeres/tiempos.py');
+    let t = desde; const voces = [], en = {};
+    for (const x of lista) {
+      if (x && x.espera != null) { t += x.espera; continue; }
+      if (typeof x === 'number') { const d = TI.b[x]; if (d == null) throw new Error('no hay audio del bloque ' + x);
+        en['b' + x] = t; (TI.s[x] || []).forEach((o, j) => { en[`b${x}.${j + 1}`] = t + o; });
+        voces.push({ en: t, dura: d, quien: 'narrador', texto: '', sinSub: true, archivo: `${TI.voz}b${String(x).padStart(2, '0')}.mp3` }); t += d + pausa; }
+      else { const [archivo, d, texto, quien = 'Acascar'] = TI.f[x]; t += pausaFrase - pausa; en[x] = t; voces.push({ en: t, dura: d, quien, texto, archivo }); t += d + pausaFrase; }
+    }
+    return { voces, en, fin: t + .4 };
+  }
+  return { curva, guion, tironCuerda, vaivenCampana, cuervo, escena, pose, pintaColores, enColor, mascara, DECORADOS, OBJETOS, PELO, SOMBREROS, tela: DECORADO_TELA, azar, ruido, suave, clamp, mezcla, rebote, peso, ik, miembro, hueco, circulo, dir, NEGRO, TAU };
 })();

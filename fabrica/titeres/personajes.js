@@ -15,9 +15,15 @@ const PERSONAJES = {
   acascar: { rostro: 'anguloso', ropa: 'traje', pelo: 'corto', barba: 'corta', nariz: 1, narizForma: 'recta', menton: 'marcado', alto: 1.08, grueso: 1.1, piernas: 1.12, hombros: 1.22, cintura: .8, semilla: 7 },
   sanchis: { rostro: 'anguloso', ropa: 'traje', pelo: 'peinado', nariz: 1.05, narizForma: 'recta', menton: 'marcado', alto: 1.16, grueso: 1, piernas: 1.15, hombros: 1.15, cintura: .82, semilla: 11 },
   feijolo: { ropa: 'traje', pelo: 'entradas', nariz: 1.1, narizForma: 'gruesa', menton: 'doble', arrugas: .6, alto: 1.02, grueso: 1.05, barriga: .4, piernas: 1.06, hombros: 1.1, cintura: .95, semilla: 13 },
+  // la Condesa: la presidenta autonómica que lo nombró en Madrid (ep. 3)
+  condesa: { ropa: 'vestido', pelo: 'mono', nariz: 1.15, narizForma: 'aguilena', menton: 'redondo', arrugas: .5, alto: .98, grueso: .95, collar: true, semilla: 17 },
   // el Vendehúmos: político genérico (no es nadie real) con la máscara de las promesas
   vendehumos: { ropa: 'traje', pelo: 'peinado', sombrero: 'chistera', barba: 'bigote', nariz: 1.2, narizForma: 'respingona', menton: 'doble', alto: 1.04, grueso: 1.15,
                 barriga: .7, piernas: 1.05, hombros: 1.05, mascara: 'PROMESAS', semilla: 31 },
+  // ep. 4 (nombres de sátira aprobados el 28-10-2026): los de la Transición y la noria
+  suavez:   { rostro: 'anguloso', ropa: 'traje', pelo: 'peinado', nariz: 1.05, narizForma: 'recta', menton: 'marcado', alto: 1.1, grueso: .95, piernas: 1.14, hombros: 1.12, cintura: .82, objeto: 'papel', semilla: 41 },
+  fragata:  { ropa: 'traje', pelo: 'entradas', nariz: 1.25, narizForma: 'gruesa', menton: 'doble', arrugas: .7, alto: 1.02, grueso: 1.25, barriga: .6, piernas: 1.02, hombros: 1.2, cintura: 1, semilla: 43 },
+  felipon:  { ropa: 'traje', pelo: 'peinado', nariz: 1.15, narizForma: 'recta', menton: 'redondo', arrugas: .2, alto: 1.06, grueso: 1.02, piernas: 1.1, hombros: 1.12, cintura: .9, semilla: 47 },
 };
 // gente del pueblo: variaciones deterministas (la misma n da siempre la misma persona)
 function ciudadano(n, extra = {}) {

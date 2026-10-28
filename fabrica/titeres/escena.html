@@ -100,12 +100,16 @@ function titulos(g, t) {
 }
 // subtítulos de las voces (ESCENA.voces: {en, dura, quien, texto, archivo}); el nombre del personaje en dorado
 function subtitulos(g, t) {
-  const v = (ESCENA.voces || []).find(v => t >= v.en && t < v.en + v.dura + .25); if (!v) return;
+  const v = (ESCENA.voces || []).find(v => !v.sinSub && t >= v.en && t < v.en + v.dura + .25); if (!v) return;   // el narrador va sin subtítulo (sinSub)
   const a = Math.min(1, (t - v.en) / .2, (v.en + v.dura + .25 - t) / .2);
   g.save(); g.globalAlpha = a; g.font = '600 30px Georgia, serif'; g.textAlign = 'center';
-  const nombre = v.quien && v.quien !== 'narrador' ? v.quien.toUpperCase() + ':  ' : '', txt = nombre + v.texto, w = g.measureText(txt).width;
-  g.fillStyle = 'rgba(10,6,3,.62)'; g.fillRect(640 - w / 2 - 22, 636, w + 44, 48);
-  g.fillStyle = v.quien && v.quien !== 'narrador' ? '#f2c14e' : '#f4ead2'; g.font = (nombre ? 'italic ' : '') + '600 30px Georgia, serif'; g.fillText(txt, 640, 670); g.restore();
+  const nombre = v.quien && v.quien !== 'narrador' ? v.quien.toUpperCase() + ':  ' : '', txt = nombre + v.texto;
+  g.font = (nombre ? 'italic ' : '') + '600 30px Georgia, serif';
+  let lineas = [txt];                                                   // si no cabe, en dos líneas partidas por el espacio más cercano al centro
+  if (g.measureText(txt).width > 1120) { const esp = [...txt.matchAll(/ /g)].map(m => m.index), c = esp.reduce((a, b) => Math.abs(b - txt.length / 2) < Math.abs(a - txt.length / 2) ? b : a); lineas = [txt.slice(0, c), txt.slice(c + 1)]; }
+  const w = Math.max(...lineas.map(l => g.measureText(l).width)), y0 = 684 - 42 * lineas.length;
+  g.fillStyle = 'rgba(10,6,3,.62)'; g.fillRect(640 - w / 2 - 22, y0, w + 44, 42 * lineas.length + 6);
+  g.fillStyle = v.quien && v.quien !== 'narrador' ? '#f2c14e' : '#f4ead2'; lineas.forEach((l, i) => g.fillText(l, 640, y0 + 32 + 42 * i)); g.restore();
 }
 // carteles con datos (ESCENA.carteles: {en, hasta, titulo, filas: [[texto, valor, color]], fuente}), en papel viejo
 function carteles(g, t) {
@@ -115,13 +119,17 @@ function carteles(g, t) {
     g.save(); g.globalAlpha = a; g.translate(x + w / 2, y + h / 2); g.rotate(-.012); g.scale(.92 + .08 * Math.min(1, (t - c.en) / .35), .92 + .08 * Math.min(1, (t - c.en) / .35)); g.translate(-w / 2, -h / 2);
     g.fillStyle = 'rgba(0,0,0,.35)'; g.fillRect(8, 10, w, h); g.fillStyle = '#efe0bd'; g.fillRect(0, 0, w, h); g.strokeStyle = '#3a2410'; g.lineWidth = 3; g.strokeRect(8, 8, w - 16, h - 16);
     g.fillStyle = '#2a1708'; g.font = '700 26px Georgia, serif'; g.fillText(c.titulo, 28, 48);
-    c.filas.forEach(([txt, val, col], i) => { const ti = c.en + .5 + i * (c.paso ?? .9); if (t < ti) return; const k = Math.min(1, (t - ti) / .3);
+    c.filas.forEach(([txt, val, col], i) => { const ti = c.tiempos ? c.tiempos[i] : c.en + .5 + i * (c.paso ?? .9); if (t < ti) return;   // c.tiempos: cada fila cuando la dice la voz
+      const k = Math.min(1, (t - ti) / .3);
       g.globalAlpha = a * k; g.font = '500 22px Georgia, serif'; g.fillStyle = '#2a1708'; g.fillText(txt, 28, 96 + i * 64);
-      g.font = '700 34px Georgia, serif'; g.fillStyle = col || '#7a1d0c'; g.textAlign = 'right'; g.fillText(val, w - 28, 100 + i * 64); g.textAlign = 'left'; });
+      const libre = w - 76 - g.measureText(txt).width; g.font = '700 34px Georgia, serif'; const tam = Math.max(18, Math.min(34, 34 * libre / Math.max(1, g.measureText(val).width)));   // el valor encoge si no cabe
+      g.font = `700 ${tam.toFixed(1)}px Georgia, serif`; g.fillStyle = col || '#7a1d0c'; g.textAlign = 'right'; g.fillText(val, w - 28, 100 + i * 64); g.textAlign = 'left'; });
     g.globalAlpha = a; g.font = 'italic 16px Georgia, serif'; g.fillStyle = '#5b4126'; g.fillText('Fuente: ' + c.fuente, 28, h - 20); g.restore();
   }
 }
 window.listo = new Promise(r => {
+  // primero los tiempos del audio del capítulo (escenas/tiempos.js; las escenas «04-…» usan tiempos-04.js) y luego la escena
+  const tiempos = document.createElement('script'); tiempos.src = /^\d\d-/.test(nombre) ? `escenas/tiempos-${nombre.slice(0, 2)}.js` : 'escenas/tiempos.js'; tiempos.onload = tiempos.onerror = () => document.head.appendChild(s); document.head.appendChild(tiempos);
   const s = document.createElement('script'); s.src = `escenas/${nombre}.js`;
   s.onload = () => { const lienzo = document.getElementById('c');
     lienzo.width = 1920; lienzo.height = 1080;   // se dibuja directamente a 1080p
@@ -129,12 +137,13 @@ window.listo = new Promise(r => {
     // cada plano se puede pintar en el lienzo o en uno auxiliar (para las transiciones de viento)
     const aux = document.createElement('canvas'); aux.width = lienzo.width; aux.height = lienzo.height;
     const planos = (ESCENA.planos || [ESCENA]).map(pl => { const d = Object.assign({ fps: ESCENA.fps, suelo: ESCENA.suelo }, pl);
-      return { desde: pl.desde ?? 0, def: pl, pinta: T.escena(d, lienzo, fondo), pintaAux: T.escena(d, aux, fondo) }; });
+      return { desde: pl.desde ?? 0, def: pl, pinta: T.escena(d, lienzo, fondo), pintaAux: T.escena(d, aux, fondo),
+        paneles: (pl.paneles || []).map(p => Object.assign({}, p, { pinta: T.escena(Object.assign({}, d, p), aux, fondo) })) }; });
     const g = lienzo.getContext('2d');
     const tinte = (c, pl) => { if (!pl.def.tinte) return; const x = c.getContext('2d'); x.save(); x.setTransform(1, 0, 0, 1, 0, 0);
       x.globalCompositeOperation = 'multiply'; x.fillStyle = TINTES[pl.def.tinte] || pl.def.tinte; x.fillRect(0, 0, c.width, c.height); x.restore(); };
     window.dibuja = t => {
-      t = Math.floor(t * (ESCENA.fps || 12) + 1e-6) / (ESCENA.fps || 12);
+      t = Math.floor(t * (ESCENA.fps || 30) + 1e-6) / (ESCENA.fps || 30);
       let i = 0; planos.forEach((q, k) => { if (t >= q.desde) i = k; });
       const sig = planos[i + 1], viene = sig && TRANS[sig.def.transicion] && t >= sig.desde - .5;
       const actual = planos[i], fue = TRANS[actual.def.transicion] && t < actual.desde + .4 && i > 0;
@@ -143,11 +152,22 @@ window.listo = new Promise(r => {
         a.pinta(t); tinte(lienzo, a); T.pintaColores(g, a.pinta.colores, t); b.pintaAux(t); tinte(aux, b); T.pintaColores(aux.getContext('2d'), b.pintaAux.colores, t);
         const k = Math.min(1, Math.max(0, (t - (t0 - .5)) / .9));
         TRANS[b.def.transicion](g, t, k, camino => { g.save(); g.setTransform(1.5, 0, 0, 1.5, 0, 0); g.beginPath(); camino(); g.clip(); g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(aux, 0, 0); g.restore(); g.setTransform(1.5, 0, 0, 1.5, 0, 0); });
-      } else { actual.pinta(t); tinte(lienzo, actual); T.pintaColores(g, actual.pinta.colores, t); }
+      } else { actual.pinta(t); tinte(lienzo, actual); T.pintaColores(g, actual.pinta.colores, t); paneles(actual, t); }
+      franjas(actual, planos[i - 1], t);
       g.setTransform(1.5, 0, 0, 1.5, 0, 0); carteles(g, t); titulos(g, t); subtitulos(g, t); };
-    window.DURA = ESCENA.dura; window.FPS = ESCENA.fps || 12;
+    // pantalla partida a lo Samurai Jack (plano.paneles: [{ en, rect: [x, y, w, h], entra: 'izq'|'der'|'arriba'|'abajo', camara, decorado?, actores? }]):
+    // cada panel es otro plano (hereda el decorado y el reparto) que entra deslizándose y se queda; entre ellos, rendijas negras
+    const paneles = (pl, t) => { for (const p of pl.paneles) { if (t < p.en) continue;
+      const k = T.suave((t - p.en) / .28), [x, y, w, h] = p.rect, lejos = { izq: [-(x + w), 0], der: [1280 - x, 0], arriba: [0, -(y + h)], abajo: [0, 720 - y] }[p.entra || 'izq'];
+      const dx = lejos[0] * (1 - k), dy = lejos[1] * (1 - k);
+      p.pinta(t); tinte(aux, { def: { tinte: p.tinte ?? pl.def.tinte } }); T.pintaColores(aux.getContext('2d'), p.pinta.colores, t);
+      g.save(); g.setTransform(1.5, 0, 0, 1.5, 0, 0); g.fillStyle = '#0b0705'; g.fillRect(x + dx - 7, y + dy - 7, w + 14, h + 14);
+      g.beginPath(); g.rect(x + dx, y + dy, w, h); g.clip(); g.setTransform(1, 0, 0, 1, 1.5 * (x + dx + w / 2 - 640), 1.5 * (y + dy + h / 2 - 360)); g.drawImage(aux, 0, 0); g.restore(); } };
+    // franjas de cine (plano.franjas: true): bandas negras arriba y abajo; entran deslizándose si el plano anterior no las tenía
+    const franjas = (pl, antes, t) => { if (!pl.def.franjas) return; const k = antes && antes.def.franjas ? 1 : T.suave((t - pl.desde) / .45), alto = 88 * k;
+      g.save(); g.setTransform(1.5, 0, 0, 1.5, 0, 0); g.fillStyle = '#000'; g.fillRect(0, 0, 1280, alto); g.fillRect(0, 720 - alto, 1280, alto); g.restore(); };
+    window.DURA = ESCENA.dura; window.FPS = ESCENA.fps || 30;
     const fin = () => { r(); let t0 = null; const vivo = ts => { if (t0 === null) t0 = ts; if (!window.grabando) window.dibuja(((ts - t0) / 1000) % ESCENA.dura); requestAnimationFrame(vivo); }; requestAnimationFrame(vivo); };
     fondo.complete ? fin() : (fondo.onload = fondo.onerror = fin); };
-  document.head.appendChild(s);
 });
 </script></body></html>
