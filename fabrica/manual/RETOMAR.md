@@ -1,8 +1,18 @@
 # Retomar Españistán (leer al abrir una sesión nueva)
 
-**28-10-2026 (noche): EP. 4 EN MARCHA → leer primero `fabrica/titeres/CAPITULO-04-PLANOS.md` (plan, estado y siguiente paso).**
-- Guion aprobado: `historias/espanistan/04-bipartidismo.md` («Las dos familias»), narrador `fabrica/herramientas/guion_espanistan-04-8min.tsv`, personajes `guion_espanistan-04-personajes.txt`.
-- Animadas 4 de 11 secuencias con tiempos ESTIMADOS (aún sin voz). Rama `claude/espanistan-ep04`, sin commit.
+## ▶ AHORA (28-10-2026, 18:30): ep. 4 TERMINADO y PROGRAMADO en YouTube
+- **Ep. 4 «Las dos familias»** (PP y PSOE, 8 min 25 s) programado como público el **viernes 30-10-2026 a las 19:00**: https://youtu.be/VR17iwWJPzs
+  Vídeo y miniatura en `~/Desktop/Espanistan-04/`. Textos aprobados y estado: `fabrica/manual/DIFUSION-EP04.md`. Cómo se hizo: `fabrica/titeres/CAPITULO-04-PLANOS.md` («Hecho»).
+- Git: rama `claude/espanistan-ep04`, commit `f5f351d` (solo local, sin push). Quedan sin commit cambios viejos del ep. 3 y otros (no son de esta tarea: preguntar antes de tocarlos).
+- **Siguiente, por orden (preguntar al usuario cuál quiere):**
+  1. Antes del viernes 19:00: en YouTube Studio, mirar que las comprobaciones del vídeo salieron sin problemas, y que el usuario lo vea entero.
+     Si pide cambios: re-grabar solo esa escena (`node fabrica/titeres/grabar.mjs 04-ESCENA out/04-ESCENA.mp4`), `python3 fabrica/titeres/montar.py out/espanistan-04.mp4 04`, limitador de audio
+     (`ffmpeg -i … -c:v copy -af alimiter=limit=0.89:level=false …`) y volver a subir (YouTube no deja cambiar el archivo: subir nuevo y borrar el viejo solo con permiso).
+  2. Shorts del ep. 4 (como los del ep. 1–3: `fabrica/manual/SHORTS-CALENDARIO.md`) y difusión en X (borradores en `X-BORRADORES.md`; todo texto nuevo, con el «sí» del usuario).
+  3. Buscar skills y repos de GitHub para optimizar y gastar menos (el usuario lo autorizó; NO ofrecerlo como sesión aparte).
+  4. Ep. 5: preguntar el tema.
+- Pendiente del ep. 4: cita de Escohotado solo si el usuario da la fuente. Voces: Gabo `o0SveC0zgHFuCsEO3vHR`, Sanchís = Javier narrador `PToUZ7lhIUiz1SP94rGo`, Feijolo = Carmelo `5egO01tkUjEzu7xSSE8M` (v4). Créditos ElevenLabs: quedan ≈ 27.500.
+- Subir a YouTube: Chrome solo sube archivos < 10 MB; el usuario elige el vídeo grande en «Seleccionar archivos» y Claude rellena el resto (título, descripción, miniatura, «no es para niños», Programar).
 
 **28-10-2026: difusión del ep. 3 en curso** (shorts en YouTube hechos; falta X) → `fabrica/manual/DIFUSION-EP03.md`.
 

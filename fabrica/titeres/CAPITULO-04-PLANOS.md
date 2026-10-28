@@ -63,6 +63,7 @@ Motor: `lluvia` con intensidad que cambia con el tiempo, `relampago` (destello m
 Se reutilizan del ep. 3 `urna`, `congreso`, `mesa`, `balanza`, `lista`, `bandera` y `monedas`.
 
 ## Para retomar en un chat nuevo (28-10-2026, noche)
+> **Ya no vale lo de abajo: el ep. 4 está TERMINADO y programado (30-10, 19:00). Seguir `fabrica/manual/RETOMAR.md`, sección «▶ AHORA».**
 - **Leer**: este archivo, `historias/espanistan/04-bipartidismo.md` y `fabrica/titeres/README.md`. Hablar al usuario en español, corto.
 - **Pedidos del usuario que mandan**: más épico, espectacular, con lógica en el ambiente (tabla «Épica y ambiente») y **más profesional**.
 - **Prueba en vídeo**: se estaba grabando al cerrar el chat (A + B + C + D, sin voz, con ambiente). Si no está en
