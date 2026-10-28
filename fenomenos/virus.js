@@ -8,7 +8,7 @@ window.FENOMENOS.virus = (() => {
   const Z0 = [-11, 116];                          // el primer enfermo: en el corrillo de la acera, donde miran las cámaras de calle
   // fracción de la ciudad contagiada y tumbada según las veces que se ha duplicado el R₀ (log2)
   const CONTAGIO = [0, .02, .05, .12, .25, .42, .6, .75, .86, .93, .97, .99, 1, 1, 1];
-  const TUMBADOS = [0, 0, 0, 0, 0, 0, 0, 0, .05, .12, .25, .4, .55, .7, .85];
+  const TUMBADOS = [0, 0, 0, 0, .04, .08, .14, .22, .32, .42, .52, .62, .72, .8, .88];
   const reloj = COMUN.reloj();
   let ctx, R0 = 1, t0 = 0, tiempo = 0, gente = [], todos = [], orden = [], planeta = null, yo = null;
   let motas = null, pos = null, nInf = 0, anillos = [], tos = 0, verde = null;
@@ -17,10 +17,12 @@ window.FENOMENOS.virus = (() => {
   let cSup = null, cEmi = null, apagadoSup = null, apagadoEmi = null;   // la superficie del planeta mientras se apaga el verde
   const est = { pandemia: 0 }, obj = { ...est };
   let cieloObj = 0x9fd3f0;
+  let vomito = null, xr = null, fase_i = 0;       // color del vómito · rayos X del pecho (plano 'rayos') · veces duplicado
 
   function crear(c) {
     ctx = c; const T = ctx.THREE;
-    verde = new T.Color(0x8fe06a);
+    verde = new T.Color(0x8fe06a); vomito = new T.Color(0xa8b832);
+    xr = rayosX(T); ANIME.crear(ctx);
     cSup = new T.Color(); cEmi = new T.Color(); apagadoSup = new T.Color(0x4a4f46); apagadoEmi = new T.Color(0x2a2e28);
     yo = COMUN.protagonista(ctx, { x: -11.5, z: 120, vel: .55 });
     // la multitud, apretada en el tramo por el que pasea el protagonista: así se ve la mancha verde desde la acera
@@ -71,7 +73,7 @@ window.FENOMENOS.virus = (() => {
     // el primer enfermo siempre, y a partir de ahí la fracción que toque
     const quiero = R0 <= 1 ? 1 : Math.round(CONTAGIO[i] * orden.length);
     for (; nInf < quiero; nInf++) orden[nInf].enfermo = tiempo + ctx.rr(0, .7);
-    const cae = TUMBADOS[i];
+    const cae = TUMBADOS[i]; fase_i = i;
     for (const p of orden.slice(0, nInf)) {
       p.lento = i >= 6 ? Math.max(.2, 1 - (i - 5) * .14) : 1; if (p.andar == null) p.andar = 0;
       if (!p.caer && ctx.R() < cae) { p.caer = ctx.rr(.6, 2.4); p.retraso = tiempo + ctx.rr(.2, 2.4); }
@@ -95,7 +97,7 @@ window.FENOMENOS.virus = (() => {
   }
 
   function actualizar(c, dt, t) {
-    tiempo = t; reloj.tick(t); yo.actualizar(dt, t);
+    tiempo = t; reloj.tick(t); ANIME.tick(dt); yo.actualizar(dt, t);
     if (apagar) apagado = Math.min(1, apagado + dt / 5);
     COMUN.corte.tick(ctx, dt);
     const k = 1 - Math.exp(-dt * 1.1);
@@ -104,7 +106,13 @@ window.FENOMENOS.virus = (() => {
     ctx.setShake(0);
     // el protagonista tose: la cabeza da una sacudida y se le abre la boca
     if (tos) { const ciclo = (t % 4.5) / 4.5, golpe = ciclo < .18 ? Math.sin(ciclo / .18 * Math.PI) : 0;
-      yo.est.hablar = golpe * .8 * tos; yo.est.tiembla = golpe * tos; } else { yo.est.hablar = 0; yo.est.tiembla = 0; }
+      yo.est.hablar = golpe * .8 * tos; yo.est.tiembla = golpe * tos;
+      if (fase_i >= 6 && ciclo < .02 && !(yo.vomita > tiempo - 2)) yo.vomita = tiempo; } else { yo.est.hablar = 0; yo.est.tiembla = 0; }
+    // vómitos: de vez en cuando un enfermo cerca de la cámara se dobla y echa un chorro
+    if (fase_i >= 3 && nInf && ctx.camDist < 220 && ctx.R() < dt * (1 + fase_i * .5)) { const p = orden[Math.floor(ctx.R() * nInf)];
+      if (p && p.enfermo && tiempo > p.enfermo && !(p.vomita > tiempo - 3) && Math.hypot(p.g.position.x - ctx.camTgt.x, p.g.position.z - ctx.camTgt.z) < 60) p.vomita = tiempo; }
+    for (const p of [yo, ...orden.slice(0, nInf)]) if (p.vomita > tiempo - 1.4) vomitar(p, tiempo - p.vomita);
+    tickRayos(dt, t);
     // la gente contagiada anda más despacio y la que se desploma se queda en el suelo
     for (const p of todos) if (p.caer && tiempo > p.retraso && !p.caido) { p.cae = Math.min(1, (p.cae || 0) + dt / p.caer);
       p.g.rotation.x = -Math.PI / 2 * p.cae * p.cae; if (p.cae >= 1) p.caido = true; }
@@ -146,6 +154,54 @@ window.FENOMENOS.virus = (() => {
   const dias = r => r <= 1 ? null : Math.max(2, Math.log(MUNDO) / Math.log(r)) * RONDA;
   // tope de una epidemia: quien se cura queda inmune y frena al virus, así que no se contagia todo el mundo.
   // Fracción final z de z = 1 − e^(−R₀·z): R₀ 2 → 80 %, R₀ 4 → 98 %, R₀ 8 o más → prácticamente todos.
+  // un chorro de vómito desde la boca, hacia delante y al suelo; el que vomita se dobla un poco
+  function vomitar(p, k) {
+    const m = p.g, a = m.rotation.y, tirado = p.caido || p.cae > .5, y = m.position.y + (tirado ? .25 : 1.35);
+    if (!tirado && p !== yo) m.rotation.x = -.45 * Math.sin(Math.min(1, k / 1.4) * Math.PI);
+    if (k < .02) { COMUN.ruido(ctx, .5, 500, .06); COMUN.tono(ctx, 160, 70, .4, 'sawtooth', .04); }
+    for (let q = 0; q < 4; q++) ctx.emit(m.position.x + Math.sin(a) * .25, y, m.position.z + Math.cos(a) * .25,
+      Math.sin(a) * ctx.rr(1.2, 2.2) + ctx.rr(-.3, .3), ctx.rr(-.2, .6), Math.cos(a) * ctx.rr(1.2, 2.2) + ctx.rr(-.3, .3), vomito, ctx.rr(.5, .9), 9.8);
+  }
+  // rayos X del pecho de un enfermo, flotando muy por encima de la ciudad (detrás solo hay cielo, que tapa una esfera oscura):
+  // los pulmones se llenan de virus según la fase y, en las últimas, el corazón se para
+  const XR = [0, 1500, 0];
+  function rayosX(T) {
+    const g = new T.Group(); g.position.set(...XR); g.visible = false; g.userData.fenPropio = true;
+    const mb = (c, o = {}) => new T.MeshBasicMaterial({ color: c, fog: false, ...o }), A = { blending: T.AdditiveBlending, transparent: true, depthWrite: false };
+    const pon = (geo, mat, x, y, z, sx, sy = sx, sz = sx) => { const m = new T.Mesh(geo, mat); m.position.set(x, y, z); m.scale.set(sx, sy, sz); g.add(m); return m; };
+    const esf = new T.SphereGeometry(1, 20, 14), cil = new T.CylinderGeometry(1, 1, 1, 10);
+    const fondo = pon(esf, mb(0x03060c, { side: T.BackSide }), 0, 1, 0, 8); fondo.renderOrder = -1;
+    const piel = mb(0x4aa8ff, { ...A, opacity: .16 });
+    pon(esf, piel, 0, .95, 0, .42, .62, .26); pon(esf, piel, 0, 1.85, 0, .22, .26, .22); pon(cil, piel, 0, 1.55, 0, .09, .25, .09);
+    const hueso = mb(0xdfe8f2, { ...A, opacity: .7 });
+    pon(cil, hueso, 0, 1.0, -.12, .035, 1.1, .035); pon(esf, hueso, 0, 1.87, 0, .17, .2, .17);
+    for (let k = 0; k < 6; k++) { const r = pon(new T.TorusGeometry(1, .05, 6, 20, Math.PI * 1.4), hueso, 0, 1.38 - k * .1, -.02, .3 - Math.abs(k - 2) * .015, .3, .2);
+      r.rotation.set(Math.PI / 2, 0, -Math.PI * .2); }
+    const pul = [-1, 1].map(sd => pon(esf, mb(0xff8aa0, { ...A, opacity: .5 }), sd * .15, 1.15, 0, .13, .24, .12));
+    const cora = pon(esf, mb(0xff2433), -.05, 1.05, .06, .075);
+    const virus = []; for (let q = 0; q < 60; q++) { const sd = q % 2 ? 1 : -1, v = pon(esf, mb(0x8fe06a), sd * .15 + ctx.rr(-.09, .09), 1.15 + ctx.rr(-.2, .2), ctx.rr(-.07, .07), .018);
+      v.visible = false; virus.push(v); }
+    ctx.scene.add(g);
+    return { g, pul, cora, virus, t: 0, k: 0, para: false, fin: 0 };
+  }
+  function verRayos(dur) {
+    const k = Math.min(1, Math.max(.15, (fase_i - 3) / 9)); Object.assign(xr, { t: 0, k, para: k > .8, fin: tiempo + dur + .3 }); xr.g.visible = true;
+    xr.virus.forEach((v, q) => { v.visible = q < k * xr.virus.length; });
+    for (const m of xr.pul) m.material.color.set(0xff8aa0).lerp(verde, k);
+    ctx.sfx('whoosh', .35); COMUN.tono(ctx, 1400, 700, .35, 'sine', .05);
+    ANIME.rotulo({ texto: xr.para ? (COMUN.EN ? 'THE HEART STOPS' : 'EL CORAZÓN SE PARA') : (COMUN.EN ? 'LUNGS FILLING WITH VIRUS' : 'LOS PULMONES SE LLENAN DE VIRUS'),
+      estilo: 'rojo', y: -.22, ancho: 1.1, dur: Math.min(2.2, dur), rot: -.04 });
+  }
+  function tickRayos(dt, t) {
+    if (!xr || !xr.g.visible) return; xr.t += dt;
+    if (tiempo > xr.fin) { xr.g.visible = false; return; }
+    for (const v of xr.virus) if (v.visible) v.position.x += Math.sin(t * 9 + v.id) * .0006;
+    // el corazón late deprisa (fiebre) y, si toca, se para a mitad del plano con el pitido plano del monitor
+    const vivo = !xr.para || xr.t < 1.3, lat = vivo ? Math.pow(Math.max(0, Math.sin(xr.t * 2.4 * 6.283)), 6) : 0;
+    xr.cora.scale.setScalar(.075 * (1 + .3 * lat));
+    if (!vivo && !xr.pita) { xr.pita = true; COMUN.tono(ctx, 1000, 1000, 1.4, 'sine', .07); }
+    if (vivo) xr.pita = false;
+  }
   const tope = r => { let z = .5; for (let q = 0; q < 60; q++) z = 1 - Math.exp(-r * z); return z; };
   // el contador mundial en este momento de la fase: día y contagiados (R₀ elevado al número de rondas, con su tope)
   const cuenta = () => {
@@ -174,6 +230,7 @@ window.FENOMENOS.virus = (() => {
     plano: (c, fi) => {
       const fijo = fi.pos ? { pos: fi.pos, mira: fi.mira } : null;
       if (fi.plano === 'heroe') return yo.camara({ pos: fi.pos, mira: fi.mira, cerca: true });
+      if (fi.plano === 'rayos') { verRayos(fi.dur || 2.4); return { pos: [XR[0] + .9, XR[1] + 1.25, XR[2] + 2.1], mira: [XR[0], XR[1] + 1.1, XR[2]] }; }
       const hz = yo.g.position.z, cerca = (a, b) => Math.hypot(a.g.position.x - b.g.position.x, a.g.position.z - b.g.position.z);
       if (fi.plano === 'enfermo') {
         // mejor uno de los que están quietos: los que pasean se salen del plano, que no se mueve mientras dura el corte
@@ -184,6 +241,7 @@ window.FENOMENOS.virus = (() => {
         // cada uno mira hacia donde le tocó al crearlo (p.dir es aleatorio), así que la cámara se pone delante de ESTA
         // persona, no en un lado fijo: si no, la mitad de las veces el corte era una espalda y el punto verde del pecho
         // no se veía. Un poco por encima de los ojos y algo ladeada, para que el punto quede por debajo de la frase.
+        p.vomita = tiempo + .6;  // en el corte, el enfermo vomita
         const P = p.g.position, a = p.g.rotation.y + .45, d = 3.8;
         return { pos: [P.x + Math.sin(a) * d, ctx.GROUND + 2.6, P.z + Math.cos(a) * d], mira: [P.x, ctx.GROUND + 2.1, P.z] };
       }
