@@ -154,6 +154,7 @@ window.FENOMENOS.virus = (() => {
     return { dia, inf: Math.min(MUNDO * tope(R0), Math.pow(R0, dia / RONDA)), fin: q >= 1 };
   };
   // «6.457 millones» como dice el narrador, no «6,5 mil millones»
+  const LET = .025;  // mortalidad: la de la gripe de 1918 (≈ 1 de cada 40 contagiados)
   const cifra = n => { const EN = COMUN.EN;
     if (n < 1e6) return COMUN.num(n, 0);
     return EN ? (n >= 1e9 ? `${COMUN.num(n / 1e9, 1)} billion` : `${COMUN.num(n / 1e6, 0)} million`) : `${COMUN.num(n / 1e6, 0)} millones`; };
@@ -217,12 +218,13 @@ window.FENOMENOS.virus = (() => {
       if (!d) return EN ? 'It never dies out · patient zero still has it' : 'No se apaga nunca · el primer enfermo sigue igual';
       // mientras habla el narrador corre el contador mundial; al acabar queda el resultado de la fase
       const c = cuenta(), dia = COMUN.num(Math.max(1, Math.ceil(c.dia)), 0);
-      if (!c.fin) return EN ? `Day ${dia} · ${cifra(c.inf)} of 8.1 billion infected` : `Día ${dia} · ${cifra(c.inf)} de 8.100 millones contagiados`;
-      const z = tope(R0);
+      const m = cifra(Math.floor(c.inf * LET));
+      if (!c.fin) return EN ? `Day ${dia} · ${cifra(c.inf)} infected · ${m} dead` : `Día ${dia} · ${cifra(c.inf)} contagiados · ${m} muertos`;
+      const z = tope(R0), muertos = cifra(MUNDO * z * LET);
       const todo = z > .99 ? (EN ? `Everyone on Earth in ${texto(d)}` : `Todo el planeta en ${texto(d)}`)
         : (EN ? `${cifra(MUNDO * z)} infected in ${texto(d)}, the rest are immune` : `${cifra(MUNDO * z)} contagiados en ${texto(d)}; el resto ya es inmune`);
-      if (planeta) return EN ? `${todo} · no hosts left` : `${todo} · no quedan huéspedes`;
-      return EN ? `${todo} · city ${pc}% infected, ${cama}% in bed` : `${todo} · ciudad ${pc} % contagiada, ${cama} % en la cama`;
+      if (planeta) return EN ? `${todo} · ${muertos} dead` : `${todo} · ${muertos} muertos`;
+      return EN ? `${todo} · ${muertos} dead` : `${todo} · ${muertos} muertos`;
     },
   };
 })();

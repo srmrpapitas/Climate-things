@@ -12,7 +12,7 @@ window.ESCENARIOS = window.ESCENARIOS || {};
     id: 'virus',
     tipo: 'virus',
     titulo: T('El virus que se duplica', 'The doubling virus'),
-    pregunta: T('¿Y si cada virus contagiara al doble de gente que el anterior?', 'What if every virus spread to twice as many people as the last?'),
+    pregunta: T('¿Qué pasaría si cada virus contagiara al doble de gente que el anterior?', 'What if every virus spread to twice as many people as the last?'),
     unidad: 'R₀',
     inicial: 1,
     multiplicador: 2,
