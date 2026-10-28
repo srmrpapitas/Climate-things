@@ -13,6 +13,7 @@ window.FENOMENOS.virus = (() => {
   let ctx, R0 = 1, t0 = 0, tiempo = 0, gente = [], todos = [], orden = [], planeta = null, yo = null;
   let motas = null, pos = null, nInf = 0, anillos = [], tos = 0, verde = null;
   let apagar = false, apagado = 0;                // último paso: sin nadie sano, la cadena se corta y el virus se extingue
+  let dFin = null, durCuenta = 5;                 // contador mundial: días hasta el final del contagio y segundos que tarda en contarlos
   let cSup = null, cEmi = null, apagadoSup = null, apagadoEmi = null;   // la superficie del planeta mientras se apaga el verde
   const est = { pandemia: 0 }, obj = { ...est };
   let cieloObj = 0x9fd3f0;
@@ -64,6 +65,8 @@ window.FENOMENOS.virus = (() => {
 
   function fase(c, n, valor, f) {
     R0 = valor; t0 = tiempo;
+    // el contador de días corre mientras habla el narrador (y si aún no se sabe cuánto dura la frase, unos 5 s)
+    dFin = dias(R0); durCuenta = Math.max(3, (ctx.vozDur(n) || 6) * .65);
     const i = Math.max(0, Math.min(CONTAGIO.length - 1, Math.round(Math.log2(Math.max(1, R0)))));
     // el primer enfermo siempre, y a partir de ahí la fracción que toque
     const quiero = R0 <= 1 ? 1 : Math.round(CONTAGIO[i] * orden.length);
@@ -132,15 +135,28 @@ window.FENOMENOS.virus = (() => {
     for (let q = 0; q < n; q++) ctx.emit(ctx.camTgt.x + ctx.rr(-r, r), ctx.camTgt.y + ctx.rr(-r, r) * .5, ctx.camTgt.z + ctx.rr(-r, r),
       ctx.rr(-1, 1), ctx.rr(-.4, .6), ctx.rr(-1, 1), verde, Math.max(.6, Math.min(2.4, ctx.camDist * .006)), 0);
     if (planeta) { planeta.update(dt);
-      // al apagarse la epidemia el verde se va y queda una Tierra apagada: ni verde ni viva
-      const k2 = apagado * apagado;
+      // la Tierra se pone verde a la vez que sube el contador mundial; al apagarse la epidemia queda una Tierra gris
+      const k2 = apagado * apagado, kv = apagar ? 1 : Math.min(1, cuenta().inf / MUNDO);
       cSup.set(0x6f8f4a).lerp(apagadoSup, k2); cEmi.set(0x4a7a22).lerp(apagadoEmi, k2);
-      planeta.teñir(cSup.getHex(), .8 + .15 * k2, cEmi.getHex(), .08);
-      planeta.nubes.material.color.set(0xffffff).lerp(verde, .55 * (1 - k2)); }
+      planeta.teñir(cSup.getHex(), (.8 + .15 * k2) * kv, cEmi.getHex(), .08 * kv);
+      planeta.nubes.material.color.set(0xffffff).lerp(verde, .55 * (1 - k2) * kv); }
   }
 
   // días que tarda en contagiar a todo el planeta: una ronda cada 3 días, y nunca menos de dos rondas
   const dias = r => r <= 1 ? null : Math.max(2, Math.log(MUNDO) / Math.log(r)) * RONDA;
+  // tope de una epidemia: quien se cura queda inmune y frena al virus, así que no se contagia todo el mundo.
+  // Fracción final z de z = 1 − e^(−R₀·z): R₀ 2 → 80 %, R₀ 4 → 98 %, R₀ 8 o más → prácticamente todos.
+  const tope = r => { let z = .5; for (let q = 0; q < 60; q++) z = 1 - Math.exp(-r * z); return z; };
+  // el contador mundial en este momento de la fase: día y contagiados (R₀ elevado al número de rondas, con su tope)
+  const cuenta = () => {
+    if (!dFin) return { dia: 0, inf: 1, fin: false };
+    const q = Math.min(1, (tiempo - t0) / durCuenta), k = 1 - Math.pow(1 - q, 2), dia = dFin * k;
+    return { dia, inf: Math.min(MUNDO * tope(R0), Math.pow(R0, dia / RONDA)), fin: q >= 1 };
+  };
+  // «6.457 millones» como dice el narrador, no «6,5 mil millones»
+  const cifra = n => { const EN = COMUN.EN;
+    if (n < 1e6) return COMUN.num(n, 0);
+    return EN ? (n >= 1e9 ? `${COMUN.num(n / 1e9, 1)} billion` : `${COMUN.num(n / 1e6, 0)} million`) : `${COMUN.num(n / 1e6, 0)} millones`; };
   // siempre en días mientras quepan (las frases hablan en días; en meses solo cuando ya no dice nada)
   const texto = d => { const n = COMUN.num;
     if (d >= 100) return COMUN.EN ? `${n(d / 30.4, 0)} months` : `${n(d / 30.4, 0)} meses`;
@@ -187,7 +203,7 @@ window.FENOMENOS.virus = (() => {
     // Dos rondas y no tres: con tres, a partir del paso 12 ya sale «todo el planeta» y la línea deja de cambiar.
     linea3: v => {
       const EN = COMUN.EN;
-      if (apagar) return EN ? ['NOBODY HEALTHY LEFT', '(the chain breaks)'] : ['NO QUEDA NADIE SANO', '(la cadena se corta)'];
+      if (apagar) return EN ? ['KILLS IN A DAY → STAYS HOME', '(and the virus dies with them)'] : ['MATA EN UN DÍA → NO SALE DE CASA', '(y el virus se apaga con él)'];
       if (v <= 1) return EN ? ['IT NEVER TAKES OFF', '(and it never goes away)'] : ['NO ARRANCA NUNCA', '(y nunca se va)'];
       const dos = Math.min(MUNDO, v * v), c = dos < 1e6 ? COMUN.num(dos, 0) : COMUN.grande(dos); // 1.024 y 16.384 enteros, no «1 mil»
       return EN ? [`≈ ${c} people in 6 days`, '(from a single patient)'] : [`≈ ${c}${dos >= 1e6 ? COMUN.DE : ' '}personas en 6 días`, '(a partir de un solo enfermo)'];
@@ -196,10 +212,15 @@ window.FENOMENOS.virus = (() => {
     danos: () => {
       const EN = COMUN.EN, pc = COMUN.num(Math.round(100 * nInf / orden.length), 0);
       const n = todos.filter(p => p.caer && tiempo > p.retraso).length, cama = COMUN.num(Math.round(100 * n / todos.length), 0);
-      if (apagar) return EN ? 'The virus dies out · it ran out of hosts' : 'El virus se extingue · se quedó sin huéspedes';
+      if (apagar) return EN ? 'Ebola kills 1 in 2: 28,600 cases · 1918 flu, 1 in 40: 500 million' : 'Ébola, mata a 1 de cada 2: 28.600 casos · Gripe de 1918, a 1 de cada 40: 500 millones';
       const d = dias(R0);
       if (!d) return EN ? 'It never dies out · patient zero still has it' : 'No se apaga nunca · el primer enfermo sigue igual';
-      const todo = EN ? `Everyone on Earth in ${texto(d)}` : `Todo el planeta en ${texto(d)}`;
+      // mientras habla el narrador corre el contador mundial; al acabar queda el resultado de la fase
+      const c = cuenta(), dia = COMUN.num(Math.max(1, Math.ceil(c.dia)), 0);
+      if (!c.fin) return EN ? `Day ${dia} · ${cifra(c.inf)} of 8.1 billion infected` : `Día ${dia} · ${cifra(c.inf)} de 8.100 millones contagiados`;
+      const z = tope(R0);
+      const todo = z > .99 ? (EN ? `Everyone on Earth in ${texto(d)}` : `Todo el planeta en ${texto(d)}`)
+        : (EN ? `${cifra(MUNDO * z)} infected in ${texto(d)}, the rest are immune` : `${cifra(MUNDO * z)} contagiados en ${texto(d)}; el resto ya es inmune`);
       if (planeta) return EN ? `${todo} · no hosts left` : `${todo} · no quedan huéspedes`;
       return EN ? `${todo} · city ${pc}% infected, ${cama}% in bed` : `${todo} · ciudad ${pc} % contagiada, ${cama} % en la cama`;
     },
