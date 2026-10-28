@@ -68,7 +68,8 @@ Se reutilizan del ep. 3 `urna`, `congreso`, `mesa`, `balanza`, `lista`, `bandera
 - **Prueba en vídeo**: se estaba grabando al cerrar el chat (A + B + C + D, sin voz, con ambiente). Si no está en
   `~/Desktop/Espanistan-04/espanistan-04-prueba.mp4`, repetir (≈ 15 min, en segundo plano), con `python3 -m http.server 8765` en marcha:
   `for e in 04-gancho 04-noria 04-restauracion 04-atado; do node fabrica/titeres/grabar.mjs $e out/$e.mp4; done`
-  y unirlas con `ffmpeg … concat` (mismo orden). Ver un fotograma suelto: `node fabrica/titeres/fotos.mjs 04-atado 20 45`.
+  y unirlas con `ffmpeg … concat` (mismo orden).
+  **Ojo:** `04-atado` (121 s) tumba el navegador hacia el segundo 61 si se graba de una vez: grabarla en dos trozos (`… 04-atado out/04-atado-1.mp4 0 60` y `… out/04-atado-2.mp4 60`). Las escenas de más de ≈ 60 s, siempre por trozos. Ver un fotograma suelto: `node fabrica/titeres/fotos.mjs 04-atado 20 45`.
 - **Siguiente, en este orden**:
   1. Esperar la opinión del usuario sobre la prueba y corregir por escena.
   2. Escenas que faltan: E–F `04-hilos` (bloques 18–26 + f1, f2), G e I `04-mesa` (27–32 y 35–36), H `04-puerta` (33–34), J `04-balanza` (37–41, copiar `escenas/balanza.js` del ep. 3).
@@ -77,6 +78,21 @@ Se reutilizan del ep. 3 `urna`, `congreso`, `mesa`, `balanza`, `lista`, `bandera
      La clave está en `~/.elevenlabs_key`; generar con `fabrica/herramientas/voz_frases.py` (cambiar guion y carpeta a `espanistan-04-gabo`).
   4. `python3 fabrica/titeres/tiempos.py 04` (tiempos reales) y afinar en cada escena las constantes en MAYÚSCULAS (ATADO, VOTAN, CAEN…: palabra clave = segundos dentro de su frase).
   5. Intro con `EPISODIO = 'Episodio 4 · Las dos familias'` (copia de `intro.js` como `04-intro.js`), outro, `montar.py` con la lista del ep. 4.
+
+## Hecho (29-10-2026, madrugada)
+- El Rey en el guion (sátira **Juancar**): b11.3 jura lealtad (1969), b12.2 elige a Suavez (1976), b13.3 confesión de Suárez sobre el referéndum. Escena D con carteles y decorado `corona` (cuelga del nudo de la cuerda); Suavez entra ahora en b12.3.
+- Escena E–F `04-hilos` hecha (tiempos estimados). Decorados nuevos: `mano`, `sello`, `voto` (urna, papeleta y grillete), `marionetas` (una o un hemiciclo, hilos que crecen, rebeldes y multa, `mira`), `senado`; `lista` acepta `escribe`.
+- Falta: G `04-mesa`, H `04-puerta`, I, J, la voz y el montaje. Escohotado: sin cita comprobada.
+- (28-10, tarde) Escena G `04-mesa` hecha (plató «CARA A CARA» en vez de pantalla partida). Decorados: `banquete` (mesa en `delante`: libro, monedas, togas, móvil, pastel que cae y vuelve),
+  `reloj`, `telaranas`, `estandarte` (UE); `salon` acepta `sinMesa`; `balanza` acepta `pesos` [[t, peso]]; `mano` acepta `baja` e `hilos`. Fichas `zapatitos` y `rajoyo`.
+- Sonido: el usuario notó el ambiente de gente muy repetitivo. `grabar.mjs` mezcla ahora cada bucle con inicio distinto, una copia desfasada más lenta y volumen que ondula.
+  `SOLO_AUDIO=1 node fabrica/titeres/grabar.mjs ESCENA out/ESCENA.mp4` rehace solo el sonido con los fotogramas ya guardados.
+- (28-10, noche) **Voces hechas** con permiso: Gabo (5.927 cr.), Sanchís = Javier narrador `PToUZ7lhIUiz1SP94rGo`, Feijolo = Carmelo `5egO01tkUjEzu7xSSE8M` (v4).
+  `tiempos.py 04` con audio real (448 s de narrador) y guarda por trozo [estimado, real, pausa]; `G.x('b28.3', 3)` pasa al segundo real lo que se puso a ojo
+  (todas las escenas 04 usan ya G.x). Escenas H `04-puerta`, I `04-mafia`, J `04-balanza` y `04-intro` hechas y revisadas.
+  Decorados: `rascacielos`, `torre` (rayo genérico), `puerta` (giratoria, en `delante`), `penumbra`. Ficha `ansar`. Los títeres aceptan `desde`/`hasta`.
+  Montaje: `python3 fabrica/titeres/montar.py out/espanistan-04.mp4 04` (lista `SECUENCIAS_04`; el outro es el del ep. 3, ya con Gabo).
+  Subida decidida por el usuario: **viernes 30-10-2026, 19:00**.
 
 ## Hecho (28-10-2026)
 - Escenas `04-gancho` (A), `04-noria` (B), `04-restauracion` (C) y `04-atado` (D), con tiempos ESTIMADOS (`python3 fabrica/titeres/tiempos.py 04` → `escenas/tiempos-04.js`, 14 letras/s).

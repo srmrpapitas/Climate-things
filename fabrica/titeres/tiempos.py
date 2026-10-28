@@ -40,15 +40,18 @@ for linea in open(GUION, encoding='utf-8'):
     if linea.strip():
         bloque, frase = linea.rstrip('\n').split('\t', 1); piezas = V.partir(frase); textos.setdefault(int(bloque), []).extend(piezas)
         trozos += [(int(bloque), V.PAUSA_FRASE if j == len(piezas) - 1 else V.PAUSA_TROZO) for j in range(len(piezas))]
-inicios, cursor = {}, {}
+inicios, cursor, piezas = {}, {}, {}
+todas = [p for k in sorted(textos) for p in textos[k]]
 for i, (bloque, pausa) in enumerate(trozos):
     inicios.setdefault(bloque, []).append(round(cursor.get(bloque, 0), 3))
-    cursor[bloque] = cursor.get(bloque, 0) + dura(f'{VOZ}f{i + 1:03d}.mp3', [p for k in sorted(textos) for p in textos[k]][i]) + pausa
+    d = dura(f'{VOZ}f{i + 1:03d}.mp3', todas[i]); cursor[bloque] = cursor.get(bloque, 0) + d + pausa
+    # [estimado a 14 letras/s, real, pausa detrás]: G.x() pasa a segundos reales las palabras clave que se pusieron con la estimación
+    piezas.setdefault(bloque, []).append([round(len(todas[i]) / LETRAS_POR_SEGUNDO + .3, 3), d, pausa])
 # duración de cada bloque: la de su audio pegado (bNN.mp3) o, si no existe, la suma de sus trozos
 b = {k: dura(f'{VOZ}b{k:02d}.mp3') if os.path.exists(f'{VOZ}b{k:02d}.mp3') else round(cursor[k] - V.PAUSA_FRASE, 3) for k in sorted(cursor)}
 estimado = not glob.glob(VOZ + 'b*.mp3')
 salida = os.path.join(os.path.dirname(__file__), 'escenas', E['salida'])
 with open(salida, 'w', encoding='utf-8') as s:
     s.write(f'// Generado por fabrica/titeres/tiempos.py {EP}: duración {"ESTIMADA (aún sin audio)" if estimado else "real"} de cada bloque del narrador y de cada frase de los personajes.\n')
-    s.write('window.TIEMPOS = ' + json.dumps({'voz': VOZ, 'b': b, 's': inicios, 'f': f}, ensure_ascii=False) + ';\n')
+    s.write('window.TIEMPOS = ' + json.dumps({'voz': VOZ, 'b': b, 's': inicios, 'p': piezas, 'f': f}, ensure_ascii=False) + ';\n')
 print(f'{salida}: {len(b)} bloques ({sum(b.values()):.1f} s de narrador{" ESTIMADOS" if estimado else ""}) y {len(f)} frases de personajes ({sum(v[1] for v in f.values()):.1f} s)')

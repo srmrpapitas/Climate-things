@@ -24,6 +24,9 @@ const PERSONAJES = {
   suavez:   { rostro: 'anguloso', ropa: 'traje', pelo: 'peinado', nariz: 1.05, narizForma: 'recta', menton: 'marcado', alto: 1.1, grueso: .95, piernas: 1.14, hombros: 1.12, cintura: .82, objeto: 'papel', semilla: 41 },
   fragata:  { ropa: 'traje', pelo: 'entradas', nariz: 1.25, narizForma: 'gruesa', menton: 'doble', arrugas: .7, alto: 1.02, grueso: 1.25, barriga: .6, piernas: 1.02, hombros: 1.2, cintura: 1, semilla: 43 },
   felipon:  { ropa: 'traje', pelo: 'peinado', nariz: 1.15, narizForma: 'recta', menton: 'redondo', arrugas: .2, alto: 1.06, grueso: 1.02, piernas: 1.1, hombros: 1.12, cintura: .9, semilla: 47 },
+  zapatitos: { rostro: 'anguloso', ropa: 'traje', pelo: 'peinado', nariz: 1, narizForma: 'recta', menton: 'marcado', arrugas: .3, alto: 1.1, grueso: .92, piernas: 1.14, hombros: 1.08, cintura: .82, semilla: 53 },
+  ansar:    { ropa: 'traje', pelo: 'peinado', barba: 'bigote', nariz: 1.05, narizForma: 'recta', menton: 'marcado', arrugas: .3, alto: .97, grueso: .95, piernas: 1.02, hombros: 1.02, cintura: .85, semilla: 61 },
+  rajoyo:   { ropa: 'traje', pelo: 'entradas', barba: 'corta', gafas: 'cuadradas', nariz: 1.1, narizForma: 'recta', menton: 'redondo', arrugas: .4, alto: 1.1, grueso: 1.02, piernas: 1.1, hombros: 1.1, cintura: .9, semilla: 59 },
 };
 // gente del pueblo: variaciones deterministas (la misma n da siempre la misma persona)
 function ciudadano(n, extra = {}) {

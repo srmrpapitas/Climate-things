@@ -7,7 +7,7 @@
 const G = T.guion([1, 2]), en = G.en;
 const SA = PERSONAJES.sanchis, FE = PERSONAJES.feijolo;
 const jack = { jack: true, quieto: true, figura: '#2b2522', sombra: 9, contraluz: 0, bordes: ['rgb(190,215,255)', 'rgb(255,150,90)'], borde: .8 };
-const PELEAN = en['b1.2'] + 1.1, MESA = en['b1.2'] + 4.9;   // «se pelean» y «la misma mesa» (ajustar con el audio real)
+const PELEAN = G.x('b1.2', 1.1), MESA = G.x('b1.2', 4.9);   // «se pelean» y «la misma mesa» (ajustar con el audio real)
 const feria = [
   { tipo: 'plano', color: '#131b30', raya: 'rgba(0,0,0,.28)', luz: 'rgba(110,140,210,.08)', par: .2 },
   { tipo: 'astro', x: 900, y: 120, r: 46, luna: true, par: .2 },
@@ -18,7 +18,7 @@ const feria = [
   { tipo: 'suelo', par: 1, matas: 0 }];
 // la gente, pequeña al pie de la noria: miran hacia arriba; un niño señala
 const gente = [80, 81, 82, 83, 84, 85, 86, 87].map((n, i) => ({ p: ciudadano(n, { escala: .27 + .04 * (i % 3) }), x: 330 + i * 88 + 20 * T.azar(n), mira: i < 4 ? 1 : -1,
-  acciones: i === 2 ? [{ hace: 'senala', en: en.b1 + 2.5, hasta: en.b1 + 6 }] : i === 5 ? [{ hace: 'encoge', en: PELEAN + .3, hasta: PELEAN + 2 }] : [] }));
+  acciones: i === 2 ? [{ hace: 'senala', en: G.x('b1', 2.5), hasta: G.x('b1', 6) }] : i === 5 ? [{ hace: 'encoge', en: PELEAN + .3, hasta: PELEAN + 2 }] : [] }));
 const sombra = (p, x, a, en0) => ({ p, x, mira: x < 640 ? 1 : -1, acciones: [{ hace: 'camina', en: en0, hasta: en0 + 2.4, a }] });
 window.ESCENA = {
   dura: G.fin, fps: 30, suelo: 600, voces: G.voces,
@@ -35,7 +35,7 @@ window.ESCENA = {
       particulas: [{ tipo: 'lluvia', n: 320, viento: 120, fuerza: [[0, .35], [MESA, .7]] }],
       camara: [[0, 640, 360, 1], [en['b1.2'] - .1, 640, 330, 1.1], [en['b1.2'] - .1, 640, 330, 1.25], [PELEAN, 640, 325, 1.3], [MESA, 640, 320, 1.38]] },
     { desde: MESA, ...jack, viento: 0, borde: 0, decorado: [{ tipo: 'salon', lluvia: .8, par: 1 }],
-      actores: [sombra(SA, -140, 200, en.b2 + 1.6), sombra(FE, 1420, 1080, en.b2 + 1.9)],
+      actores: [sombra(SA, -140, 200, G.x('b2', 1.6)), sombra(FE, 1420, 1080, G.x('b2', 1.9))],
       camara: [[0, 640, 330, 1.08], [G.fin, 640, 340, 1.2]] },
   ],
 };

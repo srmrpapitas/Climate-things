@@ -188,7 +188,7 @@
     if (hechos >= filas) for (let i = 0; i < w / 60; i++) g.fillRect(x - w / 2 + i * 60, y - filas * lh - 26, 34, 26);   // almenas
   };
   D.balanza = (g, t, d) => {                     // balanza de dos platos; d.peso (-1 izquierda … 1 derecha) y un vaivén que no se decide
-    const x = d.x || 640, y = d.y || 600, e = d.escala || 1, inc = (d.peso || 0) * .12 + .07 * Math.sin(t * 1.1) * Math.exp(-((t - (d.en ?? 0)) % 6) * .1);
+    const x = d.x || 640, y = d.y || 600, e = d.escala || 1, inc = (d.pesos || []).reduce((p, [tt, v]) => p + (v - p) * T.suave(T.clamp(t - tt)), d.peso || 0) * .12 + .07 * Math.sin(t * 1.1) * Math.exp(-((t - (d.en ?? 0)) % 6) * .1);
     g.save(); g.translate(x, y); g.scale(e, e); g.fillStyle = color(d); g.strokeStyle = color(d);
     g.beginPath(); g.moveTo(-70, 0); g.lineTo(70, 0); g.lineTo(14, -24); g.lineTo(8, -330); g.lineTo(-8, -330); g.lineTo(-14, -24); g.closePath(); g.fill();
     g.beginPath(); g.arc(0, -340, 16, 0, TAU); g.fill();
@@ -250,7 +250,9 @@
     const x = d.x, y = d.y || 600, e = d.escala || 1, n = d.n || 9; g.save(); g.translate(x, y); g.scale(e, e); g.rotate(d.giro || 0);
     g.fillStyle = 'rgba(0,0,0,.3)'; g.fillRect(-82, -30 - n * 34 - 70, 172, n * 34 + 100); g.fillStyle = '#efe0bd'; g.fillRect(-90, -36 - n * 34 - 70, 180, n * 34 + 100);
     g.fillStyle = '#2a1708'; texto(g, d.texto || 'LISTA', 0, -36 - n * 34 - 30, 22);
-    for (let i = 0; i < n; i++) { const yy = -36 - (n - i) * 34 + 10; g.fillStyle = '#3a2410'; g.fillRect(-64, yy, 16, 16); g.fillRect(-36, yy + 5, 100 - 20 * A(i + (d.s || 0)), 6); }
+    const vis = d.escribe == null ? n : Math.min(n, Math.floor((t - d.escribe) * (d.ritmo || 2.5)));     // d.escribe: la mano del partido la va escribiendo
+    for (let i = 0; i < vis; i++) { const yy = -36 - (n - i) * 34 + 10; g.fillStyle = '#3a2410'; g.fillRect(-64, yy, 16, 16); g.fillRect(-36, yy + 5, 100 - 20 * A(i + (d.s || 0)), 6); }
+    if (d.escribe != null && t > d.escribe - 1 && vis < n) { const yy = -36 - (n - Math.max(0, vis)) * 34 + 10; mano(g, 50 + 30 * Math.sin(t * 7), yy - 50, .55, -.35, 1); }
     g.restore(); };
   D.disco = (g, t, d) => { g.fillStyle = d.color || '#e9a23b'; g.beginPath(); g.arc(d.x || 1000, d.y || 300, d.r || 160, 0, TAU); g.fill(); };   // sol plano y enorme, a lo Jack
   // ---------- outro: «me gusta», suscribirse y campana (monumentos en el llano; el Elegido salta encima y se cuelga) ----------
@@ -478,11 +480,65 @@
       g.fillStyle = s < 0 ? '#5c1712' : '#16304f'; g.beginPath(); g.roundRect(cx - 28, my - 214, 56, 160, 14); g.fill();   // tapizado: rojo y azul
       g.fillStyle = 'rgba(214,170,40,.85)'; g.beginPath(); g.arc(cx, my - 246, 6, 0, TAU); g.fill();
       for (let i = 0; i < 3; i++) for (let j = 0; j < 2; j++) { g.beginPath(); g.arc(cx - 12 + j * 24, my - 180 + i * 40, 2.5, 0, TAU); g.fill(); } }
-    g.fillStyle = '#e8dcc0'; g.fillRect(140, my - 20, 1000, 24); g.beginPath(); g.moveTo(140, my + 4); for (let xx = 140; xx <= 1140; xx += 50) g.quadraticCurveTo(xx + 25, my + 30, xx + 50, my + 4); g.lineTo(1140, my + 70); g.lineTo(140, my + 70); g.fill();
-    g.fillStyle = '#1d120b'; g.fillRect(140, my + 70, 1000, 200);
-    for (const [cx, alt] of [[360, 0], [920, 0], [470, 1], [810, 1]]) { g.fillStyle = '#1d120b'; g.fillRect(cx - 3, my - 60 - 20 * alt, 6, 40 + 20 * alt); g.fillStyle = `rgba(255,${200 + 40 * Math.sin(t * 9 + cx)},120,.95)`; g.beginPath(); g.ellipse(cx, my - 66 - 20 * alt, 4, 9, 0, 0, TAU); g.fill(); brillo(g, cx, my - 66 - 20 * alt, 60, '255,200,120', .3); }   // velas
-    D.pastel(g, t, { x: 640, y: my - 20, cortes: d.cortes, escala: d.pastel || 1 });
+    if (!d.sinMesa) D.banquete(g, t, { ...d, mesaY: my });                                                         // sinMesa: la mesa va aparte, en `delante`
   };
+  // ── Ep. 4, secuencia G: la mesa ──
+  // mesa del banquete (mantel, velas, pastel). En `delante`, los títeres quedan detrás, de cintura para arriba. Opciones:
+  //   d.sinPastel · d.libro (la Constitución) y d.monedas (t: cae encima la pila de la deuda) · d.togas (t: aparecen veinte juececitos;
+  //   se tiñen con el último corte) · d.movil (t: vibra y se enciende) · d.cae (t: el pastel se cae) · d.vuelve (t: baja un pastel nuevo con d.cortes2)
+  D.banquete = (g, t, d) => {
+    const my = d.mesaY || 520, px = 640, tela = d.mantel || '#e8dcc0';
+    g.fillStyle = tela; g.fillRect(140, my - 20, 1000, 24); g.beginPath(); g.moveTo(140, my + 4); for (let xx = 140; xx <= 1140; xx += 50) g.quadraticCurveTo(xx + 25, my + 30, xx + 50, my + 4); g.lineTo(1140, my + 70); g.lineTo(140, my + 70); g.fill();
+    g.fillStyle = '#1d120b'; g.fillRect(140, my + 70, 1000, 200);
+    for (const [cx, alt] of d.velas || [[360, 0], [920, 0], [470, 1], [810, 1]]) { g.fillStyle = '#1d120b'; g.fillRect(cx - 3, my - 60 - 20 * alt, 6, 40 + 20 * alt); g.fillStyle = `rgba(255,${200 + 40 * Math.sin(t * 9 + cx)},120,.95)`; g.beginPath(); g.ellipse(cx, my - 66 - 20 * alt, 4, 9, 0, 0, TAU); g.fill(); brillo(g, cx, my - 66 - 20 * alt, 60, '255,200,120', .3); }   // velas
+    if (d.libro != null && t >= d.libro) {                                                                           // la Constitución, de pie, y la pila de la deuda encima
+      g.fillStyle = '#3a0d0a'; g.fillRect(px - 92, my - 214, 184, 194); g.fillStyle = '#efe0bd'; g.fillRect(px - 92, my - 28, 184, 10);
+      g.fillStyle = '#5c1712'; g.fillRect(px - 84, my - 210, 168, 180); g.fillStyle = '#d6aa28'; texto(g, 'CONSTITUCIÓN', px, my - 140, 21); texto(g, '1978', px, my - 106, 26);
+      g.strokeStyle = '#d6aa28'; g.lineWidth = 2; g.strokeRect(px - 74, my - 200, 148, 160);
+      if (d.monedas != null && t >= d.monedas) { const k = T.rebote(T.clamp((t - d.monedas) / .7));
+        for (let i = 0; i < 9; i++) { const yy = my - 222 - i * 15 - 520 * (1 - k) * (1 + i * .08), xx = px + 6 * Math.sin(i * 2.3);
+          g.fillStyle = '#8a6a1a'; g.beginPath(); g.ellipse(xx, yy + 5, 62, 13, 0, 0, TAU); g.fill(); g.fillStyle = '#d6aa28'; g.beginPath(); g.ellipse(xx, yy, 62, 13, 0, 0, TAU); g.fill(); }
+        brillo(g, px, my - 300, 160, '255,215,130', .4 * Math.exp(-(t - d.monedas) * 1.5)); g.fillStyle = '#5a3a08'; texto(g, 'DEUDA', px, my - 222 - 8 * 15 + 7, 18); } }
+    const cortes = [...(d.cortes || []), ...(d.vuelve != null ? d.cortes2 || [] : [])].filter(c => t >= c.en).pop();
+    if (d.togas != null && t >= d.togas) for (let i = 0; i < 20; i++) {                                              // veinte vocales con toga y birrete
+      const k = T.rebote(T.clamp((t - d.togas - i * .07) / .4)); if (k <= 0) continue;
+      const lado = i < 10 ? -1 : 1, j = i % 10, x = px + lado * (175 + j * 30), y = my - 20, h = 54 * k;
+      const col = !cortes ? '#16100c' : (lado < 0 ? j : 10 + j) < cortes.partes[0] ? '#7a1a14' : '#16305a';
+      g.fillStyle = col; g.beginPath(); g.moveTo(x - 11, y); g.lineTo(x - 7, y - h * .72); g.lineTo(x + 7, y - h * .72); g.lineTo(x + 11, y); g.fill();
+      g.fillStyle = '#efe0bd'; g.fillRect(x - 5, y - h * .72, 10, 5 * k); g.fillStyle = '#16100c'; g.beginPath(); g.arc(x, y - h * .83, 7 * k, 0, TAU); g.fill();
+      g.fillRect(x - 8 * k, y - h - 2, 16 * k, 7 * k); }
+    const pastel = (cx, cy, c) => D.pastel(g, t, { x: cx, y: cy, cortes: c, escala: d.pastel || 1 });
+    if (!d.sinPastel && (d.cae == null || t < d.cae + 1.2)) { const v = d.cae == null ? 0 : Math.max(0, t - d.cae), k = T.clamp(v / 1);
+      g.save(); g.translate(px + 300 * k, my - 20 + 600 * k * k); g.rotate(1.9 * k); g.translate(-px, -(my - 20)); pastel(px, my - 20, d.cortes); g.restore(); }
+    if (d.vuelve != null && t >= d.vuelve) { const k = T.rebote(T.clamp((t - d.vuelve) / .8)); pastel(px, my - 20 - 560 * (1 - k), d.cortes2); }
+    if (d.movil != null) { const v = t - d.movil, vib = v > 0 && v < 2.5 ? 3 * Math.sin(v * 90) * (Math.sin(v * 9) > 0) : 0, mx = (d.movilX || 1110) + vib, luz = v > 0 ? 1 : 0;   // móvil de pie en su soporte
+      g.fillStyle = '#16100c'; g.beginPath(); g.roundRect(mx - 26, my - 116, 52, 96, 8); g.fill(); g.fillRect(mx - 20, my - 24, 40, 6);
+      g.fillStyle = luz ? '#cfe3ff' : '#2a2a32'; g.beginPath(); g.roundRect(mx - 21, my - 110, 42, 82, 4); g.fill();
+      if (luz) { brillo(g, mx, my - 70, 110, '190,220,255', .5); g.fillStyle = '#9fd88a'; g.beginPath(); g.roundRect(mx - 17, my - 92, 34, 26, 5); g.fill(); g.fillStyle = 'rgba(30,60,20,.6)'; g.fillRect(mx - 12, my - 84, 24, 3); g.fillRect(mx - 12, my - 77, 16, 3); } }
+  };
+  // reloj de pared: corre deprisa entre d.corre y d.para (los años que pasan); d.x, d.y, d.r
+  D.reloj = (g, t, d) => {
+    const x = d.x || 1180, y = d.y || 180, r = d.r || 46, v = Math.max(0, Math.min(t, d.para ?? 1e9) - (d.corre ?? 1e9)), giro = t / 60 + v * 4;
+    g.fillStyle = '#1d120b'; g.beginPath(); g.arc(x, y, r + 8, 0, TAU); g.fill(); g.fillStyle = '#e8dcc0'; g.beginPath(); g.arc(x, y, r, 0, TAU); g.fill();
+    g.fillStyle = '#1d120b'; for (let i = 0; i < 12; i++) { const a = i / 12 * TAU; g.fillRect(x + Math.sin(a) * (r - 8) - 2, y - Math.cos(a) * (r - 8) - 2, 4, 4); }
+    g.strokeStyle = '#1d120b'; g.lineCap = 'round'; for (const [a, l, w] of [[giro / 12 * TAU, r * .5, 5], [giro * TAU, r * .8, 3]]) { g.lineWidth = w; g.beginPath(); g.moveTo(x, y); g.lineTo(x + Math.sin(a) * l, y - Math.cos(a) * l); g.stroke(); }
+    g.fillRect(x - 3, y + r + 6, 6, 70); g.beginPath(); g.arc(x + 26 * Math.sin(t * 3), y + r + 80, 12, 0, TAU); g.fill(); };   // péndulo
+  // telarañas en las esquinas que aparecen en d.en y se van en d.hasta
+  D.telaranas = (g, t, d) => {
+    const a = T.clamp((t - (d.en ?? 1e9)) / 1.5) * (1 - T.clamp((t - (d.hasta ?? 1e9)) / .6)); if (a <= 0) return;
+    g.save(); g.strokeStyle = `rgba(230,225,215,${.55 * a})`; g.lineWidth = 1.3;
+    for (const [cx, cy, sx, sy, r] of d.donde || [[0, 0, 1, 1, 230], [1280, 0, -1, 1, 200], [140, 500, 1, -1, 120], [1140, 500, -1, -1, 120]]) {
+      for (let i = 0; i <= 6; i++) { const ang = i / 6 * Math.PI / 2; g.beginPath(); g.moveTo(cx, cy); g.lineTo(cx + sx * Math.cos(ang) * r * a, cy + sy * Math.sin(ang) * r * a); g.stroke(); }
+      for (let k = 1; k <= 5; k++) { const rr = r * a * k / 5; g.beginPath(); for (let i = 0; i <= 6; i++) { const ang = i / 6 * Math.PI / 2, px = cx + sx * Math.cos(ang) * rr, py = cy + sy * Math.sin(ang) * rr; i ? g.quadraticCurveTo(cx + sx * Math.cos(ang - .13) * rr * .9, cy + sy * Math.sin(ang - .13) * rr * .9, px, py) : g.moveTo(px, py); } g.stroke(); } }
+    g.restore(); };
+  // estandarte azul con el círculo de doce estrellas que se desenrolla desde arriba en d.en (Bruselas); d.x, d.y (arriba), d.ancho, d.alto
+  D.estandarte = (g, t, d) => {
+    const k = T.suave(T.clamp((t - (d.en ?? 1e9)) / .9)); if (k <= 0) return; const x = d.x || 640, y = d.y || 60, w = d.ancho || 260, h = (d.alto || 300) * k;
+    g.fillStyle = '#1d120b'; g.fillRect(x - w / 2 - 20, y - 8, w + 40, 10); g.fillStyle = '#123a8c'; g.beginPath(); g.moveTo(x - w / 2, y); g.lineTo(x + w / 2, y);
+    for (let yy = y; yy <= y + h; yy += 20) g.lineTo(x + w / 2 + 4 * Math.sin(yy * .05 + t * 1.3), yy); g.lineTo(x - w / 2, y + h); g.closePath(); g.fill();
+    g.save(); g.beginPath(); g.rect(x - w / 2, y, w, h); g.clip(); g.fillStyle = '#f2c81e'; const cy = y + (d.alto || 300) * .42, R = w * .3;
+    for (let i = 0; i < 12; i++) { const a = i / 12 * TAU, sx = x + Math.sin(a) * R, sy = cy - Math.cos(a) * R; g.beginPath(); for (let j = 0; j < 10; j++) { const b = j / 10 * TAU, q = j % 2 ? 4 : 10; g.lineTo(sx + Math.sin(b) * q, sy - Math.cos(b) * q); } g.fill(); }
+    g.restore(); brillo(g, x, cy, 220, '255,220,120', .3 * Math.exp(-(t - d.en) * 1.2)); };
   const mezclaX = (a, b, k) => a + (b - a) * k;
   // el encasillado: mapa de Españistán en un tablero con casillas; desde d.en se van rellenando nombres (d.ritmo casillas/s) antes de votar
   D.encasillado = (g, t, d) => {
@@ -532,4 +588,141 @@
         g.strokeStyle = '#efe0bd'; g.lineWidth = 3; g.stroke(); } g.restore(); }
     g.restore(); g.restore();
   };
+
+  // corona que baja del cielo en d.en y se queda flotando con un brillo (el Rey que elige): d.x, d.y, d.escala, d.color
+  D.corona = (g, t, d) => {
+    if (d.en == null || t < d.en) return; const k = T.rebote(T.clamp((t - d.en) / .8)), e = d.escala || 1, y = (d.y || 150) - 260 * (1 - k) + 5 * Math.sin(t * 1.4);
+    brillo(g, d.x || 640, y - 30 * e, 150 * e, '255,215,130', .45 * T.clamp((t - d.en) / .8));
+    g.save(); g.translate(d.x || 640, y); g.scale(e, e); g.fillStyle = d.color || '#c9a24a';
+    g.beginPath(); g.moveTo(-70, 0); g.lineTo(-80, -70); g.lineTo(-40, -36); g.lineTo(0, -86); g.lineTo(40, -36); g.lineTo(80, -70); g.lineTo(70, 0); g.closePath(); g.fill();
+    g.fillRect(-72, -4, 144, 18); g.fillStyle = '#7a1410'; for (const cx of [-40, 0, 40]) { g.beginPath(); g.arc(cx, 5, 6, 0, TAU); g.fill(); }
+    g.fillStyle = d.color || '#c9a24a'; for (const [cx, cy] of [[-80, -70], [0, -86], [80, -70]]) { g.beginPath(); g.arc(cx, cy - 6, 8, 0, TAU); g.fill(); }
+    g.restore(); };
+
+  // ── Ep. 4, secuencias E–F: los hilos ──
+  // mano gigante que baja de lo alto (dedos hacia abajo, puño de la manga arriba); `coge` = dedos cerrados sobre algo
+  const mano = (g, x, y, e, giro = 0, coge = 0, col = N) => {
+    g.save(); g.translate(x, y); g.rotate(giro); g.scale(e, e); g.fillStyle = col;
+    g.fillRect(-30, -420, 60, 360); g.fillRect(-36, -78, 72, 22);                                                // manga y puño
+    g.beginPath(); g.ellipse(0, -10, 32, 44, 0, 0, TAU); g.fill();                                                // palma
+    for (let i = 0; i < 4; i++) { const fx = -21 + i * 14, l = (46 - 6 * Math.abs(i - 1.5)) * (1 - .45 * coge);
+      g.beginPath(); g.roundRect(fx - 6, 14, 12, l, 6); g.fill(); }
+    g.save(); g.translate(-30, -8); g.rotate(.6 - .5 * coge); g.beginPath(); g.roundRect(-6, 0, 12, 40, 6); g.fill(); g.restore();   // pulgar
+    g.restore(); };
+  D.mano = (g, t, d) => { const y = (d.baja ? d.baja[1] + (d.baja[2] - d.baja[1]) * T.suave(T.clamp((t - d.baja[0]) / 1.2)) : d.y || 200) + 6 * Math.sin(t * .8), e = d.escala || 1;
+    if (d.hilos) { const k = T.suave(T.clamp((t - (d.crecen ?? -9)) / 1.2)); g.strokeStyle = 'rgba(235,225,205,.85)'; g.lineWidth = 2;
+      d.hilos.forEach(([hx, hy], i) => { const fx = d.x + (-21 + (i % 4) * 14) * e, fy = y + 50 * e; g.beginPath(); g.moveTo(fx, fy); g.lineTo(fx + (hx - fx) * k, fy + (hy - fy) * k); g.stroke(); }); }
+    mano(g, d.x, y, e, d.giro || 0, d.coge || 0, color(d)); };
+  // sello que cae y se queda (d.en, d.texto con \n, d.giro, d.escala, d.color); golpe con un temblor
+  D.sello = (g, t, d) => {
+    if (t < d.en) return; const v = t - d.en, k = T.clamp(v / .14), s = (2.2 - 1.2 * k) * (d.escala || 1), tiembla = v > .14 ? 3 * Math.exp(-(v - .14) * 9) * Math.sin(v * 70) : 0;
+    const lineas = (d.texto || 'SELLO').split('\n'), w = d.ancho || 420, h = 60 + 54 * lineas.length, col = d.color || '#a3140f';
+    g.save(); g.translate(d.x || 640, (d.y || 360) + tiembla); g.rotate(d.giro ?? -.12); g.scale(s, s); g.globalAlpha = T.clamp(k * 1.5);
+    g.strokeStyle = col; g.lineWidth = 10; g.strokeRect(-w / 2, -h / 2, w, h); g.lineWidth = 3; g.strokeRect(-w / 2 + 12, -h / 2 + 12, w - 24, h - 24);
+    g.fillStyle = col; lineas.forEach((l, i) => texto(g, l, 0, -h / 2 + 76 + i * 54, 48)); g.restore(); };
+  // el voto de Rousseau: una mano baja y echa la papeleta en la urna (d.echa); al salir, un grillete se le cierra en la muñeca (d.grillete) y tira la cadena
+  D.voto = (g, t, d) => {
+    const x = d.x || 640, y = d.y || 600, e = d.escala || 1;
+    D.urna(g, t, { x, y, escala: 1.6 * e, tono: d.tono });
+    const baja = T.suave(T.clamp((t - d.echa + 1.6) / 1.2)), sube = T.suave(T.clamp((t - d.echa - .7) / 1.1));
+    const tir = d.grillete != null && t > d.grillete + .5 ? 18 * Math.exp(-(t - d.grillete - .5) * 3) * Math.sin((t - d.grillete - .5) * 14) : 0;
+    const hy = y - 1.6 * e * 150 - 120 - 380 * (1 - baja) - 70 * sube + tir, hx = x + 40 * sube;
+    if (t < d.echa + .45) { const cae = T.clamp((t - d.echa) / .45); g.save(); g.beginPath(); g.rect(x - 300, -2000, 600, 2000 + y - 1.6 * e * 150 + 6); g.clip();   // la papeleta entra por la ranura
+      g.fillStyle = '#efe0bd'; g.fillRect(hx - 30, hy + 52 + 90 * cae, 60, 80); g.fillStyle = '#3a2410'; g.fillRect(hx - 18, hy + 70 + 90 * cae, 36, 4); g.fillRect(hx - 18, hy + 82 + 90 * cae, 26, 4); g.restore(); }
+    mano(g, hx, hy, e, 0, t < d.echa ? 1 : 0, color(d));
+    if (d.grillete != null && t > d.grillete) { const k = T.clamp((t - d.grillete) / .16), s = 1.7 - .7 * k, cy = hy - 95;
+      g.strokeStyle = '#6d6a64'; g.lineWidth = 14; g.lineCap = 'round';
+      g.lineWidth = 6; for (let i = 0; i < 26; i++) { const lx = hx + 58 + i * 34 * k, ly = cy + i * 3 + 4 * Math.sin(i * 1.3 + t * 3) * (1 - k);   // cadena de eslabones hacia fuera
+        g.beginPath(); g.ellipse(lx, ly, 20, i % 2 ? 6 : 11, .08, 0, TAU); g.stroke(); }
+      g.save(); g.translate(hx, cy); g.scale(s, s); g.strokeStyle = '#8c8880'; g.lineWidth = 16; g.beginPath(); g.ellipse(0, 0, 46, 18, 0, 0, TAU); g.stroke();
+      g.strokeStyle = '#3a3834'; g.lineWidth = 4; g.beginPath(); g.ellipse(0, 0, 46, 18, 0, 0, TAU); g.stroke(); g.restore(); } };
+  // diputados-marioneta: cada títere cuelga con tres hilos (cabeza y manos) de la cruceta que agarra una mano en lo alto.
+  //   d.uno: un solo títere grande en (d.x, d.y); si no, gradas de hemiciclo (d.filas). d.mano: { x, y, escala } (sin mano, los hilos se pierden arriba)
+  //   d.crecen: los hilos nacen del títere y suben (s). d.rebeldes: { n, en, multa }: n títeres tiran al revés (hilos tensos) y en la multa vuelven de golpe con su marca roja
+  //   d.mira: [[t, a]] hacia dónde mira el títere suelto (a en radianes: 0 = derecha, -π/2 = arriba, π = izquierda; null = de frente)
+  D.marionetas = (g, t, d) => {
+    const x = d.x || 640, y = d.y || 640, e = d.escala || 1, M = d.mano, k = d.crecen == null ? 1 : T.suave(T.clamp((t - d.crecen) / 1.4));
+    const tiron = M && d.rebeldes && t > d.rebeldes.multa ? 40 * Math.exp(-(t - d.rebeldes.multa) * 4) : 0;
+    const bx = M ? M.x : x, by = M ? M.y + 70 * (M.escala || 1) - tiron + 6 * Math.sin(t * .8) : -600;
+    const pos = [];
+    if (d.uno) pos.push({ px: x, py: y, s: e * 3, i: 0, f: 0 });
+    else for (let f = (d.filas || 6) - 1; f >= 0; f--) { const rx = 240 + f * 95, ry = 70 + f * 34, cuantos = 14 + f * 5;
+      g.fillStyle = color(d); g.beginPath(); g.ellipse(x, y - f * 26 * e, (rx + 20) * e, (ry + 14) * e, 0, Math.PI, TAU); g.ellipse(x, y - f * 26 * e, (rx - 30) * e, (ry - 18) * e, 0, TAU, Math.PI, true); g.fill();
+      for (let i = 0; i < cuantos; i++) { const a = Math.PI + (i + .5) / cuantos * Math.PI; pos.push({ px: x + rx * Math.cos(a) * e, py: y + (-f * 26 + ry * Math.sin(a) - 2) * e, s: e * .62, i: pos.length, f, a }); } }
+    const R = d.rebeldes, rebelde = new Set(R ? pos.map(p => p.i).sort((a, b) => A(a + 77) - A(b + 77)).slice(0, R.n) : []);
+    const mira = (d.mira || []).filter(m => t >= m[0]).pop();
+    // títeres de atrás hacia delante, y luego los hilos por encima (cogen la luz del foco)
+    const hilos = [];
+    for (const p of pos) { const r = rebelde.has(p.i), sw = Math.sin(t * 1.7 + p.i * 1.3);
+      const tira = r && t > R.en ? T.suave(T.clamp((t - R.en - A(p.i) * .6) / .5)) * (t > R.multa ? 1 - T.rebote(T.clamp((t - R.multa) / .35)) : 1) : 0;
+      const lean = .05 * sw * (d.uno ? .4 : 1) + tira * (p.a == null || Math.cos(p.a) > 0 ? .45 : -.45), c = Math.cos(lean), sn = Math.sin(lean), s = p.s;
+      const W = (lx, ly) => [p.px + s * (lx * c - ly * sn), p.py + s * (lx * sn + ly * c)], hy = -68 - 8 * sw - 10 * tira;
+      g.save(); g.translate(p.px, p.py); g.rotate(lean); g.scale(s, s); g.fillStyle = color(d);
+      g.fillRect(-10, -42, 8, 42); g.fillRect(2, -42, 8, 42);                                                    // piernas
+      g.beginPath(); g.moveTo(-17, -40); g.lineTo(-15, -86); g.lineTo(15, -86); g.lineTo(17, -40); g.closePath(); g.fill();   // chaqueta
+      g.strokeStyle = g.fillStyle; g.lineWidth = 7; g.lineCap = 'round';
+      for (const sx of [-1, 1]) { g.beginPath(); g.moveTo(sx * 14, -82); g.lineTo(sx * 25, hy + sx * 3 * sw); g.stroke(); g.beginPath(); g.arc(sx * 25, hy + sx * 3 * sw, 4.5, 0, TAU); g.fill(); }
+      g.fillRect(-4, -94, 8, 10); g.beginPath(); g.arc(0, -101, 12, 0, TAU); g.fill();                         // cuello y cabeza
+      if (d.uno && mira && mira[1] != null) { g.beginPath(); g.moveTo(10 * Math.cos(mira[1] - .4), -101 + 10 * Math.sin(mira[1] - .4)); g.lineTo(17 * Math.cos(mira[1]), -101 + 17 * Math.sin(mira[1])); g.lineTo(10 * Math.cos(mira[1] + .4), -101 + 10 * Math.sin(mira[1] + .4)); g.fill(); }   // nariz: hacia dónde mira
+      if (r && R.multa != null && t > R.multa) { g.fillStyle = '#b0231a'; g.beginPath(); g.arc(0, -66, 6, 0, TAU); g.fill(); }   // la marca de la multa
+      g.restore();
+      for (const [lx, ly, dx] of [[0, -113, 0], [-25, hy - 3 * sw, -1], [25, hy + 3 * sw, 1]]) hilos.push({ a: W(lx, ly), b: [bx + dx * 34 * (M ? M.escala || 1 : 1) + (M ? 0 : (p.px - x) * .3), by], r: r && tira > .05 }); }
+    g.save(); g.lineCap = 'round';
+    for (const h of hilos) { const [ax, ay] = h.a, [cx, cy] = h.b, ex = ax + (cx - ax) * k, ey = ay + (cy - ay) * k, comba = h.r ? 0 : 10 * (1 - k * .5), vib = h.r ? 1.5 * Math.sin(t * 60 + ax) : 0;
+      g.strokeStyle = h.r ? 'rgba(255,190,150,.95)' : `rgba(235,220,185,${d.uno ? .85 : .45})`; g.lineWidth = h.r ? 2 : (d.uno ? 2 : 1.1);
+      g.beginPath(); g.moveTo(ax, ay); g.quadraticCurveTo((ax + ex) / 2 + comba + vib, (ay + ey) / 2, ex, ey); g.stroke(); }
+    g.restore();
+    if (M) { const me = M.escala || 1; g.fillStyle = '#4a3a2a'; g.fillRect(bx - 40 * me, by - 4 * me, 80 * me, 8 * me); g.fillRect(bx - 4 * me, by - 26 * me, 8 * me, 40 * me);   // cruceta
+      mano(g, bx, by - 30 * me, me, 0, 1, color(d)); } };
+  // papeleta del Senado (sepia): se despliega en d.abre como un mapa; columnas de partidos con nombres y casillas; d.cruces: [segundos] en que se marca una cruz
+  D.senado = (g, t, d) => {
+    const x = d.x || 640, y = d.y || 600, e = d.escala || 1, k = T.suave(T.clamp((t - (d.abre ?? -9)) / .9)); if (k <= 0) return;
+    const w = 760, h = 440; g.save(); g.translate(x, y); g.scale(e, e * k);
+    g.fillStyle = 'rgba(0,0,0,.3)'; g.fillRect(-w / 2 + 10, -h + 10, w, h); g.fillStyle = '#d9c29a'; g.fillRect(-w / 2, -h, w, h);
+    g.strokeStyle = 'rgba(90,60,30,.25)'; g.lineWidth = 2; for (const fx of [-w / 6, w / 6]) { g.beginPath(); g.moveTo(fx, -h); g.lineTo(fx, 0); g.stroke(); }   // pliegues
+    g.fillStyle = '#2a1708'; texto(g, 'SENADO', 0, -h + 44, 34); g.font = '400 18px Georgia, serif'; g.textAlign = 'center'; g.fillText('Marque con una cruz hasta tres nombres', 0, -h + 72); g.textAlign = 'left';
+    const cruces = (d.cruces || []).map((c, j) => [c, [[0, 1], [2, 3], [3, 0]][j % 3]]);
+    for (let c = 0; c < 4; c++) { const cx = -w / 2 + 30 + c * (w - 60) / 4; g.fillStyle = '#5a3a1a'; g.fillRect(cx, -h + 92, (w - 60) / 4 - 16, 22);
+      for (let r = 0; r < 6; r++) { const ry = -h + 136 + r * 46; g.strokeStyle = '#2a1708'; g.lineWidth = 2.5; g.strokeRect(cx, ry, 26, 26);
+        g.fillStyle = '#3a2410'; g.fillRect(cx + 36, ry + 10, 90 - 30 * A(c * 7 + r), 6);
+        for (const [ct, [cc, rr]] of cruces) if (cc === c && rr === r && t > ct) { const m = T.clamp((t - ct) / .25); g.strokeStyle = '#1a3a8a'; g.lineWidth = 5;
+          g.beginPath(); g.moveTo(cx + 2, ry + 2); g.lineTo(cx + 2 + 22 * Math.min(1, m * 2), ry + 2 + 22 * Math.min(1, m * 2)); if (m > .5) { g.moveTo(cx + 24, ry + 2); g.lineTo(cx + 24 - 22 * (m * 2 - 1), ry + 2 + 22 * (m * 2 - 1)); } g.stroke(); } } }
+    g.restore(); };
+
+  // ── Ep. 4, secuencia H: la puerta giratoria ──
+  // avenida de rascacielos a contraluz (d.y suelo, d.tono lejanía, d.n edificios): ventanas que se encienden al azar
+  D.rascacielos = (g, t, d) => {
+    const y = d.y || 600, n = d.n || 11; g.fillStyle = color(d);
+    for (let i = 0; i < n; i++) { const w = 70 + 70 * A(i + 41), h = 220 + 300 * A(i + 43), x = -200 + i * (1700 / n) + 30 * A(i + 47);
+      g.fillStyle = color(d); g.fillRect(x, y - h, w, h); if (A(i + 49) < .4) g.fillRect(x + w / 2 - 2, y - h - 40, 4, 40);
+      for (let r = 0; r < h / 26 - 1; r++) for (let c = 0; c < w / 18 - 1; c++) if (A(i * 97 + r * 13 + c) < .22 + .1 * Math.sin(t * .3 + i + r)) {
+        g.fillStyle = 'rgba(255,190,110,.55)'; g.fillRect(x + 8 + c * 18, y - h + 14 + r * 26, 8, 12); } } };
+  // la torre de la eléctrica (genérica, sin marca real): un rayo en lo alto que se enciende en d.enciende y late; d.x, d.alto
+  D.torre = (g, t, d) => {
+    const x = d.x || 1050, y = d.y || 600, h = d.alto || 520, w = d.ancho || 230; g.fillStyle = color(d);
+    g.beginPath(); g.moveTo(x - w / 2, y); g.lineTo(x - w / 2 + 20, y - h); g.lineTo(x + w / 2 - 20, y - h); g.lineTo(x + w / 2, y); g.fill();
+    g.fillRect(x - 4, y - h - 70, 8, 70);
+    for (let r = 0; r < h / 30 - 2; r++) for (let c = 0; c < 6; c++) if (A(r * 7 + c + 300) < .55) { g.fillStyle = 'rgba(255,200,120,.45)'; g.fillRect(x - w / 2 + 34 + c * (w - 60) / 6, y - h + 90 + r * 30, 14, 14); }
+    const k = d.enciende == null ? 0 : T.clamp((t - d.enciende) / .4), late = k * (.85 + .15 * Math.sin(t * 5));
+    if (k > 0) brillo(g, x, y - h + 40, 200, '255,210,90', .55 * late);
+    g.fillStyle = k > 0 ? `rgba(255,${200 + 40 * late},90,${.4 + .6 * late})` : 'rgba(70,50,30,.9)';
+    g.beginPath(); g.moveTo(x + 8, y - h + 4); g.lineTo(x - 24, y - h + 48); g.lineTo(x - 2, y - h + 48); g.lineTo(x - 12, y - h + 86); g.lineTo(x + 26, y - h + 36); g.lineTo(x + 4, y - h + 36); g.closePath(); g.fill(); };
+  // puerta giratoria de cristal (va en `delante`): cuatro hojas que giran desde d.arranca (d.vel vueltas/s); destellos en d.destellos
+  D.puerta = (g, t, d) => {
+    const x = d.x || 640, y = d.y || 600, R = d.r || 110, H = d.alto || 300, v = d.vel || .25, giro = Math.max(0, t - (d.arranca ?? 0)) * v * TAU;
+    g.fillStyle = 'rgba(30,20,14,.95)'; g.fillRect(x - R - 20, y - H - 40, 2 * R + 40, 40); g.fillRect(x - R - 20, y - 8, 2 * R + 40, 10);   // techo y suelo
+    g.fillStyle = 'rgba(255,215,150,.9)'; g.font = '700 18px Georgia, serif'; g.textAlign = 'center'; g.fillText(d.texto || 'SALIDA', x, y - H - 14); g.textAlign = 'left';
+    g.fillStyle = 'rgba(180,215,235,.10)'; g.fillRect(x - R, y - H, 2 * R, H);                                         // el tambor de cristal
+    const hojas = [0, 1, 2, 3].map(i => giro + i * Math.PI / 2).sort((a, b) => Math.cos(a) - Math.cos(b));            // de atrás a delante
+    for (const a of hojas) { const px = x + R * Math.sin(a), delante = Math.cos(a), w = Math.abs(R * Math.sin(a + .01) - R * Math.sin(a)) * 0 + 6;
+      g.fillStyle = `rgba(190,225,245,${.16 + .14 * Math.max(0, delante)})`; g.beginPath(); g.moveTo(x, y - H); g.lineTo(px, y - H); g.lineTo(px, y); g.lineTo(x, y); g.fill();
+      g.fillStyle = 'rgba(30,20,14,.9)'; g.fillRect(px - 3, y - H, w, H); if (delante > 0) { g.fillStyle = 'rgba(255,240,220,.25)'; g.fillRect(x + (px - x) * .3, y - H + 20, 3, H - 40); } }
+    g.fillStyle = 'rgba(30,20,14,.95)'; g.fillRect(x - 4, y - H, 8, H); for (const s of [-1, 1]) g.fillRect(x + s * R - 6, y - H, 12, H);
+    for (const e of d.destellos || []) { const u = t - e; if (u > 0 && u < .6) brillo(g, x, y - H / 2, 260, '255,235,180', .8 * (1 - u / .6)); } };
+
+  // penumbra: todo a oscuras salvo un círculo de luz (d.x, d.y, d.r); d.a = cuánto oscurece; d.en la va cerrando (de luz a oscuro en 1,5 s)
+  D.penumbra = (g, t, d) => {
+    const k = d.en == null ? 1 : T.clamp((t - d.en) / 1.5), x = d.x || 640, y = d.y || 380, r = d.r || 480;
+    const gr = g.createRadialGradient(x, y, r * .15, x, y, r); gr.addColorStop(0, 'rgba(6,3,2,0)'); gr.addColorStop(1, `rgba(6,3,2,${(d.a ?? .85) * k})`);
+    g.fillStyle = gr; g.fillRect(-900, -600, 3100, 2000); };
 })();

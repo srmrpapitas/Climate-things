@@ -6,7 +6,7 @@
 const G = T.guion([3, 4, 5]), en = G.en;
 const DE = PERSONAJES.decano;
 const jack = { jack: true, quieto: true, figura: '#2b2522', sombra: 9, contraluz: 0, bordes: ['rgb(190,215,255)', 'rgb(255,150,90)'], borde: .8 };
-const ENCIENDE = en['b3.2'] + 1.6, CAEN = en.b4 + 2.6;   // «con Podemos y Ciudadanos» y «volvieron» (ajustar con el audio real)
+const ENCIENDE = G.x('b3.2', 1.6), CAEN = G.x('b4', 2.6);   // «con Podemos y Ciudadanos» y «volvieron» (ajustar con el audio real)
 const noria = { tipo: 'noria', x: 640, y: 640, r: 300, vel: .025, par: .8, extra: [{ color: '#6b2f8f', en: ENCIENDE, cae: CAEN }, { color: '#e07a1c', en: ENCIENDE + .4, cae: CAEN + .25 }] };
 const feria = [
   { tipo: 'plano', color: '#131b30', raya: 'rgba(0,0,0,.28)', luz: 'rgba(110,140,210,.08)', par: .2 },
@@ -24,9 +24,9 @@ window.ESCENA = {
     { en: ENCIENDE, archivo: 'audio/sfx/whoosh.mp3', volumen: .3 },
     { en: CAEN + .7, archivo: 'audio/sfx/derrumbe.mp3', volumen: .5 }, { en: CAEN + .75, archivo: 'audio/sfx/impacto.mp3', volumen: .45 }],
   carteles: [
-    { en: en.b3 + .4, hasta: en.b5 - .3, x: 40, y: 40, ancho: 470, titulo: 'PP + PSOE', tiempos: [en.b3 + 3, en['b3.2'] + 3.4, CAEN + 1],
+    { en: G.x('b3', .4), hasta: en.b5 - .3, x: 40, y: 40, ancho: 470, titulo: 'PP + PSOE', tiempos: [G.x('b3', 3), G.x('b3.2', 3.4), CAEN + 1],
       filas: [['2008', '83,8 %'], ['2015', '50,7 %'], ['2023', '≈ 65 %', '#7a1410']], fuente: 'Ministerio del Interior' },
-    { en: en.b5 + .5, hasta: G.fin - .2, x: 40, y: 40, ancho: 560, titulo: 'Pregunta del Decano', tiempos: [en.b5 + 2.4, en['b5.2'] + .4],
+    { en: G.x('b5', .5), hasta: G.fin - .2, x: 40, y: 40, ancho: 560, titulo: 'Pregunta del Decano', tiempos: [G.x('b5', 2.4), G.x('b5.2', .4)],
       filas: [['¿Son los mejores…', ''], ['…o las reglas son para dos?', '']], fuente: 'Españistán' }],
   planos: [
     { desde: 0, ...jack, viento: .4, franjas: true, decorado: feria, actores: gente,
@@ -34,7 +34,7 @@ window.ESCENA = {
       camara: [[0, 640, 360, 1], [ENCIENDE - .2, 640, 340, 1.06], [ENCIENDE - .2, 640, 330, 1.18], [en.b4, 640, 325, 1.22], [CAEN - .05, 640, 325, 1.22], [CAEN - .05, 640, 360, 1], [en.b5, 640, 350, 1.04]] },
     { desde: en.b5 - .2, transicion: 'viento', ...jack, viento: .4, decorado: feria,
       particulas: [{ tipo: 'lluvia', n: 260, viento: 120, fuerza: [[0, .5]] }],
-      actores: [{ p: DE, x: 1380, mira: -1, acciones: [{ hace: 'camina', en: en.b5, hasta: en.b5 + 2.2, a: 1000 }, { hace: 'piensa', en: en.b5 + 2.4, hasta: en['b5.2'] }, { hace: 'senala', en: en['b5.2'] + .2, hasta: G.fin }] }],
+      actores: [{ p: DE, x: 1380, mira: -1, acciones: [{ hace: 'camina', en: en.b5, hasta: G.x('b5', 2.2), a: 1000 }, { hace: 'piensa', en: G.x('b5', 2.4), hasta: en['b5.2'] }, { hace: 'senala', en: G.x('b5.2', .2), hasta: G.fin }] }],
       camara: [[0, 820, 330, 1.35], [G.fin, 820, 320, 1.42]] },
   ],
 };

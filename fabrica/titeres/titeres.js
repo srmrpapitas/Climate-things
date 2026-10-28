@@ -540,6 +540,7 @@ const T = (() => {
       // títeres, en su propia capa para que los calados dejen ver el pergamino
       K.setTransform(1, 0, 0, 1, 0, 0); K.clearRect(0, 0, capa.width, capa.height); K.setTransform(...matriz(1)); const luces = [], colores = []; let hayImpacto = false;
       for (const ac of def.actores || []) {
+        if ((ac.desde != null && t < ac.desde) || (ac.hasta != null && t >= ac.hasta)) continue;   // un títere puede aparecer (desde) o irse (hasta)
         if (def.quieto) ac.quieto = true;
         const o = pose(ac, t), racha = (def.viento || 0) * (1 + .3 * Math.sin(t * 2.7) + .15 * Math.sin(t * 6.1 + 1));
         o.vf = -racha; o.vl = o.vista === 'perfil' ? -racha * Math.sign(o.f || 1) : -racha;
@@ -653,7 +654,13 @@ const T = (() => {
         voces.push({ en: t, dura: d, quien: 'narrador', texto: '', sinSub: true, archivo: `${TI.voz}b${String(x).padStart(2, '0')}.mp3` }); t += d + pausa; }
       else { const [archivo, d, texto, quien = 'Acascar'] = TI.f[x]; t += pausaFrase - pausa; en[x] = t; voces.push({ en: t, dura: d, quien, texto, archivo }); t += d + pausaFrase; }
     }
-    return { voces, en, fin: t + .4 };
+    // G.x('b28.3', 3): el segundo real de una palabra clave que se puso a ojo con la estimación (14 letras/s) a 3 s del inicio de esa frase;
+    // se reparte en proporción dentro de su trozo de voz (y salta a los siguientes si cae más allá)
+    const x = (clave, s) => { const m = clave.match(/^b(\d+)(?:\.(\d+))?$/), n = +m[1], j0 = m[2] ? +m[2] : 1, P = (TI.p || {})[n];
+      if (!P) return en[clave] + s; let j = j0 - 1;
+      while (j < P.length - 1 && s > P[j][0] + P[j][2]) { s -= P[j][0] + P[j][2]; j++; }
+      const [est, real] = P[j], base = en[`b${n}.${j + 1}`]; return base + (s <= est ? s / est * real : real + (s - est)); };
+    return { voces, en, x, fin: t + .4 };
   }
   return { curva, guion, tironCuerda, vaivenCampana, cuervo, escena, pose, pintaColores, enColor, mascara, DECORADOS, OBJETOS, PELO, SOMBREROS, tela: DECORADO_TELA, azar, ruido, suave, clamp, mezcla, rebote, peso, ik, miembro, hueco, circulo, dir, NEGRO, TAU };
 })();

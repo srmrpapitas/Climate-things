@@ -11,7 +11,7 @@ const SG = { ropa: 'traje', pelo: 'calvo', barba: 'larga', nariz: 1.1, narizForm
 const LEVITA = ciudadano(70, { ropa: 'traje', sombrero: 'chistera', barba: 'bigote', objeto: 'papel' });
 const CACIQUE = ciudadano(71, { ropa: 'traje', sombrero: 'boina', barba: 'bigote', objeto: 'baston', grueso: 1.35, barriga: .9, escala: 1.25 });
 const jack = { jack: true, quieto: true, figura: '#2b1d12', sombra: 9, contraluz: 0, bordes: ['rgb(255,236,200)', 'rgb(220,140,70)'], borde: .6, tinte: 'sepia' };
-const CANOVAS = en['b6.2'] + 4.2, SAGASTA = en['b6.2'] + 6.4, GOBERNACION = en['b7.2'] + 2.4, PUCHERAZO = en['b8.2'] + 3.4, BOTA = en['b9.2'] + 3.4;
+const CANOVAS = G.x('b6.2', 4.2), SAGASTA = G.x('b6.2', 6.4), GOBERNACION = G.x('b7.2', 2.4), PUCHERAZO = G.x('b8.2', 3.4), BOTA = G.x('b9.2', 3.4);
 const cielo = [{ tipo: 'plano', color: '#b98a52', raya: 'rgba(80,40,10,.2)', luz: 'rgba(255,230,180,.12)', par: .2 }, { tipo: 'disco', x: 1000, y: 200, r: 90, color: '#e8c088', par: .2 },
   { tipo: 'montes', tono: .4, par: .35, y: 540 }];
 const noria = (extra = {}) => ({ tipo: 'noria', x: 640, y: 640, r: 300, vel: .02, luces: 0, par: .8, ...extra });
@@ -21,14 +21,14 @@ window.ESCENA = {
   sonidos: [
     { en: 0, hasta: en['b7.2'], archivo: 'audio/sfx/viento.mp3', volumen: .2, bucle: true },
     { en: en['b7.2'], hasta: en.b8, archivo: 'audio/sfx/ciudad.mp3', volumen: .08, bucle: true },
-    { en: en.b8, hasta: en.b9, archivo: 'audio/sfx/viento.mp3', volumen: .25, bucle: true }, { en: en.b8 + .5, archivo: 'audio/sfx/campana.mp3', volumen: .15 },
+    { en: en.b8, hasta: en.b9, archivo: 'audio/sfx/viento.mp3', volumen: .25, bucle: true }, { en: G.x('b8', .5), archivo: 'audio/sfx/campana.mp3', volumen: .15 },
     { en: PUCHERAZO, archivo: 'audio/sfx/impacto.mp3', volumen: .6 },
     { en: en.b9, hasta: G.fin, archivo: 'audio/sfx/viento.mp3', volumen: .2, bucle: true },
     { en: BOTA - .5, archivo: 'audio/sfx/whoosh.mp3', volumen: .6 }, { en: BOTA, archivo: 'audio/sfx/derrumbe.mp3', volumen: .6 }, { en: BOTA, archivo: 'audio/sfx/impacto.mp3', volumen: .8 }],
   carteles: [
-    { en: en.b6 + 1, hasta: en.b7 - .2, x: 40, y: 40, ancho: 520, titulo: 'La Restauración · 1875–1923', tiempos: [CANOVAS, SAGASTA],
+    { en: G.x('b6', 1), hasta: en.b7 - .2, x: 40, y: 40, ancho: 520, titulo: 'La Restauración · 1875–1923', tiempos: [CANOVAS, SAGASTA],
       filas: [['Conservadores', 'Cánovas'], ['Liberales', 'Sagasta']], fuente: 'historia de España' },
-    { en: en.b9 + .5, hasta: en['b9.2'] - .2, x: 40, y: 40, ancho: 640, titulo: 'Lampedusa', paso: 2,
+    { en: G.x('b9', .5), hasta: en['b9.2'] - .2, x: 40, y: 40, ancho: 640, titulo: 'Lampedusa', paso: 2,
       filas: [['«Si queremos que todo siga como está,', ''], ['es necesario que todo cambie»', '']], fuente: 'Giuseppe Tomasi di Lampedusa, El Gatopardo (1958)' },
     { en: BOTA + .8, hasta: G.fin - .2, x: 40, y: 40, ancho: 460, titulo: '1923', filas: [['Fin del turno', 'Primo de Rivera', '#7a1410']], fuente: 'historia de España' }],
   planos: [
@@ -46,7 +46,7 @@ window.ESCENA = {
         { tipo: 'urna', x: 640, y: 508, escala: .8, hasta: PUCHERAZO, par: 1 }, { tipo: 'puchero', x: 640, y: 508, en: PUCHERAZO, escala: .9, par: 1 },
         { tipo: 'mesa', x: 640, ancho: 240, par: 1 }, { tipo: 'suelo', par: 1, matas: 10 }],
       particulas: [{ tipo: 'polvo', n: 60 }],
-      actores: [{ p: CACIQUE, x: 330, mira: 1, acciones: [{ hace: 'golpea', en: en.b8 + 1.2, hasta: en.b8 + 2.6 }, { hace: 'senala', en: PUCHERAZO + .4, hasta: en.b9 - .3 }] },
+      actores: [{ p: CACIQUE, x: 330, mira: 1, acciones: [{ hace: 'golpea', en: G.x('b8', 1.2), hasta: G.x('b8', 2.6) }, { hace: 'senala', en: PUCHERAZO + .4, hasta: en.b9 - .3 }] },
         ...[72, 73, 74, 75, 76].map((n, i) => ({ p: ciudadano(n, { sombrero: i % 2 ? 'boina' : null, escala: .5 }), x: 820 + i * 85, mira: -1,
           acciones: [{ hace: 'encoge', en: PUCHERAZO + .2 + .1 * i, hasta: PUCHERAZO + 1.8 }] }))],
       camara: [[0, 640, 360, 1], [PUCHERAZO - .05, 640, 350, 1.05], [PUCHERAZO - .05, 640, 430, 1.8], [en.b9, 640, 425, 1.85]] },

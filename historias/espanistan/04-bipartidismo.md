@@ -59,7 +59,8 @@ Aquel turno acabó en mil novecientos veintitrés, con un general: Primo de Rive
 [Cielo rojo. La silueta del General, sin cara, de espaldas, sobre un balcón. Una cuerda empieza a enrollarse.]
 
 Después vinieron la República, la guerra, y treinta y seis años de dictadura de Franco, sin partidos y sin elecciones libres.
-En mil novecientos sesenta y nueve, Franco eligió a su sucesor, Juan Carlos, y en su mensaje de Navidad dijo que todo quedaba atado, y bien atado.
+En mil novecientos sesenta y nueve, Franco eligió a su sucesor, Juancar, y en su mensaje de Navidad dijo que todo quedaba atado, y bien atado.
+Ese mismo año, Juancar juró lealtad a Franco y a los principios del Movimiento.
 [La cuerda hace el primer nudo, justo en «atado».]
 Franco murió en mil novecientos setenta y cinco. Y el cambio lo pilotaron los de dentro.
 [Viento al cielo marrón. Suavez entra con una carpeta del Movimiento.]
@@ -174,3 +175,10 @@ Aquí no te decimos a quién votar. Te decimos que votes, y que votes pensando.
 - Art. 135: https://www.legaltoday.com/rincon-de-reuters/el-congreso-da-el-primer-paso-para-cambiar-la-constitucion-2011-08-30/
 - Resultados electorales: Ministerio del Interior, https://infoelectoral.interior.gob.es
 - Normas electorales: Real Decreto-ley 20/1977 y Ley Orgánica 5/1985 (LOREG), en el BOE.
+
+## El Rey (añadido el 28-10-2026, a petición del usuario)
+- Nombre de sátira: **Juancar** (Juan Carlos I).
+- Ley 62/1969, de 22 de julio: sucesor «a título de Rey». El 23-07-1969 jura ante las Cortes lealtad a Franco y a los Principios del Movimiento Nacional.
+- Julio de 1976: el Rey nombra presidente a Suárez (Suavez), de la terna que le propone el Consejo del Reino.
+- Suárez, en una entrevista con Victoria Prego en 1995 (fuera de grabación, difundida en 2016): no se hizo referéndum sobre monarquía o república porque las encuestas daban que se perdía.
+- Escohotado: no hay cita suya comprobada sobre el bipartidismo; no se usa hasta tener la fuente.
