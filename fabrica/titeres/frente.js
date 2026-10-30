@@ -31,19 +31,22 @@
   T.dibujaFrente = function (g, ac, t, o) {
     const p = ac.p, A = p.alto, G = p.grueso || 1, s = p.semilla || 1, esp = o.vista === 'espalda', E = (p.escala || 1) * o.z;
     const L1 = 80 * A * (p.piernas || 1), L2 = 78 * A * (p.piernas || 1), ph = TAU * o.faseFrente, lev = o.andaFrente, vf = (o.vf || 0) * (esp ? -1 : 1);
-    g.save(); g.translate(o.x, 0); g.scale(E * o.giroVista, E * o.aplasta); g.fillStyle = g.strokeStyle = NEGRO;
+    g.save(); g.translate(o.x, 0); g.scale(E * o.giroVista / Math.sqrt(o.aplasta), E * o.aplasta); g.fillStyle = g.strokeStyle = NEGRO;
     const caderaY = -(L1 + L2) * .965 + 4 * lev * Math.abs(Math.sin(ph)) + o.y, hw = 15 * G * A * (p.cintura || 1);
+    // tres cuartos (o.ladeo ≠ 0): el cuerpo se estrecha un poco (nunca como un papel), el pecho y los pies apuntan hacia donde mira
+    const Lb = esp ? 0 : o.ladeo || 0, cB = 1 - .28 * Math.abs(Lb);
+    g.save(); g.translate(Lb * 3 * A, 0); g.scale(cB, 1);
     // piernas: de frente, la que da el paso sube la rodilla
     for (const lado of [-1, 1]) {
       const sube = lev * Math.max(0, Math.sin(ph + (lado > 0 ? 0 : Math.PI))) * 26 * A;
       const cad = [lado * hw * .7, caderaY], pie = [lado * hw * .85, -sube], rod = [lado * hw * .8, mezcla(cad[1], pie[1], .5) - sube * .2];
       const w = (p.ropa === 'vestido' ? 9 : 14) * A * G;
       miembro(g, cad, rod, w + 2, w - 1); miembro(g, rod, [pie[0], pie[1] - 6 * A], w - 1, w - 5);
-      g.beginPath(); g.ellipse(pie[0] + lado * 4 * A, pie[1] - 3 * A, 13 * A, 6 * A, 0, 0, TAU); g.fill();
+      g.beginPath(); g.ellipse(pie[0] + lado * 4 * A * (1 - Math.abs(Lb)) + Lb * 9 * A, pie[1] - 3 * A, 13 * A, 6 * A, 0, 0, TAU); g.fill();
     }
     // tronco y ropa
     const largo = 112 * A, hom = 31 * G * A * (p.hombros || 1) + 2 * o.hombros, top = caderaY - largo - o.hombros, bar = (p.barriga || 0) * 14 * A;
-    g.save(); g.translate(0, caderaY); g.rotate(.02 * Math.sin(t * 1.1 + s)); g.scale(1 + .015 * o.respira, 1 + .008 * o.respira);
+    g.save(); g.translate(Lb * 4 * A, caderaY); g.rotate(.02 * Math.sin(t * 1.1 + s)); g.scale(1 + .015 * o.respira, 1 + .008 * o.respira);
     g.beginPath(); g.moveTo(-hw * 1.35 - bar, 6 * A); g.bezierCurveTo(-hw * 1.6 - bar, -largo * .4, -hom - 4, -largo * .75, -hom, -largo - o.hombros);
     g.quadraticCurveTo(0, -largo - 8 * A - o.hombros, hom, -largo - o.hombros); g.bezierCurveTo(hom + 4, -largo * .75, hw * 1.6 + bar, -largo * .4, hw * 1.35 + bar, 6 * A); g.closePath(); g.fill();
     if (p.ropa === 'traje') {
@@ -76,10 +79,11 @@
       if (!esp) hueco(g, () => { g.moveTo(-9 * A, -largo + 2 * A); g.quadraticCurveTo(0, -largo + 16 * A, 9 * A, -largo + 2 * A); g.lineTo(7 * A, -largo + 2 * A); g.quadraticCurveTo(0, -largo + 12 * A, -7 * A, -largo + 2 * A); });
     }
     g.restore();
+    g.restore();
     // brazos (de espaldas, el derecho queda a la izquierda)
     const [bd, bi] = brazosFrente(o, t, s);
     for (const [lado, b] of [[1, bd], [-1, bi]]) {
-      const x = (esp ? -lado : lado) * hom * .92, hombro = [x, top + 8 * A], sl = Math.sign(x) || 1;
+      const x = (esp ? -lado : lado) * hom * .92 * cB + Lb * 4 * A, hombro = [x, top + 8 * A], sl = Math.sign(x) || 1;
       const codo = [hombro[0] + sl * 62 * A * Math.sin(b[0]), hombro[1] + 62 * A * Math.cos(b[0])];
       const a2 = b[0] + b[1], mu = [codo[0] + sl * 56 * A * Math.sin(a2), codo[1] + 56 * A * Math.cos(a2)], w = 12 * A * G;
       miembro(g, hombro, codo, w + 1, w - 2); miembro(g, codo, mu, w - 2, w - 4);
@@ -93,7 +97,7 @@
       if (ob && OBJETOS[ob]) OBJETOS[ob](g, mu, sl * a2, t, o, A);
     }
     // cabeza
-    g.save(); g.translate(0, top - 2 * A); g.rotate(.5 * o.cabeza + .03 * Math.sin(t * .9 + s)); g.scale((p.cabeza || 1) * A * o.cabezaAncho, (p.cabeza || 1) * A);
+    g.save(); g.translate(Lb * 4 * A + (esp ? 0 : o.ladeoCabeza || 0) * 3 * A, top - 2 * A); g.rotate(.5 * o.cabeza + .03 * Math.sin(t * .9 + s)); g.scale((p.cabeza || 1) * A * o.cabezaAncho, (p.cabeza || 1) * A);
     if (o.activos.some(a => a.hace === 'asiente')) g.translate(0, 3 * Math.max(0, Math.sin(t * 8)));
     esp ? cabezaEspalda(g, p, t, o) : cabezaFrente(g, p, t, o);
     g.restore();
@@ -109,11 +113,14 @@
     g.closePath(); g.fill();
   }
   function cabezaFrente(g, p, t, o) {
-    const w = 23, b = o.boca, ce = clamp(o.cejas, -1, 1), ojos = o.ojos, n = p.nariz || 1;
+    const w = 23, b = o.boca, ce = clamp(o.cejas, -1, 1), ojos = o.ojos, n = p.nariz || 1, Lh = o.ladeoCabeza || 0, e = Math.abs(Lh), sx = Math.sign(Lh);
     g.fillRect(-9, -16, 18, 18);                                        // cuello
     if (p.ropa === 'traje') hueco(g, () => { g.moveTo(-10, 0); g.lineTo(-9, -6); g.lineTo(0, 2); g.lineTo(9, -6); g.lineTo(10, 0); g.lineTo(0, 6); g.closePath(); });   // cuello de la camisa
-    for (const l of [-1, 1]) { g.beginPath(); g.ellipse(l * (w + 2), -42, 5, 9, 0, 0, TAU); g.fill(); hueco(g, () => g.ellipse(l * (w + 2.5), -42, 1.6, 4.5, 0, 0, TAU)); }   // orejas
+    for (const l of [-1, 1]) { if (l * Lh > .3) continue; const ox = l * (w + 2) + Lh * 8;   // orejas: en tres cuartos, la del lado al que mira queda tapada
+      g.beginPath(); g.ellipse(ox, -42, 5, 9, 0, 0, TAU); g.fill(); hueco(g, () => g.ellipse(ox + l * .5, -42, 1.6, 4.5, 0, 0, TAU)); }
     cara(g, p, w, b);
+    if (e > .1) { g.beginPath(); g.moveTo(sx * (w - 4), -45); g.quadraticCurveTo(sx * (w + 8 * n * e), -35, sx * (w - 3), -27); g.closePath(); g.fill(); }   // la nariz asoma por el borde
+    g.save(); g.translate(Lh * 10, 0); g.scale(1 - .3 * e, 1);       // ojos, nariz, boca y barba se corren hacia donde mira
     if (p.barba === 'corta' || p.barba === 'larga') {
       const lg = p.barba === 'larga' ? 24 : 6;
       g.beginPath(); g.moveTo(-w - 1, -36); g.quadraticCurveTo(-w, -8, -8, -2 - lg); for (let k = 0; k <= 6; k++) g.lineTo(-8 + k * 16 / 6, -2 - lg + (k % 2 ? 5 : 0) - lg * .1 * Math.sin(k));
@@ -146,6 +153,7 @@
     if (p.rostro === 'anguloso') hueco(g, () => { for (const l of [-1, 1]) {   // cejas gruesas que bajan hacia la nariz y pómulos
       g.moveTo(l * 16, -54.5); g.lineTo(l * 3, -50.5); g.lineTo(l * 3, -48.6); g.lineTo(l * 16, -52.4);
       g.moveTo(l * 17, -36); g.quadraticCurveTo(l * 13, -31, l * 8, -30); g.lineTo(l * 8, -29.2); g.quadraticCurveTo(l * 13.5, -30, l * 18, -35.4); } });
+    g.restore();
     PELO_FRENTE[p.pelo || 'corto'](g, t, o, p, false);
     if (p.cinta) cintaFrente(g, t, o, false);
     if (p.mascara) T.enColor(g, o, (gg, tt) => T.mascara(gg, tt, o, false, p.mascara), [0, 0], 0, 1);

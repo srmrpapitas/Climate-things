@@ -3,7 +3,7 @@
 **Programar:** viernes 30-10-2026, 19:00 (hora de España), en el canal Españistán (no el otro canal del usuario).
 **Vídeo:** `~/Desktop/Espanistan-04/espanistan-04.mp4` · **Miniatura:** `~/Desktop/Espanistan-04/Miniatura-ep04.jpg`
 **Estado (28-10-2026, 18:10):** APROBADO por el usuario y SUBIDO. Programado como público el 30-10-2026 a las 19:00 (hora local, GMT+1): https://youtu.be/VR17iwWJPzs
-Miniatura puesta, «no es para niños». Pendiente: poner el «vídeo relacionado» en los shorts cuando existan.
+Miniatura puesta, «no es para niños». **X (30-10):** subido entero como vídeo de X, https://x.com/nicholasreich9/status/2116108541958533180. Pendiente: poner el «vídeo relacionado» en los shorts cuando existan.
 
 ## Título
 PP y PSOE: ¿dos familias o una sola mesa? | Españistán ep. 4
@@ -15,6 +15,19 @@ por qué un diputado paga multa por votar lo que piensa, cómo se reparten los j
 También lo que salió bien: una democracia sin guerra, gobiernos estables, las pensiones y Europa.
 
 Españistán no te dice a quién votar. Te dice que votes, y que votes pensando.
+
+Capítulos:
+0:00 La noria: dos familias
+0:30 Dos de cada tres votos
+0:59 El turno: la Restauración (1875–1923)
+1:45 Atado y bien atado: de Franco a la Transición
+4:01 Los hilos: listas cerradas y multas por votar
+4:54 El Senado
+5:20 La mesa: el artículo 135 y los jueces
+6:40 La puerta giratoria
+7:03 ¿Mafia?
+7:25 La balanza: lo que salió bien
+8:13 Final
 
 Fuentes:
 - Resultados electorales: Ministerio del Interior, https://infoelectoral.interior.gob.es

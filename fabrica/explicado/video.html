@@ -1,0 +1,36 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Vídeo explicado</title>
+<style>html,body{margin:0;background:#000}canvas{display:block;height:100vh;width:auto;margin:auto}</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script>
+// Reproductor: video.html?v=SLUG carga escenas/tiempos_SLUG.js y escenas/SLUG.js (window.VIDEO = {escenas: [{desde: frase, dibuja(g, t)}], sonidos}).
+// Para grabar: fabrica/explicado/grabar.mjs (llama a window.dibuja(t) fotograma a fotograma).
+const slug = new URLSearchParams(location.search).get('v') || 'ia-ciudades';
+const carga = src => new Promise(r => { const s = document.createElement('script'); s.src = src; s.onload = r; document.body.appendChild(s); });
+window.listo = (async () => {
+  await carga('motor.js'); await carga(`escenas/tiempos_${slug}.js`); await carga(`escenas/${slug}.js`);
+  window.DURA = VIDEO.dura ?? TIEMPOS.fin + 1; window.FPS = M.FPS;
+})();
+const g = document.getElementById('c').getContext('2d');
+window.dibuja = t => {
+  g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
+  // entre escenas no hay corte: la cámara viaja a la derecha (como el ejemplo, ver EJEMPLO.md) en 0,6 s; la escena vieja sale y la nueva entra
+  const ini = e => e.en ?? M.F(e.desde).en - .15, lista = VIDEO.escenas;
+  const sig = lista.findIndex((e, k) => k > 0 && t >= ini(e) - .25 && t < ini(e) + .35);
+  if (sig > 0) {
+    const u = M.e(M.cl((t - ini(lista[sig]) + .25) / .6));
+    for (const [esc, dx] of [[lista[sig - 1], -M.W * u], [lista[sig], M.W * (1 - u)]]) {
+      g.save(); g.beginPath(); g.rect(dx, 0, M.W, M.H); g.clip(); g.translate(dx, 0); esc.dibuja(g, t); g.restore(); }
+  } else {
+    const i = lista.findLastIndex(e => t >= ini(e)), e = lista[Math.max(0, i)];
+    g.save(); e.dibuja(g, t); g.restore();
+  }
+  g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; M.subtitulos(g, t);
+};
+window.listo.then(() => {
+  if (window.grabando) return;
+  const t0 = performance.now(), desde = +(new URLSearchParams(location.search).get('t') || 0);
+  const paso = () => { if (window.grabando) return; dibuja((desde + (performance.now() - t0) / 1000) % DURA); requestAnimationFrame(paso); };
+  paso();
+});
+</script></body></html>

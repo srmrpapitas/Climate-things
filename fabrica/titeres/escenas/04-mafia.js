@@ -15,7 +15,7 @@ window.ESCENA = {
   silencios: [[MAFIA - .6, MAFIA], [CARTEL - .9, CARTEL]],
   sonidos: [
     { en: 0, hasta: G.fin + 2.5, archivo: 'audio/sfx/lluvia.mp3', volumen: .1, bucle: true },
-    { en: MAFIA, archivo: 'audio/sfx/whoosh.mp3', volumen: .3 }, { en: CARTEL, archivo: 'audio/sfx/impacto.mp3', volumen: 1 }, { en: CARTEL + .05, archivo: 'audio/sfx/derrumbe.mp3', volumen: .5 }],
+    { en: MAFIA, archivo: 'audio/sfx/whoosh.mp3', volumen: .3 }, { en: CARTEL, archivo: 'audio/sfx/impacto.mp3', volumen: .40 }, { en: CARTEL + .05, archivo: 'audio/sfx/derrumbe.mp3', volumen: .20 }],
   carteles: [
     { en: CARTEL + .9, hasta: G.fin + 2.5, x: 40, y: 40, ancho: 600, titulo: 'cártel', filas: [['Convenio entre empresas', ''], ['para no competir entre sí', '']], fuente: 'Diccionario de la lengua española (RAE)' },
   ],

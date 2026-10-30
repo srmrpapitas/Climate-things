@@ -158,7 +158,8 @@ for f in fondos:
     if f and not os.path.exists(f'{A}/{f}.webp'): sh('cp', f'{IMG}/{f}.webp', f'{A}/{f}.webp')
 for f in ('cuerpo', 'cabeza', 'mano'):
     if not os.path.exists(f'{A}/{f}.webp'): sh('cp', os.path.join(REPO, 'historias/espanistan/marionetas/feijolo', f + '.webp'), f'{A}/{f}.webp')
-sh('cp', '-rn', os.path.join(REPO, 'fabrica/videos/espanistan-01-intro/assets/fuentes'), A); sh('cp', '-n', os.path.join(REPO, 'fabrica/videos/espanistan-01-intro/assets/gsap.min.js'), A)
+# cp -n en macOS sale con 1 si el archivo ya está: no es error
+subprocess.run(('cp', '-rn', os.path.join(REPO, 'fabrica/videos/espanistan-01-intro/assets/fuentes'), A), capture_output=True); subprocess.run(('cp', '-n', os.path.join(REPO, 'fabrica/videos/espanistan-01-intro/assets/gsap.min.js'), A), capture_output=True)
 for f in ('hyperframes.json', 'package.json'):
     if not os.path.exists(f'{DIR}/{f}'): sh('cp', os.path.join(REPO, 'fabrica/videos/espanistan-01-intro', f), DIR)
 

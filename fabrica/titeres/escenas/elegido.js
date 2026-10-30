@@ -14,7 +14,7 @@ const noche = [
 const cielo = [{ tipo: 'estrellas', n: 90, zona: [0, 0, 1280, 420] }, { tipo: 'polvo', n: 30 }, { tipo: 'hojas', n: 5, zona: [0, 200, 1280, 560] }];
 const E = PERSONAJES.elegido, VH = PERSONAJES.vendehumos;
 window.ESCENA = {
-  dura: 22, fps: 12, suelo: 600,
+  dura: 22, fps: 30, suelo: 600,
   titulos: [{ en: 18, hasta: 22, texto: 'EL ELEGIDO', sub: 'y la Espada de la Verdad', y: 600 }],
   planos: [
     { desde: 0, tinte: 'noche', viento: .7, decorado: noche, particulas: cielo,

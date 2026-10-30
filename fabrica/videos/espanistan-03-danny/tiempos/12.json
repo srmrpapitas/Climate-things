@@ -1,0 +1,399 @@
+[
+ {
+  "texto": "Juvenal, un poeta romano, hizo la pregunta más incómoda de la política.",
+  "inicio": 0.0,
+  "fin": 5.18,
+  "palabras": [
+   [
+    "Juvenal,",
+    0.0,
+    0.8
+   ],
+   [
+    "un",
+    1.0,
+    1.18
+   ],
+   [
+    "poeta",
+    1.18,
+    1.5
+   ],
+   [
+    "romano,",
+    1.5,
+    2.2
+   ],
+   [
+    "hizo",
+    2.68,
+    2.78
+   ],
+   [
+    "la",
+    2.78,
+    2.98
+   ],
+   [
+    "pregunta",
+    2.98,
+    3.42
+   ],
+   [
+    "más",
+    3.42,
+    3.9
+   ],
+   [
+    "incómoda",
+    3.9,
+    4.4
+   ],
+   [
+    "de",
+    4.4,
+    4.54
+   ],
+   [
+    "la",
+    4.54,
+    4.76
+   ],
+   [
+    "política.",
+    4.76,
+    5.18
+   ]
+  ]
+ },
+ {
+  "texto": "¿Quién vigila a los vigilantes?",
+  "inicio": 6.12,
+  "fin": 7.78,
+  "palabras": [
+   [
+    "¿Quién",
+    6.12,
+    6.38
+   ],
+   [
+    "vigila",
+    6.38,
+    6.8
+   ],
+   [
+    "a",
+    6.8,
+    6.96
+   ],
+   [
+    "los",
+    6.96,
+    7.14
+   ],
+   [
+    "vigilantes?",
+    7.14,
+    7.78
+   ]
+  ]
+ },
+ {
+  "texto": "Un partido que promete limpiar también tiene que dejarse mirar.",
+  "inicio": 8.56,
+  "fin": 13.28,
+  "palabras": [
+   [
+    "Un",
+    8.56,
+    8.76
+   ],
+   [
+    "partido",
+    8.76,
+    9.14
+   ],
+   [
+    "que",
+    9.14,
+    9.44
+   ],
+   [
+    "promete",
+    9.44,
+    9.72
+   ],
+   [
+    "limpiar",
+    9.72,
+    10.32
+   ],
+   [
+    "también",
+    10.32,
+    10.82
+   ],
+   [
+    "tiene",
+    10.82,
+    11.06
+   ],
+   [
+    "que",
+    11.06,
+    11.32
+   ],
+   [
+    "dejarse",
+    11.32,
+    11.7
+   ],
+   [
+    "mirar.",
+    11.7,
+    13.28
+   ]
+  ]
+ },
+ {
+  "texto": "Mismas reglas.",
+  "inicio": 13.58,
+  "fin": 14.84,
+  "palabras": [
+   [
+    "Mismas",
+    13.58,
+    14.0
+   ],
+   [
+    "reglas.",
+    14.0,
+    14.84
+   ]
+  ]
+ },
+ {
+  "texto": "Nadie es culpable hasta que lo dice una sentencia.",
+  "inicio": 15.36,
+  "fin": 18.12,
+  "palabras": [
+   [
+    "Nadie",
+    15.36,
+    15.64
+   ],
+   [
+    "es",
+    15.64,
+    15.86
+   ],
+   [
+    "culpable",
+    15.86,
+    16.38
+   ],
+   [
+    "hasta",
+    16.38,
+    16.66
+   ],
+   [
+    "que",
+    16.66,
+    16.78
+   ],
+   [
+    "lo",
+    16.78,
+    17.0
+   ],
+   [
+    "dice",
+    17.0,
+    17.14
+   ],
+   [
+    "una",
+    17.14,
+    17.44
+   ],
+   [
+    "sentencia.",
+    17.44,
+    18.12
+   ]
+  ]
+ },
+ {
+  "texto": "Y cada frasco lleva su etiqueta.",
+  "inicio": 18.82,
+  "fin": 21.12,
+  "palabras": [
+   [
+    "Y",
+    18.82,
+    19.0
+   ],
+   [
+    "cada",
+    19.0,
+    19.24
+   ],
+   [
+    "frasco",
+    19.24,
+    19.74
+   ],
+   [
+    "lleva",
+    19.74,
+    20.04
+   ],
+   [
+    "su",
+    20.04,
+    20.28
+   ],
+   [
+    "etiqueta.",
+    20.28,
+    21.12
+   ]
+  ]
+ },
+ {
+  "texto": "Primer frasco.",
+  "inicio": 22.2,
+  "fin": 23.66,
+  "palabras": [
+   [
+    "Primer",
+    22.2,
+    22.96
+   ],
+   [
+    "frasco.",
+    22.96,
+    23.66
+   ]
+  ]
+ },
+ {
+  "texto": "El dinero iraní de 2014.",
+  "inicio": 23.88,
+  "fin": 25.74,
+  "palabras": [
+   [
+    "El",
+    23.88,
+    24.04
+   ],
+   [
+    "dinero",
+    24.04,
+    24.34
+   ],
+   [
+    "iraní",
+    24.34,
+    24.72
+   ],
+   [
+    "de",
+    24.72,
+    24.94
+   ],
+   [
+    "2014.",
+    24.94,
+    25.74
+   ]
+  ]
+ },
+ {
+  "texto": "El 80% de la campaña europea.",
+  "inicio": 26.7,
+  "fin": 29.52,
+  "palabras": [
+   [
+    "El",
+    26.7,
+    26.78
+   ],
+   [
+    "80",
+    26.78,
+    27.14
+   ],
+   [
+    "%",
+    27.14,
+    27.62
+   ],
+   [
+    "de",
+    27.62,
+    27.8
+   ],
+   [
+    "la",
+    27.8,
+    28.02
+   ],
+   [
+    "campaña",
+    28.02,
+    28.44
+   ],
+   [
+    "europea.",
+    28.44,
+    29.52
+   ]
+  ]
+ },
+ {
+  "texto": "Nunca hubo causa.",
+  "inicio": 30.16,
+  "fin": 31.34,
+  "palabras": [
+   [
+    "Nunca",
+    30.16,
+    30.54
+   ],
+   [
+    "hubo",
+    30.54,
+    30.82
+   ],
+   [
+    "causa.",
+    30.82,
+    31.34
+   ]
+  ]
+ },
+ {
+  "texto": "Etiqueta, sin causa.",
+  "inicio": 32.5,
+  "fin": 34.14,
+  "palabras": [
+   [
+    "Etiqueta,",
+    32.5,
+    33.24
+   ],
+   [
+    "sin",
+    33.58,
+    33.8
+   ],
+   [
+    "causa.",
+    33.8,
+    34.14
+   ]
+  ]
+ }
+]

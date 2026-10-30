@@ -29,7 +29,7 @@ const vecina = ciudadano(5, { ropa: 'vestido', pelo: 'mono', barba: null, sombre
 const vecino = ciudadano(8, { ropa: 'traje', pelo: 'corto', sombrero: 'gorra', barba: 'bigote', alto: 1.02, grueso: 1.1, barriga: .5 });
 const fila = (escala, tono, quitar = []) => [0, 1, 2, 3, 4, 5, 6, 7].filter(i => !quitar.includes(i)).map(i => ({ p: ciudadano(i + 20, { escala, tono }), x: 90 + i * 112 + 24 * T.azar(i), vista: 'frente' }));
 window.ESCENA = {
-  dura: 32, fps: 12, suelo: 600, voces,
+  dura: 32, fps: 30, suelo: 600, voces,
   carteles: [{ en: 17.6, hasta: 31.4, titulo: 'Sueldo al año (2011–2013)', x: 640, y: 60, ancho: 600, paso: 5,
     filas: [['Acascar', '82.491 € + plus'], ['Presidente del Gobierno', '78.185 €', '#2c4a1a'], ['¿Ilegal?', 'No: libre designación', '#3a2410']],
     fuente: 'Comunidad de Madrid (transparencia) · Maldita.es' }],

@@ -1,0 +1,2709 @@
+{
+ "titulo": "Españistán 3 · Acascar y Vox",
+ "guion": "fabrica/herramientas/guion_espanistan-03.txt",
+ "sombras": "historias/espanistan/sombras/ep03",
+ "retratos": "historias/espanistan/retratos/acascar",
+ "pausa": 0.6,
+ "voces": [
+  {
+   "archivo": "audio/voz/es/espanistan-03-danny/g01.mp3",
+   "pausa": 1.0,
+   "lineas": "1-4"
+  },
+  {
+   "archivo": "audio/voz/es/espanistan-03-danny/g02.mp3",
+   "pausa": 1.0,
+   "lineas": "5-8"
+  },
+  {
+   "archivo": "audio/voz/es/espanistan-03-danny/g03.mp3",
+   "pausa": 0.5,
+   "lineas": "9-12"
+  },
+  {
+   "archivo": "audio/voz/es/espanistan-03-acascar/f1_sueldo.mp3",
+   "pausa": 0.5,
+   "texto": "A mí nadie me ha regalado nada. Bueno... salvo aquel sueldo. Pero era vocación.",
+   "quien": "acascar"
+  },
+  {
+   "archivo": "audio/voz/es/espanistan-03-danny/g04.mp3",
+   "pausa": 1.0,
+   "lineas": "13-16"
+  },
+  {
+   "archivo": "audio/voz/es/espanistan-03-danny/g05.mp3",
+   "pausa": 0.5,
+   "lineas": "17-21"
+  },
+  {
+   "archivo": "audio/voz/es/espanistan-03-acascar/f2_caballo.mp3",
+   "pausa": 0.5,
+   "texto": "Los jóvenes me adoran. Será por el caballo.",
+   "quien": "acascar"
+  },
+  {
+   "archivo": "audio/voz/es/espanistan-03-danny/g06.mp3",
+   "pausa": 1.0,
+   "lineas": "22"
+  },
+  {
+   "archivo": "audio/voz/es/espanistan-03-danny/g07.mp3",
+   "pausa": 0.5,
+   "lineas": "23-24"
+  },
+  {
+   "archivo": "audio/voz/es/espanistan-03-acascar/f3_chiringuitos.mp3",
+   "pausa": 0.5,
+   "texto": "Hay que cerrar todos los chiringuitos. Empezando por los de los demás.",
+   "quien": "acascar"
+  },
+  {
+   "archivo": "audio/voz/es/espanistan-03-danny/g08.mp3",
+   "pausa": 1.0,
+   "lineas": "25-28"
+  },
+  {
+   "archivo": "audio/voz/es/espanistan-03-danny/g09.mp3",
+   "pausa": 1.0,
+   "lineas": "29-31"
+  },
+  {
+   "archivo": "audio/voz/es/espanistan-03-danny/g10.mp3",
+   "pausa": 0.5,
+   "lineas": "32-33"
+  },
+  {
+   "archivo": "audio/voz/es/espanistan-03-acascar/f4_hungaros.mp3",
+   "pausa": 0.5,
+   "texto": "Los bancos españoles no me querían. Los húngaros, sí. Será por el idioma.",
+   "quien": "acascar"
+  },
+  {
+   "archivo": "audio/voz/es/espanistan-03-danny/g11.mp3",
+   "pausa": 1.0,
+   "lineas": "34-40"
+  },
+  {
+   "archivo": "audio/voz/es/espanistan-03-danny/g12.mp3",
+   "pausa": 0.5,
+   "lineas": "41-42"
+  },
+  {
+   "archivo": "audio/voz/es/espanistan-03-acascar/f5_manodura.mp3",
+   "pausa": 0.5,
+   "texto": "Yo prometo mano dura. Lo de cómo se paga, ya si eso, después.",
+   "quien": "acascar"
+  },
+  {
+   "archivo": "audio/voz/es/espanistan-03-danny/g13.mp3",
+   "pausa": 1.0,
+   "lineas": "43"
+  },
+  {
+   "archivo": "audio/voz/es/espanistan-03-danny/g14.mp3",
+   "pausa": 1.0,
+   "lineas": "44-50"
+  },
+  {
+   "archivo": "audio/voz/es/espanistan-03-danny/g15.mp3",
+   "pausa": 1.0,
+   "lineas": "51"
+  }
+ ],
+ "negrita": [
+  "Acascar",
+  "Vox",
+  "Montaigne",
+  "tercer partido",
+  "veinte por ciento",
+  "datos públicos",
+  "palabra exacta",
+  "lo bueno",
+  "ETA",
+  "quemada",
+  "escolta",
+  "Aristóteles",
+  "miedo",
+  "Esperanza Aguirre",
+  "ochenta y dos mil",
+  "setenta y ocho mil",
+  "Ese mismo día",
+  "Rajoy",
+  "blando",
+  "Ortega Lara",
+  "quinientos treinta y dos días",
+  "ni un escaño",
+  "ochenta por ciento",
+  "oposición iraní",
+  "todo era legal",
+  "causa judicial",
+  "doce diputados",
+  "cincuenta y dos",
+  "treinta y tres",
+  "diecinueve por ciento",
+  "sesenta y ocho",
+  "menores de cuarenta y cinco",
+  "nadie les escuchaba",
+  "se debe entender",
+  "propone",
+  "contra quién",
+  "chiringuitos",
+  "letra pequeña",
+  "dinero público",
+  "cuatro millones y medio",
+  "Disenso",
+  "cinco gobiernos",
+  "menores migrantes",
+  "prioridad nacional",
+  "a quién beneficia",
+  "donde ya mandan",
+  "Juvenal",
+  "vigila a los vigilantes",
+  "sentencia",
+  "sin causa",
+  "banco húngaro",
+  "Orbán",
+  "archivado",
+  "ochocientos sesenta y dos mil",
+  "anuló la multa",
+  "anulado",
+  "veintisiete mil",
+  "sin empleados",
+  "sesenta y tres mil seiscientos",
+  "Preguntas abiertas",
+  "Revuelta",
+  "Fiscalía",
+  "administración desleal",
+  "condenado",
+  "pedir cuentas",
+  "no explicaba bien sus cuentas",
+  "poco poder",
+  "inmigración",
+  "expulsiones",
+  "menos impuestos",
+  "cuánto cuesta",
+  "quién lo paga",
+  "lo decides tú",
+  "a las pruebas",
+  "votes pensando",
+  "el bipartidismo",
+  "listas cerradas",
+  "dale a like",
+  "suscríbete",
+  "la campana"
+ ],
+ "planos": [
+  {
+   "en": 0,
+   "tipo": "cueva",
+   "cam": [
+    640,
+    300,
+    1.15
+   ],
+   "cam2": [
+    450,
+    210,
+    1.9
+   ],
+   "musica": "misterio"
+  },
+  {
+   "en": "1:Montaigne",
+   "tipo": "decano",
+   "cam": [
+    870,
+    245,
+    2.6
+   ],
+   "cam2": [
+    860,
+    250,
+    2.2
+   ],
+   "musica": "misterio",
+   "capas": [
+    {
+     "tipo": "cita",
+     "autor": "MONTAIGNE · 1580",
+     "texto": "Nada se cree con tanta fuerza como lo que menos se conoce.",
+     "en": "1:Montaigne",
+     "hasta": "1:Así que hoy"
+    }
+   ]
+  },
+  {
+   "en": "1:Este es Acascar",
+   "tipo": "teatro",
+   "escena": "caballo",
+   "cam": [
+    500,
+    300,
+    1.9
+   ],
+   "cam2": [
+    640,
+    360,
+    1.05
+   ],
+   "musica": "neutro",
+   "particulas": [
+    {
+     "tipo": "pajaros",
+     "n": 8,
+     "zona": [
+      0,
+      40,
+      1280,
+      260
+     ]
+    }
+   ],
+   "capas": [
+    {
+     "tipo": "nota",
+     "texto": "Acascar",
+     "sub": "Líder de Vox, el tercer partido",
+     "dato": "2014: 0 diputados · 2026: ~19 % en las encuestas",
+     "pos": "der",
+     "en": "1:Este es Acascar",
+     "hasta": "1:Mismas reglas"
+    }
+   ],
+   "acciones": [
+    {
+     "pieza": "jinete",
+     "hace": "balancea",
+     "en": "1:Este es Acascar",
+     "g": 1.2,
+     "hasta": "1:el tercer partido"
+    },
+    {
+     "pieza": "bandera",
+     "hace": "balancea",
+     "en": "1:Este es Acascar",
+     "g": 6,
+     "hasta": "1:Mismas reglas"
+    },
+    {
+     "pieza": "publico",
+     "hace": "salta",
+     "en": "1:el tercer partido",
+     "hasta": "1:Mismas reglas"
+    },
+    {
+     "pieza": "m1",
+     "hace": "camina",
+     "en": "1:Hace doce años",
+     "g": 60,
+     "hasta": "1:Mismas reglas"
+    },
+    {
+     "pieza": "m2",
+     "hace": "camina",
+     "en": "1:Hace doce años",
+     "g": 60,
+     "hasta": "1:Mismas reglas"
+    },
+    {
+     "pieza": "m3",
+     "hace": "camina",
+     "en": "1:Hoy las encuestas",
+     "g": 50,
+     "hasta": "1:Mismas reglas"
+    },
+    {
+     "pieza": "ave",
+     "hace": "arrastra",
+     "en": "1:Este es Acascar",
+     "g": -500,
+     "hasta": "1:Mismas reglas"
+    }
+   ]
+  },
+  {
+   "en": "1:Mismas reglas",
+   "tipo": "teatro",
+   "escena": "tribunal",
+   "cam": [
+    780,
+    200,
+    1.5
+   ],
+   "cam2": [
+    700,
+    330,
+    1.15
+   ],
+   "musica": "neutro",
+   "acciones": [
+    {
+     "pieza": "balanza",
+     "hace": "balancea",
+     "en": "1:Mismas reglas",
+     "hasta": "1:lo bueno",
+     "g": 4
+    },
+    {
+     "pieza": "decano",
+     "hace": "asiente",
+     "en": "1:la palabra exacta"
+    }
+   ]
+  },
+  {
+   "en": "2:Acascar creció",
+   "tipo": "teatro",
+   "escena": "amurrio",
+   "cam": [
+    640,
+    330,
+    1.05
+   ],
+   "cam2": [
+    400,
+    470,
+    1.45
+   ],
+   "musica": "misterio",
+   "particulas": [
+    {
+     "tipo": "chispas",
+     "en": "2:ETA amenazó",
+     "n": 60,
+     "zona": [
+      90,
+      360,
+      340,
+      610
+     ]
+    },
+    {
+     "tipo": "humo",
+     "en": "2:ETA amenazó",
+     "n": 22,
+     "zona": [
+      40,
+      120,
+      360,
+      600
+     ]
+    }
+   ],
+   "zooms": [
+    [
+     "2:El padre vivía",
+     520,
+     520,
+     1.9,
+     1.2
+    ],
+    [
+     "2:El hijo entró",
+     930,
+     520,
+     2.1,
+     1.2
+    ]
+   ],
+   "capas": [
+    {
+     "tipo": "nota",
+     "texto": "Amurrio (Álava)",
+     "sub": "Años de ETA",
+     "dato": "1999: la tienda del padre, quemada",
+     "pos": "der",
+     "en": "2:ETA amenazó",
+     "hasta": "2:El padre vivía"
+    }
+   ],
+   "acciones": [
+    {
+     "pieza": "llamas",
+     "hace": "crece",
+     "en": "2:ETA amenazó",
+     "g": 0.6,
+     "hasta": "2:El padre vivía"
+    },
+    {
+     "pieza": "llamas",
+     "hace": "tiembla",
+     "en": "2:escaparates rotos",
+     "g": 2,
+     "hasta": "2:El padre vivía"
+    },
+    {
+     "pieza": "mujer",
+     "hace": "niega",
+     "en": "2:pintadas",
+     "hasta": "2:la tienda acabó"
+    },
+    {
+     "pieza": "nino",
+     "hace": "tiembla",
+     "en": "2:la tienda acabó",
+     "g": 1.5
+    },
+    {
+     "pieza": "padre",
+     "hace": "inclina",
+     "en": "2:El padre vivía",
+     "g": 8,
+     "hasta": "2:El hijo entró"
+    },
+    {
+     "pieza": "escolta",
+     "hace": "alza",
+     "en": "2:con escolta",
+     "g": 6,
+     "hasta": "2:El hijo entró"
+    },
+    {
+     "pieza": "vigia",
+     "hace": "asiente",
+     "en": "2:con escolta"
+    },
+    {
+     "pieza": "chico",
+     "hace": "camina",
+     "en": "2:El hijo entró",
+     "g": -60,
+     "hasta": "2:Aristóteles"
+    },
+    {
+     "pieza": "chico",
+     "hace": "asiente",
+     "en": "2:diputado en el Parlamento"
+    }
+   ]
+  },
+  {
+   "en": "2:Aristóteles",
+   "tipo": "decano",
+   "cam": [
+    870,
+    245,
+    2.4
+   ],
+   "cam2": [
+    860,
+    250,
+    2.6
+   ],
+   "musica": "misterio",
+   "capas": [
+    {
+     "tipo": "cita",
+     "autor": "ARISTÓTELES",
+     "texto": "El valor es el punto medio entre el miedo y la temeridad.",
+     "en": "2:Aristóteles",
+     "hasta": "2:La pregunta del Decano"
+    },
+    {
+     "tipo": "sello",
+     "texto": "¿QUÉ HACES CON EL MIEDO?",
+     "en": "2:qué hace esa persona"
+    }
+   ],
+   "sfx": [
+    [
+     "impacto",
+     "2:qué hace esa persona",
+     0.3
+    ]
+   ]
+  },
+  {
+   "en": "3:En dos mil diez",
+   "tipo": "teatro",
+   "escena": "despacho",
+   "cam": [
+    420,
+    360,
+    1.6
+   ],
+   "cam2": [
+    640,
+    360,
+    1.1
+   ],
+   "musica": "neutro",
+   "particulas": [
+    {
+     "tipo": "monedas",
+     "en": "3:Cobraba",
+     "hasta": "3:El diecisiete",
+     "n": 35,
+     "zona": [
+      980,
+      60,
+      1240,
+      600
+     ]
+    }
+   ],
+   "capas": [
+    {
+     "tipo": "comparacion",
+     "izq": {
+      "titulo": "Acascar (2011-2013)",
+      "texto": "82.491 € al año + 11.363 € de plus"
+     },
+     "der": {
+      "titulo": "Presidente del Gobierno",
+      "texto": "78.185 € al año",
+      "en": "3:Más que el presidente"
+     },
+     "en": "3:Cobraba",
+     "hasta": "3:El diecisiete"
+    }
+   ],
+   "acciones": [
+    {
+     "pieza": "reina",
+     "hace": "asiente",
+     "en": "3:Esperanza Aguirre",
+     "hasta": "3:lo nombró"
+    },
+    {
+     "pieza": "llave",
+     "hace": "arrastra",
+     "en": "3:lo nombró",
+     "g": 40,
+     "hasta": "3:de la Comunidad"
+    },
+    {
+     "pieza": "joven",
+     "hace": "inclina",
+     "en": "3:lo nombró",
+     "g": -6,
+     "hasta": "3:Cuando la agencia"
+    },
+    {
+     "pieza": "escribiente",
+     "hace": "camina",
+     "en": "3:Cuando la agencia",
+     "g": -90,
+     "hasta": "3:Cobraba"
+    },
+    {
+     "pieza": "sacos",
+     "hace": "crece",
+     "en": "3:Cobraba",
+     "g": 0.25,
+     "hasta": "3:El diecisiete"
+    },
+    {
+     "pieza": "joven",
+     "hace": "salta",
+     "en": "3:Más que el presidente",
+     "g": 6
+    }
+   ]
+  },
+  {
+   "en": "3:El diecisiete",
+   "tipo": "teatro",
+   "escena": "despacho",
+   "cam": [
+    900,
+    380,
+    1.5
+   ],
+   "cam2": [
+    800,
+    360,
+    1.25
+   ],
+   "musica": "misterio",
+   "capas": [
+    {
+     "tipo": "sello",
+     "texto": "EL MISMO DÍA: NACE VOX",
+     "en": "3:se registró un partido"
+    }
+   ],
+   "sfx": [
+    [
+     "golpe",
+     "3:se registró un partido",
+     0.4
+    ]
+   ],
+   "acciones": [
+    {
+     "pieza": "sacos",
+     "hace": "desaparece",
+     "en": "3:la fundación se disolvió"
+    },
+    {
+     "pieza": "pila",
+     "hace": "cae",
+     "en": "3:la fundación se disolvió",
+     "g": 40,
+     "hasta": "3:Ese mismo día"
+    },
+    {
+     "pieza": "joven",
+     "hace": "alza",
+     "en": "3:se registró un partido",
+     "g": 10
+    }
+   ]
+  },
+  {
+   "en": "4:A mí",
+   "tipo": "retrato",
+   "img": "p1",
+   "lado": 1,
+   "z": [
+    1,
+    1.06
+   ],
+   "y": 0,
+   "musica": "neutro"
+  },
+  {
+   "en": "5:Vox nace",
+   "tipo": "teatro",
+   "escena": "fundacion",
+   "cam": [
+    640,
+    360,
+    1.05
+   ],
+   "cam2": [
+    640,
+    330,
+    1.2
+   ],
+   "musica": "neutro",
+   "zooms": [
+    [
+     "5:En la mesa fundadora",
+     640,
+     380,
+     1.2,
+     1.0
+    ],
+    [
+     "5:Alejo Vidal-Quadras",
+     510,
+     380,
+     1.7,
+     1.0
+    ],
+    [
+     "5:José Antonio Ortega Lara",
+     340,
+     400,
+     1.8,
+     1.2
+    ]
+   ],
+   "capas": [
+    {
+     "tipo": "lista",
+     "titulo": "Contra Rajoy, lo acusaban de blando con…",
+     "marca": "✗",
+     "items": [
+      {
+       "texto": "los presos de ETA que salieron",
+       "en": "5:los presos"
+      },
+      {
+       "texto": "los impuestos",
+       "en": "5:con los impuestos"
+      },
+      {
+       "texto": "el independentismo catalán",
+       "en": "5:el independentismo"
+      }
+     ],
+     "en": "5:Lo acusaban",
+     "hasta": "5:En la mesa fundadora"
+    },
+    {
+     "tipo": "nota",
+     "texto": "Ortega Lara",
+     "sub": "Funcionario de prisiones",
+     "dato": "532 días secuestrado por ETA",
+     "pos": "der",
+     "en": "5:José Antonio Ortega Lara",
+     "hasta": "5:Se presentaron"
+    }
+   ],
+   "acciones": [
+    {
+     "pieza": "f4",
+     "hace": "niega",
+     "en": "5:Vox nace",
+     "hasta": "5:Lo acusaban"
+    },
+    {
+     "pieza": "f2",
+     "hace": "inclina",
+     "en": "5:Lo acusaban",
+     "g": 5,
+     "hasta": "5:En la mesa"
+    },
+    {
+     "pieza": "perro",
+     "hace": "camina",
+     "en": "5:los impuestos",
+     "g": -80,
+     "hasta": "5:En la mesa"
+    },
+    {
+     "pieza": "f3",
+     "hace": "alza",
+     "en": "5:estaban Acascar",
+     "g": 8
+    },
+    {
+     "pieza": "f2",
+     "hace": "asiente",
+     "en": "5:Alejo Vidal-Quadras"
+    },
+    {
+     "pieza": "f1",
+     "hace": "asiente",
+     "en": "5:José Antonio Ortega Lara"
+    },
+    {
+     "pieza": "asta",
+     "hace": "balancea",
+     "en": "5:En la mesa",
+     "g": 3,
+     "hasta": "5:Se presentaron"
+    }
+   ]
+  },
+  {
+   "en": "5:Se presentaron",
+   "tipo": "teatro",
+   "escena": "europeas",
+   "cam": [
+    640,
+    360,
+    1.05
+   ],
+   "cam2": [
+    800,
+    380,
+    1.35
+   ],
+   "musica": "misterio",
+   "particulas": [
+    {
+     "tipo": "estrellas",
+     "n": 40,
+     "zona": [
+      80,
+      40,
+      1200,
+      260
+     ]
+    },
+    {
+     "tipo": "monedas",
+     "en": "5:el ochenta por ciento",
+     "hasta": "5:Vidal-Quadras dijo",
+     "n": 24,
+     "zona": [
+      560,
+      380,
+      780,
+      600
+     ]
+    }
+   ],
+   "capas": [
+    {
+     "tipo": "dato",
+     "pos": "izq",
+     "valor": "80 %",
+     "texto": "de la campaña de 2014, de simpatizantes de la oposición iraní",
+     "fuente": "El País, 2019",
+     "color": "rojo",
+     "en": "5:el ochenta por ciento",
+     "hasta": "5:Nunca hubo"
+    }
+   ],
+   "acciones": [
+    {
+     "pieza": "orador",
+     "hace": "alza",
+     "en": "5:Se presentaron",
+     "g": 8,
+     "hasta": "5:y no sacaron"
+    },
+    {
+     "pieza": "urna",
+     "hace": "tiembla",
+     "en": "5:ni un escaño",
+     "g": 2
+    },
+    {
+     "pieza": "orador",
+     "hace": "inclina",
+     "en": "5:ni un escaño",
+     "g": 6,
+     "hasta": "5:Aquella campaña"
+    },
+    {
+     "pieza": "barca",
+     "hace": "entra",
+     "en": "5:Aquella campaña",
+     "g": -700,
+     "hasta": "5:el ochenta por ciento"
+    },
+    {
+     "pieza": "barca",
+     "hace": "balancea",
+     "en": "5:el ochenta",
+     "g": 4,
+     "hasta": "5:De aquella mesa"
+    },
+    {
+     "pieza": "encapuchado",
+     "hace": "inclina",
+     "en": "5:simpatizantes",
+     "g": 6
+    },
+    {
+     "pieza": "saco",
+     "hace": "arrastra",
+     "en": "5:simpatizantes",
+     "g": -220,
+     "hasta": "5:Vidal-Quadras dijo"
+    },
+    {
+     "pieza": "mujer",
+     "hace": "niega",
+     "en": "5:Acascar dijo"
+    },
+    {
+     "pieza": "orador",
+     "hace": "asiente",
+     "en": "5:todo era legal"
+    },
+    {
+     "pieza": "gente",
+     "hace": "sale",
+     "en": "5:Vidal-Quadras se fue",
+     "g": 500,
+     "hasta": "5:De aquella mesa"
+    }
+   ]
+  },
+  {
+   "en": "5:De aquella mesa",
+   "tipo": "teatro",
+   "escena": "fundacion",
+   "cam": [
+    640,
+    360,
+    1.1
+   ],
+   "cam2": [
+    330,
+    340,
+    1.6
+   ],
+   "musica": "misterio",
+   "capas": [
+    {
+     "tipo": "nota",
+     "texto": "La mesa fundadora",
+     "sub": "Además del propio Acascar…",
+     "dato": "hoy solo sigue Ortega Lara",
+     "pos": "der",
+     "en": "5:hoy solo queda"
+    }
+   ],
+   "acciones": [
+    {
+     "pieza": "f2",
+     "hace": "desaparece",
+     "en": "5:De aquella mesa"
+    },
+    {
+     "pieza": "f4",
+     "hace": "desaparece",
+     "en": "5:hoy solo queda"
+    },
+    {
+     "pieza": "f1",
+     "hace": "asiente",
+     "en": "5:Ortega Lara"
+    }
+   ]
+  },
+  {
+   "en": "6:Cuatro años",
+   "tipo": "teatro",
+   "escena": "hemiciclo",
+   "cam": [
+    640,
+    360,
+    1.05
+   ],
+   "cam2": [
+    640,
+    300,
+    1.25
+   ],
+   "musica": "esperanza",
+   "capas": [
+    {
+     "tipo": "barras",
+     "titulo": "Diputados de Vox",
+     "unidad": "",
+     "filas": [
+      [
+       "Andalucía 2018",
+       12,
+       "verde"
+      ],
+      [
+       "Abril 2019",
+       24,
+       "verde"
+      ],
+      [
+       "Nov. 2019",
+       52,
+       "verde"
+      ],
+      [
+       "2023",
+       33,
+       "verde"
+      ],
+      [
+       "Encuestas 2026",
+       68,
+       "ambar"
+      ]
+     ],
+     "fuente": "Ministerio del Interior · Sigma Dos y GAD3 (12-10-2026)",
+     "en": "6:doce diputados",
+     "hasta": "6:Sube sobre todo",
+     "items": [
+      {
+       "en": "6:doce diputados"
+      },
+      {
+       "en": "6:veinticuatro"
+      },
+      {
+       "en": "6:cincuenta y dos"
+      },
+      {
+       "en": "6:treinta y tres"
+      },
+      {
+       "en": "6:sesenta y ocho"
+      }
+     ]
+    }
+   ],
+   "acciones": [
+    {
+     "pieza": "d6",
+     "hace": "aparece",
+     "en": "6:doce diputados"
+    },
+    {
+     "pieza": "d7",
+     "hace": "aparece",
+     "en": "6:doce diputados"
+    },
+    {
+     "pieza": "d5",
+     "hace": "aparece",
+     "en": "6:veinticuatro"
+    },
+    {
+     "pieza": "d8",
+     "hace": "aparece",
+     "en": "6:veinticuatro"
+    },
+    {
+     "pieza": "d4",
+     "hace": "aparece",
+     "en": "6:en el Congreso"
+    },
+    {
+     "pieza": "d3",
+     "hace": "aparece",
+     "en": "6:cincuenta y dos"
+    },
+    {
+     "pieza": "d9",
+     "hace": "aparece",
+     "en": "6:cincuenta y dos"
+    },
+    {
+     "pieza": "d2",
+     "hace": "aparece",
+     "en": "6:tercera fuerza"
+    },
+    {
+     "pieza": "d10",
+     "hace": "aparece",
+     "en": "6:tercera fuerza"
+    },
+    {
+     "pieza": "d10",
+     "hace": "desaparece",
+     "en": "6:bajó a treinta"
+    },
+    {
+     "pieza": "d2",
+     "hace": "desaparece",
+     "en": "6:bajó a treinta"
+    },
+    {
+     "pieza": "d1",
+     "hace": "aparece",
+     "en": "6:sesenta y ocho"
+    },
+    {
+     "pieza": "orador",
+     "hace": "balancea",
+     "en": "6:Cuatro años",
+     "g": 3,
+     "hasta": "6:Sube sobre todo"
+    },
+    {
+     "pieza": "ponente",
+     "hace": "asiente",
+     "en": "6:tercera fuerza"
+    },
+    {
+     "pieza": "d5",
+     "hace": "salta",
+     "en": "6:su mejor marca"
+    },
+    {
+     "pieza": "d6",
+     "hace": "salta",
+     "en": "6:su mejor marca"
+    }
+   ]
+  },
+  {
+   "en": "6:Sube sobre todo",
+   "tipo": "teatro",
+   "escena": "caballo",
+   "cam": [
+    900,
+    420,
+    1.6
+   ],
+   "cam2": [
+    640,
+    360,
+    1.05
+   ],
+   "musica": "esperanza",
+   "particulas": [
+    {
+     "tipo": "pajaros",
+     "n": 10,
+     "zona": [
+      0,
+      40,
+      1280,
+      260
+     ]
+    },
+    {
+     "tipo": "papeles",
+     "en": "6:Lo bueno",
+     "n": 25
+    }
+   ],
+   "capas": [
+    {
+     "tipo": "sello",
+     "texto": "SE DEBE ENTENDER",
+     "en": "6:se debe entender"
+    }
+   ],
+   "sfx": [
+    [
+     "golpe",
+     "6:se debe entender",
+     0.35
+    ]
+   ],
+   "acciones": [
+    {
+     "pieza": "publico",
+     "hace": "salta",
+     "en": "6:menores de cuarenta",
+     "hasta": "6:Lo bueno"
+    },
+    {
+     "pieza": "publico",
+     "hace": "asiente",
+     "en": "6:nadie les escuchaba",
+     "hasta": "6:Eso no se puede"
+    },
+    {
+     "pieza": "bandera",
+     "hace": "balancea",
+     "en": "6:Sube sobre todo",
+     "g": 8,
+     "hasta": "7:Los jóvenes"
+    },
+    {
+     "pieza": "m4",
+     "hace": "alza",
+     "en": "6:votos que se van del PP",
+     "g": 8
+    },
+    {
+     "pieza": "m1",
+     "hace": "camina",
+     "en": "6:votos que se van",
+     "g": 90,
+     "hasta": "6:Lo bueno"
+    },
+    {
+     "pieza": "m2",
+     "hace": "camina",
+     "en": "6:votos que se van",
+     "g": 90,
+     "hasta": "6:Lo bueno"
+    },
+    {
+     "pieza": "jinete",
+     "hace": "balancea",
+     "en": "6:Acascar tiene",
+     "g": 1.2
+    },
+    {
+     "pieza": "ave",
+     "hace": "arrastra",
+     "en": "6:Lo bueno",
+     "g": -600,
+     "hasta": "7:Los jóvenes"
+    }
+   ]
+  },
+  {
+   "en": "7:Los jóvenes",
+   "tipo": "retrato",
+   "img": "p2",
+   "lado": -1,
+   "z": [
+    1,
+    1.06
+   ],
+   "y": 0,
+   "musica": "neutro"
+  },
+  {
+   "en": "8:Pregunta del Decano",
+   "tipo": "decano",
+   "cam": [
+    870,
+    245,
+    2.3
+   ],
+   "cam2": [
+    870,
+    250,
+    2.6
+   ],
+   "musica": "misterio",
+   "capas": [
+    {
+     "tipo": "sello",
+     "texto": "¿POR O CONTRA?",
+     "en": "8:contra quién"
+    }
+   ],
+   "sfx": [
+    [
+     "impacto",
+     "8:contra quién",
+     0.3
+    ]
+   ]
+  },
+  {
+   "en": "9:Vox prometió",
+   "tipo": "teatro",
+   "escena": "chiringuitos",
+   "cam": [
+    640,
+    360,
+    1.05
+   ],
+   "cam2": [
+    380,
+    380,
+    1.5
+   ],
+   "musica": "neutro",
+   "particulas": [
+    {
+     "tipo": "pajaros",
+     "n": 6,
+     "zona": [
+      0,
+      30,
+      1280,
+      220
+     ]
+    },
+    {
+     "tipo": "polvo",
+     "en": "9:para colocar",
+     "n": 60,
+     "zona": [
+      760,
+      420,
+      940,
+      640
+     ]
+    }
+   ],
+   "acciones": [
+    {
+     "pieza": "mazo",
+     "hace": "golpea",
+     "en": "9:acabar con los chiringuitos",
+     "hasta": "9:Acascar lo dice",
+     "g": 35
+    },
+    {
+     "pieza": "h1",
+     "hace": "asiente",
+     "en": "9:Vox prometió"
+    },
+    {
+     "pieza": "h2",
+     "hace": "saluda",
+     "en": "9:organismos y fundaciones"
+    },
+    {
+     "pieza": "puesto",
+     "hace": "cae",
+     "en": "9:para colocar",
+     "g": 120,
+     "hasta": "9:Acascar lo dice"
+    },
+    {
+     "pieza": "vendedor",
+     "hace": "sale",
+     "en": "9:para colocar",
+     "g": 600,
+     "hasta": "9:Acascar lo dice"
+    },
+    {
+     "pieza": "a1",
+     "hace": "arrastra",
+     "en": "9:Vox prometió",
+     "g": 700,
+     "hasta": "10:Hay que cerrar"
+    },
+    {
+     "pieza": "a2",
+     "hace": "arrastra",
+     "en": "9:Vox prometió",
+     "g": -500,
+     "hasta": "10:Hay que cerrar"
+    }
+   ]
+  },
+  {
+   "en": "10:Hay que cerrar",
+   "tipo": "retrato",
+   "img": "p1",
+   "lado": 1,
+   "z": [
+    1.15,
+    1.25
+   ],
+   "y": 30,
+   "musica": "neutro"
+  },
+  {
+   "en": "11:Y aquí, la letra",
+   "tipo": "teatro",
+   "escena": "chiringuitos",
+   "cam": [
+    900,
+    380,
+    1.5
+   ],
+   "cam2": [
+    1000,
+    380,
+    1.7
+   ],
+   "musica": "misterio",
+   "particulas": [
+    {
+     "tipo": "monedas",
+     "en": "11:dinero público",
+     "hasta": "11:En dos mil veintitrés entró",
+     "n": 40,
+     "zona": [
+      860,
+      60,
+      1020,
+      560
+     ]
+    }
+   ],
+   "capas": [
+    {
+     "tipo": "dato",
+     "pos": "izq",
+     "valor": "4,5 M€",
+     "texto": "de Vox a su fundación, Disenso (2023-2024)",
+     "fuente": "Cuentas de Vox · El Español",
+     "color": "ambar",
+     "en": "11:cuatro millones",
+     "hasta": "11:En dos mil veintitrés entró"
+    }
+   ],
+   "acciones": [
+    {
+     "pieza": "saco",
+     "hace": "crece",
+     "en": "11:dinero público",
+     "g": 0.5,
+     "hasta": "11:En dos mil veintitrés entró"
+    },
+    {
+     "pieza": "h3",
+     "hace": "camina",
+     "en": "11:Vox vive",
+     "g": 150,
+     "hasta": "11:cuatro millones"
+    },
+    {
+     "pieza": "h2",
+     "hace": "camina",
+     "en": "11:cuatro millones",
+     "g": 200,
+     "hasta": "11:Disenso"
+    },
+    {
+     "pieza": "martillo",
+     "hace": "niega",
+     "en": "11:su propia fundación"
+    },
+    {
+     "pieza": "pato1",
+     "hace": "salta",
+     "en": "11:Disenso"
+    },
+    {
+     "pieza": "pato2",
+     "hace": "camina",
+     "en": "11:Y aquí",
+     "g": 60,
+     "hasta": "11:Disenso"
+    }
+   ]
+  },
+  {
+   "en": "11:En dos mil veintitrés entró",
+   "tipo": "teatro",
+   "escena": "castillos",
+   "cam": [
+    640,
+    400,
+    1.1
+   ],
+   "cam2": [
+    600,
+    470,
+    1.4
+   ],
+   "musica": "neutro",
+   "particulas": [
+    {
+     "tipo": "pajaros",
+     "n": 6,
+     "zona": [
+      0,
+      80,
+      1280,
+      300
+     ]
+    },
+    {
+     "tipo": "papeles",
+     "en": "11:se salió de todos",
+     "hasta": "11:En dos mil veintiséis",
+     "n": 18
+    }
+   ],
+   "zooms": [
+    [
+     "11:En dos mil veintiséis",
+     780,
+     470,
+     1.7,
+     1.2
+    ]
+   ],
+   "capas": [
+    {
+     "tipo": "nota",
+     "texto": "2023 → 2024 → 2026",
+     "sub": "Entra, se va por los menores migrantes, vuelve",
+     "dato": "«Prioridad nacional» en las ayudas",
+     "pos": "izq",
+     "en": "11:En julio",
+     "hasta": "11:Cicerón"
+    }
+   ],
+   "acciones": [
+    {
+     "pieza": "hombre",
+     "hace": "camina",
+     "en": "11:entró en cinco",
+     "g": 260,
+     "hasta": "11:con el PP"
+    },
+    {
+     "pieza": "torre",
+     "hace": "late",
+     "en": "11:con el PP",
+     "g": 0.05,
+     "hasta": "11:En julio"
+    },
+    {
+     "pieza": "hombre",
+     "hace": "sale",
+     "en": "11:se salió de todos",
+     "g": -900,
+     "hasta": "11:por el reparto"
+    },
+    {
+     "pieza": "dm1",
+     "hace": "niega",
+     "en": "11:menores migrantes"
+    },
+    {
+     "pieza": "dm2",
+     "hace": "asiente",
+     "en": "11:menores migrantes"
+    },
+    {
+     "pieza": "hombre",
+     "hace": "camina",
+     "en": "11:ha vuelto",
+     "g": 900,
+     "hasta": "11:vicepresidencias"
+    },
+    {
+     "pieza": "g1",
+     "hace": "asiente",
+     "en": "11:prioridad nacional",
+     "hasta": "11:Cicerón"
+    },
+    {
+     "pieza": "g2",
+     "hace": "niega",
+     "en": "11:prioridad nacional",
+     "hasta": "11:Cicerón"
+    },
+    {
+     "pieza": "perro",
+     "hace": "salta",
+     "en": "11:ha vuelto"
+    },
+    {
+     "pieza": "bestia",
+     "hace": "camina",
+     "en": "11:En dos mil veintitrés entró",
+     "g": -120,
+     "hasta": "11:Cicerón"
+    },
+    {
+     "pieza": "dm3",
+     "hace": "inclina",
+     "en": "11:como bandera",
+     "g": 5
+    }
+   ]
+  },
+  {
+   "en": "11:Cicerón",
+   "tipo": "decano",
+   "cam": [
+    860,
+    250,
+    2.4
+   ],
+   "cam2": [
+    760,
+    260,
+    2.1
+   ],
+   "capas": [
+    {
+     "tipo": "cita",
+     "autor": "CICERÓN",
+     "texto": "¿Cui bono? ¿A quién beneficia?",
+     "en": "11:a quién beneficia"
+    }
+   ],
+   "sfx": [
+    [
+     "impacto",
+     "11:donde ya mandan",
+     0.3
+    ]
+   ]
+  },
+  {
+   "en": "12:Juvenal",
+   "tipo": "decano",
+   "cam": [
+    870,
+    245,
+    2.5
+   ],
+   "cam2": [
+    860,
+    250,
+    2.2
+   ],
+   "musica": "tension",
+   "capas": [
+    {
+     "tipo": "cita",
+     "autor": "JUVENAL",
+     "texto": "¿Quién vigila a los vigilantes?",
+     "en": "12:quién vigila",
+     "hasta": "12:Mismas reglas"
+    }
+   ]
+  },
+  {
+   "en": "12:Mismas reglas",
+   "tipo": "teatro",
+   "escena": "tribunal",
+   "cam": [
+    260,
+    380,
+    1.6
+   ],
+   "cam2": [
+    300,
+    380,
+    1.4
+   ],
+   "musica": "tension",
+   "capas": [
+    {
+     "tipo": "sello",
+     "texto": "PRESUNCIÓN DE INOCENCIA",
+     "en": "12:nadie es culpable",
+     "hasta": "12:Primer frasco"
+    }
+   ],
+   "acciones": [
+    {
+     "pieza": "decano",
+     "hace": "asiente",
+     "en": "12:nadie es culpable"
+    }
+   ]
+  },
+  {
+   "en": "12:Primer frasco",
+   "tipo": "teatro",
+   "escena": "europeas",
+   "cam": [
+    700,
+    400,
+    1.6
+   ],
+   "cam2": [
+    640,
+    380,
+    1.3
+   ],
+   "musica": "tension",
+   "particulas": [
+    {
+     "tipo": "estrellas",
+     "n": 40,
+     "zona": [
+      80,
+      40,
+      1200,
+      260
+     ]
+    },
+    {
+     "tipo": "monedas",
+     "en": "12:ochenta por ciento",
+     "n": 18,
+     "zona": [
+      560,
+      380,
+      780,
+      600
+     ]
+    }
+   ],
+   "capas": [
+    {
+     "tipo": "frasco",
+     "nombre": "El dinero iraní",
+     "corto": "Irán",
+     "texto": "2014: el 80 % de la campaña europea, de simpatizantes de la oposición iraní en el exilio.",
+     "etiqueta": "SIN CAUSA",
+     "color": "gris",
+     "fuente": "El País · 3Cat",
+     "en": "12:Primer frasco",
+     "hasta": "13:Segundo frasco"
+    }
+   ],
+   "acciones": [
+    {
+     "pieza": "barca",
+     "hace": "balancea",
+     "en": "12:Primer frasco",
+     "g": 4,
+     "hasta": "13:Segundo frasco"
+    },
+    {
+     "pieza": "encapuchado",
+     "hace": "asiente",
+     "en": "12:Primer frasco"
+    },
+    {
+     "pieza": "urna",
+     "hace": "late",
+     "en": "12:Nunca hubo causa",
+     "g": 0.05
+    }
+   ]
+  },
+  {
+   "en": "13:Segundo frasco",
+   "tipo": "teatro",
+   "escena": "banco",
+   "cam": [
+    640,
+    360,
+    1.05
+   ],
+   "cam2": [
+    760,
+    380,
+    1.4
+   ],
+   "musica": "tension",
+   "capas": [
+    {
+     "tipo": "frasco",
+     "nombre": "El banco húngaro",
+     "corto": "Banco",
+     "texto": "2023: préstamo de 6,5 M€ de un banco cercano a Orbán. Devuelto en 2024.",
+     "etiqueta": "ARCHIVADO",
+     "color": "gris",
+     "fuente": "Fiscalía Anticorrupción, 2025",
+     "en": "13:Segundo frasco",
+     "hasta": "14:Los bancos"
+    }
+   ],
+   "particulas": [
+    {
+     "tipo": "monedas",
+     "en": "13:seis millones",
+     "hasta": "13:Anticorrupción",
+     "n": 30,
+     "zona": [
+      640,
+      300,
+      840,
+      620
+     ]
+    },
+    {
+     "tipo": "humo",
+     "n": 10,
+     "zona": [
+      1080,
+      300,
+      1160,
+      470
+     ]
+    }
+   ],
+   "acciones": [
+    {
+     "pieza": "banquero",
+     "hace": "inclina",
+     "en": "13:Vox pidió",
+     "g": 8,
+     "hasta": "13:Anticorrupción"
+    },
+    {
+     "pieza": "bestia",
+     "hace": "late",
+     "en": "13:seis millones",
+     "g": 0.08,
+     "hasta": "13:Anticorrupción"
+    },
+    {
+     "pieza": "q5",
+     "hace": "camina",
+     "en": "13:banco húngaro",
+     "g": 50,
+     "hasta": "13:Vox pidió"
+    },
+    {
+     "pieza": "q4",
+     "hace": "camina",
+     "en": "13:cercano al Gobierno",
+     "g": 60,
+     "hasta": "13:Anticorrupción"
+    },
+    {
+     "pieza": "q3",
+     "hace": "camina",
+     "en": "13:cercano al Gobierno",
+     "g": 60,
+     "hasta": "13:Anticorrupción"
+    },
+    {
+     "pieza": "banquero",
+     "hace": "niega",
+     "en": "13:no vio delito"
+    },
+    {
+     "pieza": "q2",
+     "hace": "salta",
+     "en": "13:archivado"
+    },
+    {
+     "pieza": "barco",
+     "hace": "balancea",
+     "en": "13:Segundo frasco",
+     "g": 3,
+     "hasta": "14:Los bancos"
+    }
+   ]
+  },
+  {
+   "en": "14:Los bancos",
+   "tipo": "retrato",
+   "img": "p2",
+   "lado": -1,
+   "z": [
+    1.1,
+    1.2
+   ],
+   "y": 20,
+   "musica": "neutro"
+  },
+  {
+   "en": "15:Tercer frasco",
+   "tipo": "teatro",
+   "escena": "huchas",
+   "cam": [
+    640,
+    360,
+    1.05
+   ],
+   "cam2": [
+    760,
+    360,
+    1.3
+   ],
+   "musica": "tension",
+   "particulas": [
+    {
+     "tipo": "monedas",
+     "en": "15:Tercer frasco",
+     "hasta": "15:Cuarto frasco",
+     "n": 28,
+     "zona": [
+      520,
+      140,
+      740,
+      420
+     ]
+    }
+   ],
+   "capas": [
+    {
+     "tipo": "frasco",
+     "nombre": "Las huchas",
+     "corto": "Huchas",
+     "texto": "Multa de 862.000 € del Tribunal de Cuentas. El Supremo la anuló: no se probó.",
+     "etiqueta": "ANULADO",
+     "color": "verde",
+     "fuente": "Tribunal Supremo, 3-6-2026",
+     "en": "15:Tercer frasco",
+     "hasta": "15:Cuarto frasco"
+    },
+    {
+     "tipo": "sello",
+     "texto": "ESTO TAMBIÉN SE CUENTA",
+     "en": "15:Esto también se cuenta",
+     "hasta": "15:Cuarto frasco"
+    }
+   ],
+   "acciones": [
+    {
+     "pieza": "lampara",
+     "hace": "balancea",
+     "en": "15:Tercer frasco",
+     "g": 4,
+     "hasta": "15:Cuarto frasco"
+    },
+    {
+     "pieza": "hucha",
+     "hace": "late",
+     "en": "15:las huchas",
+     "g": 0.1,
+     "hasta": "15:El Tribunal"
+    },
+    {
+     "pieza": "mujer2",
+     "hace": "inclina",
+     "en": "15:las huchas",
+     "g": 5,
+     "hasta": "15:El Tribunal"
+    },
+    {
+     "pieza": "lupa",
+     "hace": "alza",
+     "en": "15:El Tribunal de Cuentas",
+     "g": 20,
+     "hasta": "15:En junio"
+    },
+    {
+     "pieza": "juez",
+     "hace": "inclina",
+     "en": "15:multó",
+     "g": 4,
+     "hasta": "15:En junio"
+    },
+    {
+     "pieza": "escriba",
+     "hace": "asiente",
+     "en": "15:donativos ilegales"
+    },
+    {
+     "pieza": "juez",
+     "hace": "niega",
+     "en": "15:anuló la multa"
+    },
+    {
+     "pieza": "mujer1",
+     "hace": "salta",
+     "en": "15:Esto también"
+    },
+    {
+     "pieza": "mujer2",
+     "hace": "salta",
+     "en": "15:Esto también"
+    },
+    {
+     "pieza": "hada",
+     "hace": "saluda",
+     "en": "15:Esto también"
+    }
+   ]
+  },
+  {
+   "en": "15:Cuarto frasco",
+   "tipo": "teatro",
+   "escena": "despacho",
+   "cam": [
+    640,
+    360,
+    1.05
+   ],
+   "cam2": [
+    900,
+    380,
+    1.4
+   ],
+   "musica": "tension",
+   "particulas": [
+    {
+     "tipo": "monedas",
+     "en": "15:veintisiete mil euros",
+     "hasta": "15:Quinto frasco",
+     "n": 30,
+     "zona": [
+      600,
+      80,
+      1200,
+      560
+     ]
+    },
+    {
+     "tipo": "papeles",
+     "en": "15:PP y PSOE",
+     "hasta": "15:Quinto frasco",
+     "n": 20
+    }
+   ],
+   "capas": [
+    {
+     "tipo": "frasco",
+     "nombre": "Los proveedores",
+     "corto": "Tizona",
+     "texto": "Casi 27.000 € al mes a la empresa de su asesor, sin empleados. Su mujer: 63.600 € al año de una editorial del mismo grupo.",
+     "etiqueta": "SIN CAUSA · PREGUNTAS ABIERTAS",
+     "color": "ambar",
+     "fuente": "El Confidencial · El Español, 2026",
+     "en": "15:Cuarto frasco",
+     "hasta": "15:Quinto frasco"
+    }
+   ],
+   "acciones": [
+    {
+     "pieza": "sacos",
+     "hace": "late",
+     "en": "15:veintisiete mil euros",
+     "g": 0.08,
+     "hasta": "15:Vox dice"
+    },
+    {
+     "pieza": "escribiente",
+     "hace": "camina",
+     "en": "15:Vox dice",
+     "g": -160,
+     "hasta": "15:PP y PSOE"
+    },
+    {
+     "pieza": "reina",
+     "hace": "niega",
+     "en": "15:PP y PSOE"
+    },
+    {
+     "pieza": "dama",
+     "hace": "asiente",
+     "en": "15:la mujer de Acascar"
+    }
+   ]
+  },
+  {
+   "en": "15:Quinto frasco",
+   "tipo": "teatro",
+   "escena": "dana",
+   "cam": [
+    640,
+    360,
+    1.05
+   ],
+   "cam2": [
+    500,
+    380,
+    1.4
+   ],
+   "musica": "silencio",
+   "particulas": [
+    {
+     "tipo": "lluvia",
+     "n": 160
+    },
+    {
+     "tipo": "lluvia",
+     "en": "15:Revuelta",
+     "n": 90,
+     "sube": 4
+    }
+   ],
+   "capas": [
+    {
+     "tipo": "frasco",
+     "nombre": "La dana",
+     "corto": "Dana",
+     "texto": "Revuelta recogió donativos para Valencia. Dos miembros de Vox la denunciaron. La Fiscalía archivó.",
+     "etiqueta": "ARCHIVADO",
+     "color": "gris",
+     "fuente": "El Español, 21-4-2026",
+     "en": "15:Quinto frasco",
+     "hasta": "15:Sexto frasco"
+    }
+   ],
+   "acciones": [
+    {
+     "pieza": "v1",
+     "hace": "camina",
+     "en": "15:Quinto frasco",
+     "g": 120,
+     "hasta": "15:Dos miembros"
+    },
+    {
+     "pieza": "v2",
+     "hace": "camina",
+     "en": "15:Quinto frasco",
+     "g": 120,
+     "hasta": "15:Dos miembros"
+    },
+    {
+     "pieza": "v3",
+     "hace": "camina",
+     "en": "15:Revuelta",
+     "g": 110,
+     "hasta": "15:Dos miembros"
+    },
+    {
+     "pieza": "v4",
+     "hace": "camina",
+     "en": "15:Revuelta",
+     "g": 100,
+     "hasta": "15:Dos miembros"
+    },
+    {
+     "pieza": "carrito",
+     "hace": "arrastra",
+     "en": "15:recogió donativos",
+     "g": 90,
+     "hasta": "15:La Fiscalía"
+    },
+    {
+     "pieza": "empuja",
+     "hace": "inclina",
+     "en": "15:recogió donativos",
+     "g": -4,
+     "hasta": "15:La Fiscalía"
+    },
+    {
+     "pieza": "cajas",
+     "hace": "arrastra",
+     "en": "15:recogió donativos",
+     "g": 90,
+     "hasta": "15:La Fiscalía"
+    },
+    {
+     "pieza": "vigia",
+     "hace": "niega",
+     "en": "15:quedarse parte"
+    },
+    {
+     "pieza": "v2",
+     "hace": "asiente",
+     "en": "15:archivó la denuncia"
+    },
+    {
+     "pieza": "carro2",
+     "hace": "balancea",
+     "en": "15:Quinto frasco",
+     "g": 2,
+     "hasta": "15:Sexto frasco"
+    }
+   ]
+  },
+  {
+   "en": "15:Sexto frasco",
+   "tipo": "teatro",
+   "escena": "tribunal",
+   "cam": [
+    700,
+    300,
+    1.25
+   ],
+   "cam2": [
+    700,
+    330,
+    1.15
+   ],
+   "musica": "tension",
+   "capas": [
+    {
+     "tipo": "frasco",
+     "nombre": "Un diputado",
+     "corto": "Diputado",
+     "texto": "2024: diputado de Vox en Castilla-La Mancha, 6 meses por administración desleal en un negocio privado.",
+     "etiqueta": "CONDENADO",
+     "color": "rojo",
+     "fuente": "Juzgado de lo Penal, 2024",
+     "en": "15:Sexto frasco",
+     "hasta": "15:Y el último"
+    }
+   ],
+   "acciones": [
+    {
+     "pieza": "balanza",
+     "hace": "inclina",
+     "en": "15:fue condenado",
+     "g": 7,
+     "hasta": "15:Y el último"
+    },
+    {
+     "pieza": "r3",
+     "hace": "inclina",
+     "en": "15:administración desleal",
+     "g": 5
+    },
+    {
+     "pieza": "r4",
+     "hace": "niega",
+     "en": "15:no por dinero público"
+    }
+   ]
+  },
+  {
+   "en": "15:Y el último",
+   "tipo": "teatro",
+   "escena": "fundacion",
+   "cam": [
+    640,
+    360,
+    1.1
+   ],
+   "cam2": [
+    330,
+    340,
+    1.5
+   ],
+   "musica": "tension",
+   "capas": [
+    {
+     "tipo": "frasco",
+     "nombre": "Los que se fueron",
+     "corto": "Fugas",
+     "texto": "Vidal-Quadras, Espinosa de los Monteros, Olona… varios se fueron pidiendo cuentas.",
+     "etiqueta": "SIN CAUSA",
+     "color": "gris",
+     "fuente": "Valencia Plaza · Newtral",
+     "en": "15:Y el último",
+     "hasta": "15:Lección del Decano"
+    }
+   ],
+   "acciones": [
+    {
+     "pieza": "f2",
+     "hace": "sale",
+     "en": "15:Vidal-Quadras",
+     "g": -900,
+     "hasta": "15:Espinosa"
+    },
+    {
+     "pieza": "f4",
+     "hace": "sale",
+     "en": "15:Espinosa",
+     "g": 900,
+     "hasta": "15:Macarena"
+    },
+    {
+     "pieza": "perro",
+     "hace": "sale",
+     "en": "15:Macarena",
+     "g": 900,
+     "hasta": "15:Casi todos"
+    },
+    {
+     "pieza": "f3",
+     "hace": "niega",
+     "en": "15:no explicaba"
+    }
+   ]
+  },
+  {
+   "en": "15:Lección del Decano",
+   "tipo": "decano",
+   "cam": [
+    870,
+    245,
+    2.5
+   ],
+   "cam2": [
+    800,
+    260,
+    2.1
+   ],
+   "musica": "misterio",
+   "capas": [
+    {
+     "tipo": "dato",
+     "pos": "der",
+     "valor": "Poco tiempo, poco poder",
+     "texto": "Sin condenas al partido. ¿Y con mucho poder?",
+     "en": "15:no haya condenas"
+    }
+   ],
+   "sfx": [
+    [
+     "impacto",
+     "15:qué haría con mucho",
+     0.3
+    ]
+   ]
+  },
+  {
+   "en": "16:Para el veintinueve",
+   "tipo": "teatro",
+   "escena": "muralla",
+   "cam": [
+    640,
+    360,
+    1.05
+   ],
+   "cam2": [
+    520,
+    330,
+    1.35
+   ],
+   "musica": "tension",
+   "particulas": [
+    {
+     "tipo": "papeles",
+     "en": "16:menos impuestos",
+     "n": 20
+    },
+    {
+     "tipo": "polvo",
+     "en": "16:más expulsiones",
+     "n": 50,
+     "zona": [
+      60,
+      520,
+      700,
+      650
+     ]
+    }
+   ],
+   "capas": [
+    {
+     "tipo": "lista",
+     "titulo": "Programa para el 29 de noviembre",
+     "items": [
+      {
+       "texto": "«Prioridad nacional» en ayudas y vivienda",
+       "en": "16:prioridad nacional"
+      },
+      {
+       "texto": "Más expulsiones",
+       "en": "16:más expulsiones"
+      },
+      {
+       "texto": "Menos impuestos",
+       "en": "16:menos impuestos"
+      }
+     ],
+     "en": "16:prioridad nacional",
+     "hasta": "16:Acascar lo tiene"
+    }
+   ],
+   "acciones": [
+    {
+     "pieza": "orador",
+     "hace": "golpea",
+     "en": "16:Vox pone",
+     "hasta": "16:Acascar lo tiene",
+     "g": 10
+    },
+    {
+     "pieza": "guardia",
+     "hace": "alza",
+     "en": "16:prioridad nacional",
+     "g": 10,
+     "hasta": "16:menos impuestos"
+    },
+    {
+     "pieza": "publico",
+     "hace": "salta",
+     "en": "16:prioridad nacional",
+     "hasta": "16:Acascar lo tiene"
+    },
+    {
+     "pieza": "c1",
+     "hace": "camina",
+     "en": "16:más expulsiones",
+     "g": -200,
+     "hasta": "17:Yo"
+    },
+    {
+     "pieza": "c2",
+     "hace": "camina",
+     "en": "16:más expulsiones",
+     "g": -200,
+     "hasta": "17:Yo"
+    },
+    {
+     "pieza": "c3",
+     "hace": "camina",
+     "en": "16:más expulsiones",
+     "g": -180,
+     "hasta": "17:Yo"
+    },
+    {
+     "pieza": "c4",
+     "hace": "camina",
+     "en": "16:más expulsiones",
+     "g": -160,
+     "hasta": "17:Yo"
+    },
+    {
+     "pieza": "viejo",
+     "hace": "camina",
+     "en": "16:más expulsiones",
+     "g": -150,
+     "hasta": "17:Yo"
+    },
+    {
+     "pieza": "maleta",
+     "hace": "camina",
+     "en": "16:más expulsiones",
+     "g": -150,
+     "hasta": "17:Yo"
+    },
+    {
+     "pieza": "nina",
+     "hace": "camina",
+     "en": "16:menos impuestos",
+     "g": -140,
+     "hasta": "17:Yo"
+    },
+    {
+     "pieza": "guardia",
+     "hace": "asiente",
+     "en": "16:Acascar lo tiene"
+    }
+   ]
+  },
+  {
+   "en": "17:Yo prometo",
+   "tipo": "retrato",
+   "img": "p1",
+   "lado": 1,
+   "z": [
+    1.2,
+    1.32
+   ],
+   "y": 40,
+   "musica": "neutro"
+  },
+  {
+   "en": "18:Pregunta del Decano",
+   "tipo": "decano",
+   "cam": [
+    870,
+    245,
+    2.3
+   ],
+   "cam2": [
+    870,
+    250,
+    2.6
+   ],
+   "musica": "misterio",
+   "capas": [
+    {
+     "tipo": "lista",
+     "titulo": "La misma pregunta de siempre",
+     "marca": "?",
+     "items": [
+      {
+       "texto": "¿Cuánto cuesta?",
+       "en": "18:cuánto cuesta"
+      },
+      {
+       "texto": "¿Quién lo paga?",
+       "en": "18:quién lo paga"
+      },
+      {
+       "texto": "¿Quién hará esos trabajos?",
+       "en": "18:quién hará"
+      }
+     ],
+     "en": "18:cuánto cuesta"
+    }
+   ]
+  },
+  {
+   "en": "19:Balance",
+   "tipo": "teatro",
+   "escena": "tribunal",
+   "cam": [
+    780,
+    200,
+    1.5
+   ],
+   "cam2": [
+    700,
+    330,
+    1.15
+   ],
+   "musica": "neutro",
+   "capas": [
+    {
+     "tipo": "comparacion",
+     "izq": {
+      "titulo": "En un plato",
+      "texto": "Creció bajo la amenaza de ETA · escucha a millones · ninguna condena al partido"
+     },
+     "der": {
+      "titulo": "En el otro",
+      "texto": "Sueldo público alto · campaña pagada desde fuera · banco de Orbán · fundación propia · fundadores que se fueron",
+      "en": "19:En el otro"
+     },
+     "en": "19:En un plato",
+     "hasta": "19:Cuál pesa más"
+    },
+    {
+     "tipo": "sello",
+     "texto": "LO DECIDES TÚ",
+     "en": "19:Eso lo decides"
+    }
+   ],
+   "sfx": [
+    [
+     "golpe",
+     "19:Eso lo decides",
+     0.4
+    ]
+   ],
+   "acciones": [
+    {
+     "pieza": "balanza",
+     "hace": "balancea",
+     "en": "19:En un plato",
+     "hasta": "19:En el otro",
+     "g": 4
+    },
+    {
+     "pieza": "balanza",
+     "hace": "balancea",
+     "en": "19:En el otro",
+     "hasta": "19:Eso lo decides",
+     "g": 7
+    },
+    {
+     "pieza": "decano",
+     "hace": "asiente",
+     "en": "19:Eso lo decides"
+    }
+   ]
+  },
+  {
+   "en": "19:Hume",
+   "tipo": "decano",
+   "cam": [
+    860,
+    250,
+    2.4
+   ],
+   "cam2": [
+    760,
+    260,
+    2.1
+   ],
+   "capas": [
+    {
+     "tipo": "cita",
+     "autor": "DAVID HUME",
+     "texto": "El sabio ajusta lo que cree a las pruebas.",
+     "en": "19:el sabio"
+    }
+   ]
+  },
+  {
+   "en": "19:Las tres preguntas",
+   "tipo": "teatro",
+   "escena": "hemiciclo",
+   "cam": [
+    640,
+    360,
+    1.05
+   ],
+   "cam2": [
+    640,
+    330,
+    1.2
+   ],
+   "musica": "neutro",
+   "capas": [
+    {
+     "tipo": "lista",
+     "titulo": "Tres preguntas, con este partido y con todos",
+     "marca": "?",
+     "items": [
+      {
+       "texto": "¿Qué prometieron y qué cumplieron donde ya mandan?",
+       "en": "19:qué prometieron"
+      },
+      {
+       "texto": "¿Son euros o porcentajes?",
+       "en": "19:Son euros"
+      },
+      {
+       "texto": "¿Me fío de la gente de la que se rodean?",
+       "en": "19:Me fío"
+      }
+     ],
+     "hasta": "19:Aquí no te decimos"
+    },
+    {
+     "tipo": "sello",
+     "texto": "VOTA PENSANDO",
+     "en": "19:votes pensando"
+    }
+   ],
+   "sfx": [
+    [
+     "impacto",
+     "19:votes pensando",
+     0.35
+    ]
+   ],
+   "acciones": [
+    {
+     "pieza": "orador",
+     "hace": "balancea",
+     "en": "19:Las tres preguntas",
+     "g": 3,
+     "hasta": "19:Aquí no te decimos"
+    },
+    {
+     "pieza": "d3",
+     "hace": "asiente",
+     "en": "19:qué prometieron"
+    },
+    {
+     "pieza": "d8",
+     "hace": "asiente",
+     "en": "19:Son euros"
+    },
+    {
+     "pieza": "d5",
+     "hace": "niega",
+     "en": "19:Me fío"
+    },
+    {
+     "pieza": "ponente",
+     "hace": "asiente",
+     "en": "19:Aquí no te decimos"
+    },
+    {
+     "pieza": "d1",
+     "hace": "salta",
+     "en": "19:votes pensando"
+    },
+    {
+     "pieza": "d10",
+     "hace": "salta",
+     "en": "19:votes pensando"
+    }
+   ]
+  },
+  {
+   "en": "19:En el próximo episodio",
+   "tipo": "cueva",
+   "cam": [
+    640,
+    360,
+    1.05
+   ],
+   "cam2": [
+    640,
+    330,
+    1.2
+   ],
+   "musica": "misterio",
+   "capas": [
+    {
+     "tipo": "titulo",
+     "h1": "ESPAÑISTÁN",
+     "h2": "Próximo episodio: el bipartidismo",
+     "p": "Listas cerradas: ¿a quién le deben su sillón?",
+     "en": "19:En el próximo episodio"
+    }
+   ]
+  },
+  {
+   "en": "20:Y no te olvides",
+   "tipo": "teatro",
+   "escena": "caballo",
+   "cam": [
+    640,
+    360,
+    1.05
+   ],
+   "cam2": [
+    640,
+    360,
+    1.12
+   ],
+   "musica": "neutro",
+   "particulas": [
+    {
+     "tipo": "pajaros",
+     "n": 10,
+     "zona": [
+      0,
+      40,
+      1280,
+      260
+     ]
+    },
+    {
+     "tipo": "papeles",
+     "n": 25
+    }
+   ],
+   "capas": [
+    {
+     "tipo": "suscribete",
+     "en": "20:dale a like",
+     "hasta": "20:próximo episodio"
+    },
+    {
+     "tipo": "titulo",
+     "h1": "ESPAÑISTÁN",
+     "h2": "Episodio 3 · Acascar y Vox",
+     "p": "Fuentes en la descripción",
+     "en": "20:próximo episodio"
+    }
+   ],
+   "acciones": [
+    {
+     "pieza": "publico",
+     "hace": "salta",
+     "en": "20:dale a like"
+    },
+    {
+     "pieza": "bandera",
+     "hace": "balancea",
+     "en": "20:dale a like",
+     "g": 8,
+     "hasta": "20:próximo episodio"
+    },
+    {
+     "pieza": "jinete",
+     "hace": "balancea",
+     "en": "20:suscríbete",
+     "g": 1.2
+    },
+    {
+     "pieza": "m1",
+     "hace": "salta",
+     "en": "20:la campana"
+    },
+    {
+     "pieza": "m2",
+     "hace": "salta",
+     "en": "20:la campana"
+    }
+   ]
+  }
+ ]
+}

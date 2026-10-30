@@ -7,19 +7,34 @@ const T = (() => {
   const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
   const suave = x => (x = clamp(x), x * x * (3 - 2 * x));
   const rampa = (t, a, b) => suave((t - a) / (b - a));
-  const rebote = x => { x = clamp(x); const c = 1.6; return 1 + (c + 1) * (x - 1) ** 3 + c * (x - 1) ** 2; };   // se pasa un poco y vuelve
+  const rebote = (x, c = 1.6) => { x = clamp(x); return 1 + (c + 1) * (x - 1) ** 3 + c * (x - 1) ** 2; };   // se pasa un poco y vuelve
   const azar = i => { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
   const ruido = (t, s) => .5 * Math.sin(t * 1.3 + s * 7.1) + .3 * Math.sin(t * 2.9 + s * 3.3) + .2 * Math.sin(t * 5.3 + s * 1.7);
   const mezcla = (a, b, k) => a + (b - a) * k;
   const dir = (a, l) => [l * Math.sin(a), l * Math.cos(a)];         // ángulo 0 = hacia abajo; + = hacia delante
   const NEGRO = '#0b0705';
+  // campo de viento: corrientes suaves que se mueven despacio. Lo que está cerca se mueve parecido (como el viento de verdad, no cada cosa
+  // por su lado); devuelve un empuje de −2 a 2 en x e y
+  const campo = (x, y, t) => [Math.sin(y * .004 + t * .7) + .6 * Math.sin((x + y) * .0031 - t * 1.1) + .35 * Math.sin(y * .011 + x * .003 + t * 1.9),
+    Math.cos(x * .0037 - t * .6) + .6 * Math.sin((x - y) * .0027 + t * .9) + .35 * Math.cos(x * .012 - t * 1.7)];
+  // fuerza de las ráfagas (0,55 a 1): sube y baja despacio, a golpes irregulares, con un temblor encima (el viento de verdad no sopla igual)
+  const fuerzaRacha = t => { const s = .5 + .5 * Math.sin(t * .37 + 1.3 * Math.sin(t * .13)); return .55 + .45 * s * s * (.8 + .2 * Math.sin(t * 2.3)); };
   let ANGULOSO = false;                                               // planos `jack`: miembros en cuña, sin puntas redondas
 
-  // peso de un gesto: entra con rebote, se mantiene y sale suave; antes de entrar hay una pequeña anticipación
-  function peso(t, a, b, entra = .32, sale = .35) {
+  const suave2 = x => (x = clamp(x), x * x * x * (x * (6 * x - 15) + 10));   // como suave, pero sin tirón al arrancar ni al parar
+  // muelle amortiguado: sale de 0 con velocidad 0 (nada arranca de golpe), se pasa un poco, vuelve y se asienta en 1.
+  // x = 1 es el tiempo de entrada (el pico llega en x ≈ 0,62); pasa: 1,6 ≈ 9 % de pasada, 2,6 ≈ 20 %
+  const muelle = (x, pasa = 1.6) => {
+    if (x <= 0) return 0; if (x >= 4) return 1;
+    const z = clamp(.95 - .19 * pasa, .2, .95), wd = Math.PI / .62, w = wd / Math.sqrt(1 - z * z), e = Math.exp(-z * w * x);
+    return 1 - e * (Math.cos(wd * x) + z * w / wd * Math.sin(wd * x));
+  };
+
+  // peso de un gesto: entra con muelle, se mantiene y sale suave; antes de entrar hay una pequeña anticipación (sin tirones en las juntas)
+  function peso(t, a, b, entra = .32, sale = .35, pasa = 1.6) {
     if (t < a - .22 || t > b) return [0, 0];
-    const ant = t < a ? -Math.sin(Math.PI * clamp((t - (a - .22)) / .22)) : 0;
-    return [rebote((t - a) / entra) * (1 - rampa(t, b - sale, b)), ant];
+    const ant = t < a ? -(Math.sin(Math.PI * clamp((t - (a - .22)) / .22)) ** 2) : 0;
+    return [muelle((t - a) / entra, pasa) * (1 - suave2((t - (b - sale)) / sale)), ant];
   }
 
   // pierna en dos huesos: la rodilla hacia delante (+x)
@@ -38,38 +53,75 @@ const T = (() => {
       if (a.hace === 'gira') { if (t >= a.en) { anterior = mira; mira = -mira; giro = a.en; } continue; }
       const dx = a.a - x, n = Math.max(1, Math.round(Math.abs(dx) / (C0 / 2)));
       const quiere = Math.sign(dx) || mira;
-      if (quiere !== mira && t >= a.en - .3) { anterior = mira; mira = quiere; giro = a.en - .3; }
+      if (quiere !== mira && t >= a.en - GIRO) { anterior = mira; mira = quiere; giro = a.en - GIRO; }
       if (t <= a.en) break;
       const k = suave((t - a.en) / (a.hasta - a.en));
       fase += k * n / 2; x += dx * k;
       if (t < a.hasta) break;
     }
-    const vuelta = clamp((t - giro) / .3);                              // al girarse se estrecha y se da la vuelta
-    const f = vuelta < 1 ? anterior * Math.cos(Math.PI * vuelta) : mira;
-    return { x, fase, f: Math.abs(f) < .08 ? .08 * Math.sign(f || 1) : f, mira };
+    // giro como una persona, no como una carta: la cabeza va delante, el cuerpo pasa de frente a mitad del giro
+    // (si hay vista de frente) y nunca se queda fino como un papel
+    const vuelta = suave(clamp((t - giro) / GIRO));
+    return { x, fase, f: vuelta < 1 ? (vuelta < .5 ? anterior : mira) : mira, mira, vuelta, anterior };
   }
+  const GIRO = .42;                                                     // segundos que tarda en darse la vuelta
 
   // ---------- la pose de un fotograma ----------
   function pose(ac, t) {
-    const p = ac.p, s = p.semilla || 1, q = ac.quieto ? 0 : 1, r = recorrido(ac, t), r2 = recorrido(ac, t - 1 / 24), r3 = recorrido(ac, t - .2);
+    const p = ac.p, s = p.semilla || 1, q = ac.quieto && !ac.cartoon ? 0 : 1, r = recorrido(ac, t), r2 = recorrido(ac, t - 1 / 24), r3 = recorrido(ac, t - .2);
     const vel = (r.x - r2.x) * 24, anda = clamp(Math.abs(vel) / (90 * p.alto)), velAtras = (r2.x - r3.x) / .18;
     const o = { x: r.x, y: 0, f: r.f, fase: r.fase, anda, vel: vel * Math.sign(r.mira), velAtras: velAtras * Math.sign(r.mira),
       inclina: .07 * anda + (p.encorvado || 0) + .015 * q * ruido(t * .7, s), cabeza: .03 * q * ruido(t * .9, s + 2), boca: 0, aplasta: 1,
       parpadea: (u => u < .12 || (azar(Math.floor((t + azar(s) * 4) / (3.2 + azar(s + 1))) + s) < .3 && u > .26 && u < .36))((t + azar(s) * 4) % (3.2 + azar(s + 1))),
       respira: Math.sin(t * 1.9 + s), hombros: 0, cabezaAncho: 1, cejas: .15 * q * ruido(t * .6, s + 7),
       ojos: .5 * q * Math.sin(t * .7 + s) * (Math.sin(t * .23 + s) > 0), activos: [], agacha: 0, dorsal: 0, tumbado: 0, trepaW: 0, dy: 0 };
-    // vista (perfil / frente / espalda): al cambiar, el títere se estrecha y se da la vuelta como una carta
+    // vista (perfil / frente / espalda). Los giros pasan por poses dibujadas, como en los dibujos animados: perfil → tres cuartos →
+    // frente → tres cuartos → perfil, sin estrecharse nunca como una hoja de papel. La cabeza va un poco por delante del cuerpo.
+    // o.ladeo / o.ladeoCabeza: −1…1, hacia dónde mira el cuerpo / la cara dentro de la vista de frente (0,75 = tres cuartos)
     let vista = ac.vista || 'perfil', cambio = -9, antes = vista;
     for (const a of ac.acciones) if (a.hace === 'vista' && t >= a.en - .15) { antes = vista; vista = a.a; cambio = a.en - .15; }
-    const kv = clamp((t - cambio) / .3); o.vista = kv < .5 ? antes : vista; o.giroVista = kv < 1 ? Math.max(.06, Math.abs(Math.cos(Math.PI * kv))) : 1;
+    const kv = clamp((t - cambio) / .45), fr = Math.sign(r.mira) || 1; o.vista = kv < .5 ? antes : vista; o.giroVista = 1; o.ladeo = 0; o.ladeoCabeza = 0;
+    if (kv < 1 && T.dibujaFrente && [antes, vista].includes('perfil') && [antes, vista].includes('frente')) {
+      const de = x => { const k = antes === 'perfil' ? clamp(x) : 1 - clamp(x); return k < .3 ? null : .75 * fr * (1 - suave((k - .3) / .7)); };   // 0 perfil … 1 frente
+      const L = de(kv); o.vista = L === null ? 'perfil' : 'frente'; o.ladeo = L || 0; o.ladeoCabeza = de(kv + .15) ?? o.ladeo;
+    } else if (kv < 1) o.giroVista = .7 + .3 * Math.abs(Math.cos(Math.PI * suave(kv)));   // frente ↔ espalda: media vuelta rápida
+    if (r.vuelta < 1 && o.vista === 'perfil' && T.dibujaFrente) {       // darse la vuelta de perfil: pasa por tres cuartos y de frente
+      const v = r.vuelta, L = x => .75 * r.anterior * Math.cos(Math.PI * clamp((x - .18) / .64));
+      if (v > .18 && v < .82) { o.vista = 'frente'; o.ladeo = L(v); o.ladeoCabeza = L(v + .12); }
+      o.cabeza += .1 * Math.sin(Math.PI * v) * -Math.sign(r.mira);
+      o.agacha = Math.max(o.agacha, .08 * Math.sin(Math.PI * v));      // baja un poco el peso al pivotar
+    } else if (r.vuelta < 1 && o.vista === 'perfil') {                  // sin vista de frente: tres cuartos → de frente → tres cuartos
+      const v = r.vuelta, frente = T.dibujaFrente && v > .3 && v < .7;
+      const lado = T.dibujaFrente ? .3 : .5;                            // perfil que se estrecha a tres cuartos, y al revés
+      if (frente) { o.vista = 'frente'; o.giroVista = .62 + .38 * Math.sin(Math.PI * (v - .3) / .4); }
+      else o.giroVista = v < .5 ? mezcla(1, .62, v / lado) : mezcla(.62, 1, (v - (1 - lado)) / lado);
+      o.cabeza += .1 * Math.sin(Math.PI * v) * -Math.sign(r.mira);   // la cabeza se adelanta al cuerpo
+      o.agacha = Math.max(o.agacha, .06 * Math.sin(Math.PI * v));      // y baja un poco el peso al pivotar
+    }
     // acercarse o alejarse de la cámara (crece o encoge mientras anda de frente)
     o.z = ac.z || 1; o.andaFrente = 0; o.faseFrente = 0;
     for (const a of ac.acciones) if (a.hace === 'acerca' && t > a.en) { const q = suave((t - a.en) / (a.hasta - a.en)); o.z = mezcla(o.z, a.a, q);
       if (t < a.hasta) { o.andaFrente = Math.min(1, 4 * q, 4 * (1 - q)); o.faseFrente = (t - a.en) * 1.7; } }
-    const sw = Math.sin(TAU * r.fase) * anda;
+    const sw = Math.sin(TAU * r.fase) * anda * (ac.cartoon ? 1.45 : 1);   // en dibujo animado, los brazos bracean más
     o.cerca = [.12 - .42 * sw + .03 * ruido(t, s + 4), .22 + .25 * anda, p.mano || 'abierta'];
     o.lejos = [.1 + .42 * sw + .03 * ruido(t, s + 5), .2 + .25 * anda, p.manoLejos || 'abierta'];
+    o.cartoon = !!ac.cartoon;
+    // peso: los grandes tardan más en arrancar y en parar y rebotan menos; los menudos, al revés (ficha: `masa` lo fuerza)
+    o.masa = p.masa ?? clamp(((p.grueso || 1) + .5 * (p.barriga || 0)) * (p.alto || 1) / 1.05, .8, 1.4);
     for (const a of ac.acciones) gesto(a, t, o, s);
+    if (o.cartoon) {                                                     // modo dibujo animado: se encoge antes de cada gesto y se estira al lanzarlo; al andar, rebota
+      let sq = 0;
+      for (const a of o.activos) if (a.hace !== 'habla') sq += .9 * a.ant + (a.u > 0 && a.u < .28 ? .7 * Math.sin(Math.PI * a.u / .28) : 0);
+      o.aplasta *= 1 + .1 * clamp(sq, -1, 1) + .02 * o.respira * (o.anda < .2) - .07 * anda * Math.cos(2 * TAU * r.fase);
+      o.cejas *= 1.4; o.cabeza *= 1.3;
+      // que no parezca un robot: nada se queda clavado. El brazo que aguanta un gesto se mece, el peso pasa de un pie a otro,
+      // al andar la cabeza cabecea y el pecho contrarrota, y los ojos saltan de un sitio a otro como los de verdad
+      o.cerca[0] += .035 * ruido(t * 1.4, s + 11); o.lejos[0] += .03 * ruido(t * 1.2, s + 13);
+      if (o.anda < .2) { o.x += 3 * Math.sin(t * .5 + s); o.inclina += .02 * Math.sin(t * .5 + s + 1); }
+      o.cabeza += .05 * anda * Math.sin(2 * TAU * r.fase + 1); o.dorsal += .04 * anda * Math.sin(TAU * r.fase);
+      const ks = t / 1.3 + s, ki = Math.floor(ks);                      // el salto de mirada dura 0,08 s, no un fotograma
+      o.ojos += .45 * (mezcla(azar(ki - 1 + s), azar(ki + s), suave((ks - ki) * 1.3 / .08)) - .5);
+    }
     // cadena del cuerpo: el brazo que se estira hacia delante arrastra el pecho; al agacharse, el tronco se inclina para no caerse
     o.dorsal += .1 * clamp((o.cerca[0] - .9) / 1.2, -1, 1) - .06 * clamp(-o.lejos[0] / 1.2);
     o.inclina += .35 * o.agacha;
@@ -81,14 +133,21 @@ const T = (() => {
     }
     if (o.anda < .2 && q) { o.cabeza += .05 * Math.sin(t * .31 + s * 2) * (Math.sin(t * .13 + s) > .3); o.inclina += .012 * o.respira; o.x += 2.5 * Math.sin(t * .4 + s); }
     if (!pose.dentro) {                                                  // arrastre: el antebrazo llega un poco después que el brazo
-      pose.dentro = true; const atras = pose(ac, t - .09); pose.dentro = false;
-      for (const b of ['cerca', 'lejos']) o[b][1] = mezcla(o[b][1], atras[b][1] + (o[b][0] - atras[b][0]) * -.6, .45);
+      const lag = ac.cartoon ? .13 : .09;
+      pose.dentro = true; const atras = pose(ac, t - lag); pose.dentro = false;
+      if (!o.trepaW) o.lejos[0] = mezcla(o.lejos[0], atras.lejos[0], .55);   // sin gemelos: el brazo de atrás va un poco más tarde que el de delante
+      for (const b of ['cerca', 'lejos']) o[b][1] = mezcla(o[b][1], atras[b][1] + (o[b][0] - atras[b][0]) * (ac.cartoon ? -.85 : -.6), ac.cartoon ? .55 : .45);
+      if (ac.cartoon) o.cabeza = mezcla(o.cabeza, atras.cabeza, .35) - .6 * (o.inclina - atras.inclina);   // la cabeza llega tarde: si el cuerpo va, ella se queda
     }
     return o;
   }
   const brazo = (o, cual, sH, sC, mano, w, mu = 0) => { const b = o[cual]; o[cual] = [mezcla(b[0], sH, w), mezcla(b[1], sC, w), w > .5 && mano ? mano : b[2], mezcla(b[3] || 0, mu, w)]; };   // mu: ángulo de la muñeca
+  const SIN_ANTICIPO = new Set(['habla', 'asiente', 'niega', 'recibe', 'repta', 'agacha', 'corta']);   // reacciones y gestos que no se preparan
   function gesto(a, t, o, s) {
-    const hasta = a.hasta ?? a.en + 1.2, [w, ant] = peso(t, a.en, hasta, a.entra ?? .32, a.sale ?? .35), u = t - a.en;
+    const hasta = a.hasta ?? a.en + 1.2, u = t - a.en;
+    const m = o.masa || 1;
+    let [w, ant] = peso(t, a.en, hasta, (a.entra ?? (o.cartoon ? .2 : .32)) * m, (a.sale ?? .35) * m, (o.cartoon ? 2.6 : 1.6) / m);
+    if (ant < 0 && !SIN_ANTICIPO.has(a.hace)) w = ant * (o.cartoon ? .14 : .07);   // anticipación: antes del gesto, brazo y cuerpo van un poco al lado contrario
     if (a.hace === 'desenmascara' && t >= a.en) o.corteMascara = a.en;
     if (a.hace === 'coge' && t >= a.en) o['obj' + (a.mano || 'cerca')] = a.que;            // coger / soltar un objeto (daga, bandera…)
     if (a.hace === 'suelta' && t >= a.en) o['obj' + (a.mano || 'cerca')] = null;
@@ -124,7 +183,7 @@ const T = (() => {
       if (u2 < 0) { const k = suave((u2 + .5) / .5); h = mezcla(.4, 3.0, k); c = mezcla(.3, 1.2, k); m = mezcla(0, .6, k); d = -.2 * k; o.inclina -= .08 * k; o.agacha = Math.max(o.agacha, .1 * k); }
       else if (u2 < .09) { const k = u2 / .09; h = mezcla(3.0, 1.2, k); c = mezcla(1.2, .5, k); m = mezcla(.6, -.3, k); d = mezcla(-.2, .3, k); o.inclina += .14 * k; o.impacto = true; }
       else { h = 1.2; c = .5; m = -.3; d = .3; o.inclina += .14; o.agacha = Math.max(o.agacha, .15); }
-      const v = 1 - sal; brazo(o, 'cerca', h, c, 'agarra', v, m); o.dorsal += d * v; o.cejas -= .8 * v; o.ojos = -.3 * v; return;
+      const v = (1 - sal) * suave((u2 + .5) / .12); brazo(o, 'cerca', h, c, 'agarra', v, m); o.dorsal += d * v; o.cejas -= .8 * v; o.ojos = mezcla(o.ojos, -.3, v); return;
     }
     if (a.hace === 'corta' && t > a.en - .45 && t < (a.hasta ?? a.en + 1.2)) { o.activos.push({ hace: 'corta', w: 1, u }); }
     if (w === 0 && ant === 0 && a.hace !== 'salta' && !(a.hace === 'corta' && t > a.en - .45 && t < (a.hasta ?? a.en + 1.2))) return;
@@ -137,7 +196,7 @@ const T = (() => {
         o.y -= 12 * w * Math.abs(Math.sin(t * 6 + s)); o.cabeza -= .1 * w; break;
       case 'aplaude': brazo(o, 'cerca', 1.25, .95 + .3 * Math.sin(t * 15 + s), 'abierta', w); brazo(o, 'lejos', 1.1, 1.05, 'abierta', w); break;
       case 'encoge': o.cejas += .8 * w; brazo(o, 'cerca', .45, 1.7, 'abierta', w); brazo(o, 'lejos', .4, 1.75, 'abierta', w); o.hombros = 8 * w; o.cabeza += .18 * w; break;
-      case 'piensa': o.cejas += .4 * w * Math.sin(t * 1.3); o.ojos = .8 * w; brazo(o, 'cerca', .55, 2.45, 'puno', w); o.cabeza += .16 * w + .03 * Math.sin(t * 2) * w; o.inclina += .04 * w; break;
+      case 'piensa': o.cejas += .4 * w * Math.sin(t * 1.3); o.ojos = mezcla(o.ojos, .8, w); brazo(o, 'cerca', .55, 2.45, 'puno', w); o.cabeza += .16 * w + .03 * Math.sin(t * 2) * w; o.inclina += .04 * w; break;
       case 'golpea': brazo(o, 'cerca', 1.25 + .65 * Math.max(0, Math.sin(u * 7)) + .4 * ant, .5, 'puno', w); o.inclina += .06 * w; break;
       case 'corta': {                                                  // tajo: arma atrás, corta en diagonal y aguanta
         const u2 = t - a.en; let h, c;
@@ -146,10 +205,14 @@ const T = (() => {
         else { h = .75; c = -.15; o.inclina += .2; }
         if (u2 > -.4) { o.cerca = [mezcla(o.cerca[0], h, Math.max(w, u2 < .12 ? 1 : 0)), mezcla(o.cerca[1], c, Math.max(w, u2 < .12 ? 1 : 0)), 'puno']; o.tajo = u2; }
         o.cejas -= .7; break; }
-      case 'desenmascara': o.corteMascara = a.en; o.cejas += 1.1 * w; o.boca = Math.max(o.boca, .55 * w); o.ojos = -.6 * w; break;
+      case 'desenmascara': o.corteMascara = a.en; o.cejas += 1.1 * w; o.boca = Math.max(o.boca, .55 * w); o.ojos = mezcla(o.ojos, -.6, w); break;
       case 'asiente': o.cabeza += .2 * w * Math.max(0, Math.sin(u * 8)); break;
       case 'niega': o.cabezaAncho = 1 - .3 * w * Math.abs(Math.sin(u * 9)); o.cabeza += .04 * w; break;
       case 'inclina': o.inclina += .45 * w; o.cabeza += .2 * w; break;
+      case 'sorprende': {                                             // susto de dibujo animado: se encoge, se estira de golpe con los ojos como platos y vuelve rebotando
+        const e = u < 0 ? 0 : Math.exp(-u * 5) * Math.cos(u * 18);
+        o.aplasta *= 1 + .14 * ant + .2 * e * w; o.cejas += 1.4 * w; o.ojos = mezcla(o.ojos, -.6, w); o.boca = Math.max(o.boca, .6 * w);
+        brazo(o, 'cerca', 2.4, .9, 'abierta', w); brazo(o, 'lejos', 2.2, 1, 'abierta', w); o.inclina -= .12 * w; o.cabeza -= .12 * w; break; }
       case 'mano': {                                                  // dar la mano: el brazo se estira, la mano de canto, y se agita (sincronizada entre los dos)
         const agita = .1 * Math.sin(u * 13) * clamp((u - .45) / .2) * clamp((hasta - .4 - t) / .2);
         brazo(o, 'cerca', 1.38 + agita + (a.h || 0), .12 - agita * .6, 'estrecha', w, -.15 + agita); o.inclina += .05 * w; o.dorsal += .05 * w; o.cabeza -= .04 * w; break; }
@@ -159,12 +222,14 @@ const T = (() => {
         o.tumbado = Math.max(o.tumbado, w); o.inclina = mezcla(o.inclina, 1.4 + .04 * Math.sin(2 * c), w); o.dorsal -= (.14 + .05 * r1) * w;
         o.cabeza = mezcla(o.cabeza, .1 + .06 * Math.sin(2 * c), w); o.cejas -= .6 * w; o.boca = Math.max(o.boca, .3 * w * r1);
         brazo(o, 'cerca', mezcla(.3, 1.2, r1), mezcla(1.3, .4, r1), 'abierta', w, .6); brazo(o, 'lejos', mezcla(.3, 1.2, r2), mezcla(1.3, .4, r2), 'abierta', w, .6); break; }
+      case 'miraCamara': if (o.vista === 'perfil' && T.dibujaFrente && w > .3) {   // mira a cámara: tres cuartos y luego casi de frente, la cara por delante
+        o.vista = 'frente'; o.ladeo = (w < .65 ? .75 : .5) * o.f; o.ladeoCabeza = (w < .65 ? .55 : .18) * o.f; } break;
       case 'agacha': o.agacha = Math.max(o.agacha, (a.g ?? .5) * w); break;
       case 'recibe': {                                                // recibe una puñalada: se arquea, se le doblan las rodillas, la mano busca la espalda
         const k = clamp(u / .12), sacude = Math.exp(-u * 3) * Math.sin(u * 22);
         o.dorsal -= (.32 * k - .06 * sacude) * w; o.inclina -= .06 * k * w; o.cabeza -= (.28 * k + .05 * sacude) * w; o.agacha = Math.max(o.agacha, (.18 + .12 * clamp((u - .3) / .5)) * w);
         brazo(o, 'cerca', .55 + .2 * sacude, .5, 'abierta', w, .5); brazo(o, 'lejos', -1.6 + .15 * Math.sin(u * 3), 1.9, 'abierta', w * clamp((u - .2) / .3), -.4);
-        o.boca = Math.max(o.boca, .7 * w); o.cejas += 1.1 * w; o.ojos = .2 * w; o.x += 10 * clamp(u / .4) * w + 3 * Math.sin(u * 5) * w * (u > .4); break; }
+        o.boca = Math.max(o.boca, .7 * w); o.cejas += 1.1 * w; o.ojos = mezcla(o.ojos, .2, w); o.x += 10 * clamp(u / .4) * w + 3 * Math.sin(u * 5) * w * (u > .4); break; }
       case 'brazos': brazo(o, 'cerca', a.h ?? 1.2, a.c ?? .3, a.mano, w); if (a.h2 != null) brazo(o, 'lejos', a.h2, a.c2 ?? .3, a.mano, w); break;
       case 'habla': o.boca = Math.max(o.boca, w * clamp(.55 + .45 * Math.sin(t * 17 + s) * Math.sin(t * 5.3 + s * 2) + .25 * Math.sin(t * 29))); break;
       case 'salta': { const k = clamp(u / .55); if (u > -.15 && u < .7) { o.y -= 70 * Math.sin(Math.PI * k) * (k < 1); o.aplasta = u < 0 ? 1 - .12 * Math.sin(Math.PI * (u + .15) / .15) : u > .55 ? 1 - .15 * Math.sin(Math.PI * (u - .55) / .15) : 1.06; } break; }
@@ -200,7 +265,7 @@ const T = (() => {
       const sn = Math.sin(TAU * o.trepaFase + i * Math.PI), ti = [(i ? -8 : 22) * A + 10 * A * sn, -34 * A * (.5 + .5 * sn), .45];
       for (let j = 0; j < 3; j++) q[j] = mezcla(q[j], ti[j], o.trepaW); });
     const caderaY = mezcla(-(L1 + L2) * (.965 - .32 * o.agacha) + 5 * o.anda * (.5 + .5 * Math.cos(2 * TAU * o.fase)), -24 * A * G - 4 * A * Math.abs(Math.sin(TAU * o.fase)), o.tumbado) + o.y;
-    g.save(); g.translate(o.x, 0); g.scale(o.f * (p.escala || 1) * o.z * o.giroVista, (p.escala || 1) * o.z * o.aplasta); g.fillStyle = g.strokeStyle = NEGRO;
+    g.save(); g.translate(o.x, 0); g.scale(o.f * (p.escala || 1) * o.z * o.giroVista / Math.sqrt(o.aplasta), (p.escala || 1) * o.z * o.aplasta);   // al encogerse, engorda (mismo volumen) g.fillStyle = g.strokeStyle = NEGRO;
     const [pc, pl] = pies, cad = [-26 * A * o.agacha, caderaY];
     const rod = pie => ik(0, caderaY, pie[0], pie[1] - 6 * A, L1, L2);
     // lo de atrás, un poco más claro para que se lea
@@ -513,12 +578,52 @@ const T = (() => {
     const K = capa.getContext('2d'), halo = document.createElement('canvas'), lejos = document.createElement('canvas');
     halo.width = capa.width / 10; halo.height = capa.height / 10;
     const borde = document.createElement('canvas'); borde.width = capa.width; borde.height = capa.height; lejos.width = capa.width / 3; lejos.height = capa.height / 3;
-    const cam = t => {                                                 // [x, y, zoom] interpolados entre las claves, más el pulso de la mano
-      const c = def.camara || [[0, 640, 360, 1]]; let a = c[0], b = c[0], k = 0;
-      for (let i = 0; i < c.length; i++) if (t >= c[i][0]) { a = c[i]; b = c[i + 1] || c[i]; k = b === a ? 0 : suave((t - a[0]) / (b[0] - a[0])); }
-      const pulso = def.quieto ? 0 : 1;
-      return [mezcla(a[1], b[1], k) + pulso * (4 * Math.sin(t * .37) + 2 * Math.sin(t * 1.1)), mezcla(a[2], b[2], k) + pulso * 3 * Math.sin(t * .29), mezcla(a[3], b[3], k)];
+    // cámara: curva cúbica monótona por las claves. No se para en cada clave si sigue en el mismo sentido; se para al principio,
+    // al final y donde da la vuelta o se queda quieta. Con dos claves es igual que suave()
+    const pendiente = (c, k, j) => { const h = c[k + 1][0] - c[k][0]; return h > 1e-6 ? (c[k + 1][j] - c[k][j]) / h : NaN; };
+    const tangente = (c, k, j) => {
+      if (k <= 0 || k >= c.length - 1) return 0;
+      const d0 = pendiente(c, k - 1, j), d1 = pendiente(c, k, j), h0 = c[k][0] - c[k - 1][0], h1 = c[k + 1][0] - c[k][0];
+      if (!(d0 * d1 > 0)) return 0;
+      const w1 = 2 * h1 + h0, w2 = h1 + 2 * h0; return (w1 + w2) / (w1 / d0 + w2 / d1);
     };
+    const cam = t => {                                                 // [x, y, zoom] interpolados entre las claves, más el pulso de la mano
+      const c = def.camara || [[0, 640, 360, 1]]; let i = 0;
+      while (i < c.length - 1 && t >= c[i + 1][0]) i++;
+      const val = j => { if (i >= c.length - 1) return c[i][j]; const h = c[i + 1][0] - c[i][0]; if (h <= 1e-6) return c[i + 1][j];
+        const u = clamp((t - c[i][0]) / h), u2 = u * u, u3 = u2 * u;
+        return (2 * u3 - 3 * u2 + 1) * c[i][j] + (u3 - 2 * u2 + u) * h * tangente(c, i, j) + (3 * u2 - 2 * u3) * c[i + 1][j] + (u3 - u2) * h * tangente(c, i + 1, j); };
+      const pulso = def.quieto ? 0 : 1;
+      return [val(1) + pulso * (4 * Math.sin(t * .37) + 2 * Math.sin(t * 1.1)), val(2) + pulso * 3 * Math.sin(t * .29), val(3)];
+    };
+    const sub = document.createElement('canvas'); sub.width = capa.width; sub.height = capa.height; const KS = sub.getContext('2d');   // para el desenfoque de movimiento
+    // formarse y deshacerse (actor.forma = { aparece, desaparece, dura: 1,4, materia: 'hojas' | 'tinta' }): el títere se dibuja aparte y
+    // se trocea en celdas de 8 px; cada celda llega volando con el viento (o se va volando) como una hoja o una gota, a su hora.
+    // La hora de cada celda depende de su sitio dentro del títere, así que el orden no cambia aunque el títere se mueva
+    const F = document.createElement('canvas'); F.width = capa.width; F.height = capa.height; const KF = F.getContext('2d');
+    const rej = document.createElement('canvas'); rej.width = Math.ceil(capa.width / 8); rej.height = Math.ceil(capa.height / 8);
+    const KR = rej.getContext('2d', { willReadFrequently: true }), msk = document.createElement('canvas'); msk.width = rej.width; msk.height = rej.height; const KM = msk.getContext('2d');
+    const fase = (ac, t) => { const f = ac.forma; if (!f) return null; const d = f.dura ?? 1.4;
+      if (f.aparece != null && t < f.aparece) return 'oculto'; if (f.aparece != null && t < f.aparece + d) return { k: (t - f.aparece) / d, entra: true, f };
+      if (f.desaparece != null && t >= f.desaparece + d) return 'oculto'; if (f.desaparece != null && t >= f.desaparece) return { k: (t - f.desaparece) / d, entra: false, f }; return null; };
+    const deshaz = (D, { k, entra, f }, ox, oy, t, tam) => {
+      const w = rej.width, h = rej.height, vuelo = .32, hojas = f.materia !== 'tinta', i0 = Math.floor(ox / 8), j0 = Math.floor(oy / 8), vuelan = [];
+      KR.clearRect(0, 0, w, h); KR.drawImage(F, 0, 0, w, h); const d = KR.getImageData(0, 0, w, h).data;
+      KM.clearRect(0, 0, w, h); KM.fillStyle = '#fff';
+      for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) { if (d[4 * (j * w + i) + 3] < 50) continue;
+        const li = i - i0, lj = j - j0, hs = azar(li * 73.1 + lj * 19.7 + 5), x0 = clamp((li + 30) / 60), a = .04 + .6 * (.55 * hs + .45 * (entra ? x0 : x0));
+        if (entra ? k >= a + vuelo : k < a) KM.fillRect(i - .3, j - .3, 1.6, 1.6);                     // la celda ya está (o aún está) en su sitio
+        else if (k >= a && k < a + vuelo) vuelan.push([(i + .5) * 8, (j + .5) * 8, entra ? (k - a) / vuelo : 1 - (k - a) / vuelo, hs]); }
+      KF.save(); KF.setTransform(1, 0, 0, 1, 0, 0); KF.globalCompositeOperation = 'destination-in'; KF.imageSmoothingQuality = 'high'; KF.drawImage(msk, 0, 0, F.width, F.height); KF.restore();
+      D.save(); D.setTransform(1, 0, 0, 1, 0, 0); D.globalAlpha = 1; D.drawImage(F, 0, 0); D.fillStyle = D.strokeStyle = NEGRO; D.lineCap = 'round';
+      const en = (px, py, hs, e) => { const lx = entra ? -620 - 260 * hs : 640 + 260 * hs, ly = entra ? -120 + 160 * azar(hs * 91) : -260 - 160 * azar(hs * 91);   // todas vienen (o se van) con el mismo viento
+        const x = mezcla(px + lx * tam, px, e), y = mezcla(py + ly * tam, py, e) - Math.sin(Math.PI * e) * 90 * tam, [cx, cy] = campo(x, y, t * .8), w = Math.sin(Math.PI * e) * 70 * tam;
+        return [x + w * cx, y + w * cy]; };
+      for (const [px, py, u, hs] of vuelan) { const e = suave(u), [x, y] = en(px, py, hs, e);   // la hoja se mece y da vueltas sobre sí, no gira como una hélice
+        if (hojas) { D.save(); D.translate(x, y); D.rotate(hs * 40 + 1.2 * Math.sin(t * 4 + hs * 9)); D.scale(1, .2 + .8 * Math.abs(Math.cos(t * 5 + hs * 30))); D.beginPath(); D.ellipse(0, 0, 8 * tam, 3.4 * tam, 0, 0, TAU); D.fill(); D.restore(); }
+        else { const [x0, y0] = en(px, py, hs, suave(clamp(u + (entra ? -.12 : .12)))), [xm, ym] = en(px, py, hs, suave(clamp(u + (entra ? -.05 : .05))));   // gota con cola que adelgaza
+          D.lineWidth = (1.5 + 2 * hs) * tam; D.beginPath(); D.moveTo(x0, y0); D.lineTo(xm, ym); D.stroke(); D.lineWidth = (3 + 5 * hs) * tam; D.beginPath(); D.moveTo(xm, ym); D.lineTo(x, y); D.stroke(); } }
+      D.restore(); };
     const pinta = function (t) {
       t = Math.floor(t * (def.fps || 30) + 1e-6) / (def.fps || 30);  // 30 dibujos por segundo (el usuario quiere 30 fps en todo el capítulo)
       ANGULOSO = !!def.jack;
@@ -539,16 +644,36 @@ const T = (() => {
       capaCam(1);
       // títeres, en su propia capa para que los calados dejen ver el pergamino
       K.setTransform(1, 0, 0, 1, 0, 0); K.clearRect(0, 0, capa.width, capa.height); K.setTransform(...matriz(1)); const luces = [], colores = []; let hayImpacto = false;
-      for (const ac of def.actores || []) {
-        if ((ac.desde != null && t < ac.desde) || (ac.hasta != null && t >= ac.hasta)) continue;   // un títere puede aparecer (desde) o irse (hasta)
-        if (def.quieto) ac.quieto = true;
-        const o = pose(ac, t), racha = (def.viento || 0) * (1 + .3 * Math.sin(t * 2.7) + .15 * Math.sin(t * 6.1 + 1));
-        o.vf = -racha; o.vl = o.vista === 'perfil' ? -racha * Math.sign(o.f || 1) : -racha;
-        K.save(); K.translate(0, (def.suelo || 600) + (ac.y || 0) + o.dy);             // ac.y: subido a algo (negativo) o hundido
-        K.globalAlpha = ac.p.tono ?? 1; dibuja(K, ac, t, o); K.restore();
-        colores.push(...(o.colores || []));
-        if (o.impacto) hayImpacto = true; ac._o = o;
-        for (const l of o.luces || []) luces.push([o.x + l[0] * o.f * (ac.p.escala || 1), (def.suelo || 600) + (ac.y || 0) + l[1] * (ac.p.escala || 1)]);
+      // desenfoque de movimiento: cada títere se dibuja N veces dentro del obturador (media vuelta, 1/60 s) y se promedian;
+      // lo quieto sale igual de nítido y lo rápido deja un rastro suave, como en el cine. `desenfoque: 0` lo apaga
+      const formandose = (def.actores || []).some(ac => typeof fase(ac, t) === 'object' && fase(ac, t));
+      const N = def.desenfoque === 0 || formandose ? 1 : def.muestras || 5, obt = (def.desenfoque ?? .5) / (def.fps || 30);
+      for (let j = 0; j < N; j++) {
+        const tj = N > 1 ? t + obt * (j / (N - 1) - .5) : t, centro = j === (N - 1) >> 1; let D = N > 1 ? KS : K;
+        if (N > 1) { D.setTransform(1, 0, 0, 1, 0, 0); D.clearRect(0, 0, sub.width, sub.height); D.setTransform(...matriz(1)); }
+        for (const ac of def.actores || []) {
+          if ((ac.desde != null && t < ac.desde) || (ac.hasta != null && t >= ac.hasta)) continue;   // un títere puede aparecer (desde) o irse (hasta)
+          const fz = fase(ac, t); if (fz === 'oculto') continue;
+          const D0 = D; if (fz) { KF.setTransform(1, 0, 0, 1, 0, 0); KF.clearRect(0, 0, F.width, F.height); KF.setTransform(...matriz(1)); D = KF; }
+          if (def.quieto) ac.quieto = true;
+          if (def.cartoon) ac.cartoon = true;
+          const o = pose(ac, tj), racha = (def.viento || 0) * 1.3 * fuerzaRacha(tj) * (1 + .1 * Math.sin(tj * 6.1 + 1));
+          o.vf = -racha; o.vl = o.vista === 'perfil' ? -racha * Math.sign(o.f || 1) : -racha;
+          D.save(); D.translate(0, (def.suelo || 600) + (ac.y || 0) + o.dy);             // ac.y: subido a algo (negativo) o hundido
+          D.globalAlpha = ac.p.tono ?? 1; dibuja(D, ac, tj, o);
+          if (def.cartoon && o.anda > .5) {                                  // líneas de velocidad detrás de quien corre
+            const es = (ac.p.escala || 1) * o.z, dx = -(o.f || 1); D.strokeStyle = NEGRO; D.lineCap = 'round'; D.lineWidth = 3 * es;
+            for (let i = 0; i < 3; i++) { const yy = -(60 + 55 * i) * es, l = (60 + 50 * azar(i + Math.floor(t * 10))) * es * o.anda, x0 = o.x + dx * (45 + 20 * i) * es;
+              D.globalAlpha = .45 * o.anda; D.beginPath(); D.moveTo(x0, yy); D.lineTo(x0 + dx * l, yy); D.stroke(); }
+          }
+          D.restore();
+          if (fz) { D = D0; const m = matriz(1); deshaz(D, fz, m[0] * o.x + m[4], m[3] * ((def.suelo || 600) + (ac.y || 0)) + m[5], t, z * S * (ac.p.escala || 1) / 1.5); }
+          if (!centro) continue;
+          colores.push(...(o.colores || []));
+          if (o.impacto) hayImpacto = true; ac._o = o;
+          for (const l of o.luces || []) luces.push([o.x + l[0] * o.f * (ac.p.escala || 1), (def.suelo || 600) + (ac.y || 0) + l[1] * (ac.p.escala || 1)]);
+        }
+        if (N > 1) { K.save(); K.setTransform(1, 0, 0, 1, 0, 0); K.globalCompositeOperation = 'lighter'; K.globalAlpha = 1 / N; K.drawImage(sub, 0, 0); K.restore(); }
       }
       g.setTransform(1, 0, 0, 1, 0, 0);
       if (def.contraluz !== 0) { const h = halo.getContext('2d'); h.globalCompositeOperation = 'copy'; h.drawImage(capa, 0, 0, halo.width, halo.height);
@@ -632,8 +757,21 @@ const T = (() => {
         if (q.tipo === 'lluvia') { const vida = .55 + .35 * r3, u = ((t + r1 * vida) % vida) / vida, cerca = .5 + r3, x = x0 + r2 * zw + (q.viento ?? 140) * u, y = y0 - 40 + u * (zh + 40);
           g.strokeStyle = `rgba(${q.color || '210,225,240'},${(.18 + .3 * r3) * Math.min(1, e + .3)})`; g.lineWidth = .8 * cerca; g.beginPath(); g.moveTo(x, y); g.lineTo(x - .06 * (q.viento ?? 140) * cerca, y - 26 * cerca); g.stroke();
           if (u > .9 && r1 < .35) { const k = (u - .9) * 10; g.strokeStyle = `rgba(${q.color || '210,225,240'},${.4 * (1 - k)})`; g.beginPath(); g.ellipse(x, y1 - 4 * r2, 4 + 8 * k, 1.5 + 2 * k, 0, Math.PI, 0); g.stroke(); } }
-        if (q.tipo === 'hojas') { const vida = 5 + 3 * r3, u = ((t + r1 * vida) % vida) / vida, x = x0 + u * zw, y = y0 + r2 * zh + 40 * Math.sin(u * 7 + i);
-          g.save(); g.translate(x, y); g.rotate(t * 3 + i); g.fillStyle = NEGRO; g.beginPath(); g.ellipse(0, 0, 7, 3, 0, 0, TAU); g.fill(); g.restore(); }
+        if (q.tipo === 'hojas') { const vida = 5 + 3 * r3, u = ((t + r1 * vida) % vida) / vida, bx = x0 + u * zw, by = y0 + r2 * zh + 40 * Math.sin(u * 7 + i), rr = fuerzaRacha(t), [cx, cy] = campo(bx, by, t * .8);
+          const x = bx + 70 * cx * rr, y = by + 40 * cy * rr;                // las lleva la corriente y la ráfaga, y se dan la vuelta sobre sí mismas
+          g.save(); g.translate(x, y); g.rotate(i * 2.3 + 1.4 * Math.sin(t * 2.5 * rr + i)); g.scale(1, .15 + .85 * Math.abs(Math.cos(t * (3 + 3 * r3) + i))); g.fillStyle = NEGRO;
+          g.beginPath(); g.ellipse(0, 0, 7 + 3 * r3, 3 + r3, 0, 0, TAU); g.fill(); g.restore(); }
+        // remolino: hojas que giran en espiral alrededor de q.x, q.y; se abre y se cierra cada q.ciclo segundos (radio q.r)
+        if (q.tipo === 'remolino') { const ci = q.ciclo || 4, k = (((t - (q.en ?? 0)) % ci) + ci) % ci / ci, a = Math.sin(Math.PI * k) ** 2, R = (q.r || 160) * (.2 + .8 * r2) * (.35 + .65 * a);
+          const th = r1 * TAU + t * (1.5 + 3 * (1 - r2)) * (.4 + .6 * a), x = (q.x ?? 640) + R * Math.cos(th), y = (q.y ?? 500) + .35 * R * Math.sin(th) - 110 * r3 * a;
+          g.save(); g.globalAlpha = .25 + .75 * a; g.translate(x, y); g.rotate(th + 1.5); g.scale(1, .2 + .8 * Math.abs(Math.cos(t * 6 + i))); g.fillStyle = NEGRO;
+          g.beginPath(); g.ellipse(0, 0, 6 + 3 * r3, 2.6 + r3, 0, 0, TAU); g.fill(); g.restore(); }
+        // goteo: gotas de tinta que cuelgan del borde de arriba de la zona, se estiran, se sueltan y caen (el viento las tuerce)
+        if (q.tipo === 'goteo') { const vida = 2.6 + 2.2 * r3, u = ((t + r1 * vida) % vida) / vida, x = x0 + r1 * zw, ya = y0 + 14 * r2, rad = 2.5 + 2.5 * r3; g.fillStyle = g.strokeStyle = NEGRO;
+          if (u < .62) { const l = 4 + 34 * suave(u / .62) * (.6 + .4 * r2); g.lineCap = 'round'; g.lineWidth = rad * .9; g.beginPath(); g.moveTo(x, ya); g.lineTo(x, ya + l); g.stroke();
+            g.beginPath(); g.arc(x, ya + l, rad * (.6 + .5 * u / .62), 0, TAU); g.fill(); }
+          else { const v = (u - .62) / .38, y = ya + 38 + v * v * zh, [cx] = campo(x, y, t * .8), dx = 30 * cx * fuerzaRacha(t) * v;
+            g.beginPath(); g.ellipse(x + dx, y, rad * .8, rad * (1.2 + 2.2 * v), Math.atan2(dx, 40) * -.5, 0, TAU); g.fill(); } }
       }
     }
   }
@@ -660,7 +798,12 @@ const T = (() => {
       if (!P) return en[clave] + s; let j = j0 - 1;
       while (j < P.length - 1 && s > P[j][0] + P[j][2]) { s -= P[j][0] + P[j][2]; j++; }
       const [est, real] = P[j], base = en[`b${n}.${j + 1}`]; return base + (s <= est ? s / est * real : real + (s - est)); };
-    return { voces, en, x, fin: t + .4 };
+    // G.k(13, 'seis'): el segundo real en que el narrador dice esa palabra del bloque 13 (busca el trozo y reparte en proporción a las letras);
+    // n = qué aparición (1 = la primera); s = segundos de más
+    const k = (bloque, palabra, n = 1, s = 0) => { const L = (TI.txt || {})[bloque], P = (TI.p || {})[bloque]; if (!L || !P) throw new Error('sin texto del bloque ' + bloque);
+      for (let j = 0, vistas = 0; j < L.length; j++) { let i = -1; while ((i = L[j].toLowerCase().indexOf(palabra.toLowerCase(), i + 1)) >= 0) if (++vistas === n) return en[`b${bloque}.${j + 1}`] + i / L[j].length * P[j][1] + s; }
+      throw new Error(`no está «${palabra}» en el bloque ${bloque}`); };
+    return { voces, en, x, k, fin: t + .4 };
   }
-  return { curva, guion, tironCuerda, vaivenCampana, cuervo, escena, pose, pintaColores, enColor, mascara, DECORADOS, OBJETOS, PELO, SOMBREROS, tela: DECORADO_TELA, azar, ruido, suave, clamp, mezcla, rebote, peso, ik, miembro, hueco, circulo, dir, NEGRO, TAU };
+  return { campo, racha: fuerzaRacha, curva, guion, tironCuerda, vaivenCampana, cuervo, escena, pose, pintaColores, enColor, mascara, DECORADOS, OBJETOS, PELO, SOMBREROS, tela: DECORADO_TELA, azar, ruido, suave, clamp, mezcla, rebote, peso, ik, miembro, hueco, circulo, dir, NEGRO, TAU };
 })();

@@ -35,7 +35,7 @@ const decano = { p: PERSONAJES.decano, x: -180, mira: 1, acciones: [
   { hace: 'senala', en: 16, hasta: 17.4 }, { hace: 'asiente', en: 16.6, hasta: 17.3 },
 ] };
 window.ESCENA = {
-  dura: 24, fps: 12, suelo: 600,
+  dura: 24, fps: 30, suelo: 600,
   planos: [
     { desde: 0, decorado: plaza, delante: [{ tipo: 'atril', x: 900 }], actores: [...gente, acascar, decano], luces: [[560, 314]], particulas: aire,
       camara: [[0, 640, 360, 1.0], [4, 620, 370, 1.07], [4, 1050, 400, 1.55], [7.4, 960, 410, 1.6]] },

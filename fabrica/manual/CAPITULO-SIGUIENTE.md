@@ -1,5 +1,65 @@
 # Españistán · cómo hacer el capítulo siguiente (pegar esto en una conversación nueva)
 
+> **Formato nuevo desde el 28-10-2026 (manda sobre todo lo de abajo; el usuario: «todos los episodios se harán así»):**
+> - **El capítulo entero animado con los títeres** (`fabrica/titeres/`), a lo Samurai Jack: color plano, siluetas, franjas de cine, pantalla partida,
+>   cortes secos dentro de un lugar y viento entre lugares. Nada de fotos que se mueven ni de retratos a lápiz.
+> - **30 fps** en todas las escenas; **≈ 8 minutos** con la historia y las frases de los personajes (si el guion se alarga, apretarlo sin tocar los datos).
+> - Narrador **Gabo** `o0SveC0zgHFuCsEO3vHR`, modelo **eleven_v4**, la voz tal cual, en frases enteras con entonación enlazada (`fabrica/herramientas/voz_frases.py`).
+> - Final con el **outro** `fabrica/titeres/escenas/outro.js` (el Elegido salta al «me gusta», pisa SUSCRÍBETE y se cuelga de la campana).
+> - Pasos: guion → plan de planos (ejemplo: `fabrica/titeres/CAPITULO-03-PLANOS.md`) → narrador (pedir permiso y decir los créditos) →
+>   `python3 fabrica/titeres/tiempos.py` → escenas con `T.guion([...])` → revisar con `fotos.mjs` → grabar con `grabar.mjs`.
+
+## Los primeros 30 segundos (métricas de YouTube, 30-10-2026; manda para el ep. 6 y siguientes)
+En los ep. 1–3 la mitad del público se va antes del segundo 30; quien pasa del minuto suele quedarse hasta el final (≈ 20 %).
+- **La primera frase es el dato más fuerte del capítulo, con una cifra y una persona** («31 años y en litera»). Nunca «En el episodio anterior…».
+- **La cita de filósofo, nunca al principio**: después del gancho o de la intro. En las métricas, las citas no hacen subir la curva.
+- **Antes del segundo 20, una pregunta abierta** que solo se responde viendo el vídeo («¿por qué faltan 750.000 casas?»).
+- Lo que más se vuelve a ver (ep. 2): **cifras concretas y sentencias con fecha** («ganó con 137, necesitaba 176»; la caja B). Que salgan pronto y a menudo.
+- Título y miniatura deben prometer lo que dicen los primeros 10 s (ep. 3: 3 % de clics y 29 % a los 30 s; ep. 2: 7,6 % y 49 %).
+- Capítulos en la descripción (como el ep. 3): «Capítulos:» y una línea por secuencia, `m:ss Tema`, la primera en 0:00, cada una ≥ 10 s (la intro va con el gancho).
+  El inicio de cada secuencia = suma de (duración de `out/<sec>.mp4` − 0,5) de las anteriores (lo que hace `montar.py`).
+
+## Antes de montar cada capítulo (checklist, 30-10-2026)
+- Golpes (`impacto`, `derrumbe`, `cristales`, `trueno`) con `volumen` ≤ 0,4 (lo normal, 0,15–0,3), siempre por debajo de la voz.
+- Primera frase: el dato más fuerte, con cifra o persona, o un acertijo (el bate y la pelota del ep. 7). Pregunta abierta antes del segundo 20.
+- Final: Pregunta del Decano → «Te leo en comentarios» → avance del capítulo siguiente → outro.
+- Transiciones 60/40: contarlas al escribir cada secuencia.
+- El mismo día que se programa:
+  - shorts;
+  - comentario fijado con la pregunta del Decano;
+  - pantalla final y tarjeta al capítulo que se cite;
+  - lista de reproducción;
+  - subtítulos `.srt`.
+
+## Lecciones del ep. 3 para el ep. 4 (valoración del usuario, 28-10-2026: «por lo demás está perfecto»)
+**Lo que funcionó y se repite**
+- **Los frascos (`escenas/frascos.js`) son el modelo**: cada cosa que dice el narrador tiene su propio objeto en pantalla y reacciona
+  justo cuando se nombra (el sello cae al decir la etiqueta). Imagen y voz cuentan lo mismo a la vez.
+- **El viento es la mejor transición**: es la de por defecto entre lugares. Las demás (tinta, humo, tajo), solo de vez en cuando.
+- Los planos se cuadran solos con el audio (`tiempos.py` + `T.guion`).
+- **Intro** (`escenas/intro.js`, 9,5 s), justo después del gancho: voz de Gabo ya grabada; en cada capítulo solo cambia `EPISODIO`.
+- **Outro** de 12 s como máximo, con la voz desde el segundo 0 y cada palabra sobre su acción: «like» en el pulgar, «suscríbete» en el botón,
+  «campana» justo antes de que suene. Si una frase de voz no cuadra con la acción, se parte por sus pausas (sin regenerarla).
+- Nunca hay segundos muertos: la voz entra en menos de 1 s en cada secuencia, y no hay esperas largas entre acciones.
+
+**Lo que hay que mejorar**
+1. **Una lógica mejor entre audio e imagen** (lo más importante). Ejemplo de lo que no se entendió: el PP y Vox hablando uno frente al otro.
+   - Antes de escribir una escena, hacer una tabla: *frase → qué se ve → qué cambia justo en la palabra clave*.
+   - Prueba: **si la imagen no explica la frase sin sonido, se cambia**.
+   - Metáforas con objetos (frascos, balanza, muralla, tronos, daga) en vez de dos personajes de pie hablando.
+   - Cada personaje lleva su nombre la primera vez que sale; el usuario dudó de quién era quién.
+   - Que no queden frases sin una escena propia: hacer crecer la biblioteca de decorados y acciones para cada tema.
+2. **Un 5 % más de calidad en todo**:
+   - movimientos encadenados (hombro, torso y cuello, ver `fabrica/titeres/RETOMAR.md`);
+   - formas más cuidadas;
+   - animales con más vida;
+   - transiciones, todas al nivel del viento.
+   Son detalles, pero sumados se nota.
+3. **Que no se sienta vacío**:
+   - sonido de ambiente siempre (viento, gente, fuego, pasos) y música algo más presente;
+   - vida al fondo (gente, pájaros, banderas, humo);
+   - algo nuevo cada 2–3 s como máximo.
+
 > **Para Claude:** estás en el repo `srmrpapitas/Climate-things`. Todo el trabajo está en la rama `claude/new-session-k0kf29`
 > (si la rama de la sesión no lo tiene: `git fetch origin claude/new-session-k0kf29` y llevar la rama de trabajo a ese commit).
 > Lee este archivo y `fabrica/manual/COMO-HACER-UN-VIDEO.md`. El modelo a copiar es el **ep. 3**: `fabrica/videos/espanistan-03-sombras/`
@@ -34,6 +94,27 @@
 
 ## Animación por escena (lección del ep. 2, el usuario: «las animaciones son mínimas»)
 - **Movimiento continuo y elaborado**: varias cosas moviéndose a la vez y algo nuevo cada 1–2 s, nunca un plano quieto.
+- **Cambios de plano: 60 % sin cortes, 40 % transiciones** (el usuario, 30-10-2026, a lo «Cuento de los tres hermanos» de Harry Potter):
+  - **60 % sin cortar**: el plano sigue y se transforma.
+    - Primer plano que sigue al que corre y se aleja para enseñar el sitio nuevo.
+    - `transicion: 'metamorfosis'`: todo se deshace en tinta y redibuja el plano nuevo.
+    - `forma` en los actores: se construyen y se deshacen con hojas o tinta.
+    - Zooms y paneos de cámara dentro del mismo plano.
+  - **40 % transiciones de verdad**: `viento` (entre lugares), `tajo`, `humo`, `paneo`, `pajaros`, `papeles`, y cortes secos dentro del mismo sitio.
+  - Contar al escribir cada secuencia: de cada 5 cambios, 3 sin cortar.
+  - El viento y las hojas son la «Muerte» del teatro: lo que se va se lo lleva el viento, y lo que llega lo trae.
+  - **Notas del ep. 6, para el ep. 7** (el usuario, 31-10-2026):
+    - **Dejar respirar la tinta.** Lo que acaba de formarse con tinta tiene que quedarse en pantalla un rato. A veces, en menos de un segundo, ya había otra transición, y así no se aprecia el arte.
+      - Regla: dejar **≥ 3 s** entre que termina un `forma.aparece` o una `metamorfosis` y el siguiente cambio de plano o `desaparece`.
+      - Si el guion va rápido, se juntan dos bloques en el mismo plano.
+    - **Coherencia de la tinta.** La tinta que se deshace debe ser la misma que forma lo nuevo: mismo color y misma materia (tinta o hojas). Tiene que viajar con sentido, de lo viejo a lo nuevo y a favor del viento, sin aparecer de la nada.
+    - **Más natural, el viento y la tinta.** Ha mejorado, pero aún se nota mecánico. Con 60 fps hay que afinarlos:
+      - Ráfagas que cambian de fuerza.
+      - Remolinos que se abren y se cierran.
+      - Hojas que giran sobre sí mismas.
+      - Gotas que gotean y se estiran.
+      - Más tiempo para cada `metamorfosis`, ≈ 3 s en vez de 2,4 s.
+- **Suave, nunca a tirones** (el usuario, 30-10-2026: «muchísimo más smooth»): el motor ya trae muelle, anticipación, cámara curva y desenfoque de movimiento (ver `fabrica/titeres/README.md`). No hay que hacer nada en la escena, pero hay que dejar ≥ 0,3 s entre gestos para que se asienten.
 - **Cronológico, no en bucle**: la escena **evoluciona** con lo que cuenta el narrador, de principio a fin.
   Ejemplo, la dana de Valencia:
   1. Empieza a llover.

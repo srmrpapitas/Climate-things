@@ -22,9 +22,9 @@ window.ESCENA = {
     { en: 0, hasta: en['b7.2'], archivo: 'audio/sfx/viento.mp3', volumen: .2, bucle: true },
     { en: en['b7.2'], hasta: en.b8, archivo: 'audio/sfx/ciudad.mp3', volumen: .08, bucle: true },
     { en: en.b8, hasta: en.b9, archivo: 'audio/sfx/viento.mp3', volumen: .25, bucle: true }, { en: G.x('b8', .5), archivo: 'audio/sfx/campana.mp3', volumen: .15 },
-    { en: PUCHERAZO, archivo: 'audio/sfx/impacto.mp3', volumen: .6 },
+    { en: PUCHERAZO, archivo: 'audio/sfx/impacto.mp3', volumen: .24 },
     { en: en.b9, hasta: G.fin, archivo: 'audio/sfx/viento.mp3', volumen: .2, bucle: true },
-    { en: BOTA - .5, archivo: 'audio/sfx/whoosh.mp3', volumen: .6 }, { en: BOTA, archivo: 'audio/sfx/derrumbe.mp3', volumen: .6 }, { en: BOTA, archivo: 'audio/sfx/impacto.mp3', volumen: .8 }],
+    { en: BOTA - .5, archivo: 'audio/sfx/whoosh.mp3', volumen: .6 }, { en: BOTA, archivo: 'audio/sfx/derrumbe.mp3', volumen: .24 }, { en: BOTA, archivo: 'audio/sfx/impacto.mp3', volumen: .32 }],
   carteles: [
     { en: G.x('b6', 1), hasta: en.b7 - .2, x: 40, y: 40, ancho: 520, titulo: 'La Restauración · 1875–1923', tiempos: [CANOVAS, SAGASTA],
       filas: [['Conservadores', 'Cánovas'], ['Liberales', 'Sagasta']], fuente: 'historia de España' },

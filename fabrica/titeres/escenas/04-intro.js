@@ -19,7 +19,7 @@ window.ESCENA = {
   dura: 9.5, fps: 30, suelo: 600,
   voces: [{ en: .4, dura: 7.04, quien: 'narrador', texto: '', sinSub: true, archivo: 'audio/voz/es/espanistan-intro/intro.mp3' }],
   sonidos: [{ en: 2.2, archivo: 'audio/sfx/whoosh.mp3', volumen: .4 }, { en: 2.3, archivo: 'audio/sfx/riser.mp3', volumen: .25 },
-    { en: 5.1, archivo: 'audio/sfx/whoosh.mp3', volumen: .7 }, { en: 5.35, archivo: 'audio/sfx/impacto.mp3', volumen: .6 }],
+    { en: 5.1, archivo: 'audio/sfx/whoosh.mp3', volumen: .7 }, { en: 5.35, archivo: 'audio/sfx/impacto.mp3', volumen: .24 }],
   titulos: [{ en: 5.6, hasta: 9.5, texto: 'ESPAÑISTÁN', sub: EPISODIO, y: 175 }],
   planos: [
     { desde: 0, ...jack, viento: .4, franjas: true, decorado: [{ tipo: 'plano', color: '#14141c', par: .3 }], actores: [], camara: [[0, 640, 360, 1]], paneles: [

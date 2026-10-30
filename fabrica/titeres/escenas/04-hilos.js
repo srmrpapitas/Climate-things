@@ -24,10 +24,10 @@ window.ESCENA = {
   silencios: [[ESCLAVOS - .8, ESCLAVOS], [MULTA - 1, MULTA]],
   sonidos: [
     { en: 0, hasta: en.b20, archivo: 'audio/sfx/grada.mp3', volumen: .1, bucle: true },
-    { en: ECHA + .2, archivo: 'audio/sfx/whoosh.mp3', volumen: .25 }, { en: ESCLAVOS, archivo: 'audio/sfx/impacto.mp3', volumen: .6 },
+    { en: ECHA + .2, archivo: 'audio/sfx/whoosh.mp3', volumen: .25 }, { en: ESCLAVOS, archivo: 'audio/sfx/impacto.mp3', volumen: .24 },
     { en: DEBE, archivo: 'audio/sfx/riser.mp3', volumen: .3 },
     { en: en.b20, hasta: en.b23, archivo: 'audio/sfx/grada.mp3', volumen: .2, bucle: true }, { en: en.b20 - .2, archivo: 'audio/sfx/viento.mp3', volumen: .3 },
-    { en: QUINCE + .3, archivo: 'audio/sfx/riser.mp3', volumen: .3 }, { en: MULTA, archivo: 'audio/sfx/impacto.mp3', volumen: .9 },
+    { en: QUINCE + .3, archivo: 'audio/sfx/riser.mp3', volumen: .3 }, { en: MULTA, archivo: 'audio/sfx/impacto.mp3', volumen: .36 },
     { en: en.b23 - .2, archivo: 'audio/sfx/viento.mp3', volumen: .3 }, { en: en.b23, hasta: en.b26, archivo: 'audio/sfx/ciudad.mp3', volumen: .15, bucle: true },
     { en: ABRE, archivo: 'audio/sfx/whoosh.mp3', volumen: .3 },
     { en: en.b26, hasta: G.fin, archivo: 'audio/sfx/viento.mp3', volumen: .12, bucle: true }],

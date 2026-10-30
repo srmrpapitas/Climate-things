@@ -27,6 +27,15 @@ const PERSONAJES = {
   zapatitos: { rostro: 'anguloso', ropa: 'traje', pelo: 'peinado', nariz: 1, narizForma: 'recta', menton: 'marcado', arrugas: .3, alto: 1.1, grueso: .92, piernas: 1.14, hombros: 1.08, cintura: .82, semilla: 53 },
   ansar:    { ropa: 'traje', pelo: 'peinado', barba: 'bigote', nariz: 1.05, narizForma: 'recta', menton: 'marcado', arrugas: .3, alto: .97, grueso: .95, piernas: 1.02, hombros: 1.02, cintura: .85, semilla: 61 },
   rajoyo:   { ropa: 'traje', pelo: 'entradas', barba: 'corta', gafas: 'cuadradas', nariz: 1.1, narizForma: 'recta', menton: 'redondo', arrugas: .4, alto: 1.1, grueso: 1.02, piernas: 1.1, hombros: 1.1, cintura: .9, semilla: 59 },
+  // ep. 5 (la vivienda): la pareja que busca piso y los casos reales, sin cara de nadie real
+  lucia:    { ropa: 'vestido', pelo: 'coleta', nariz: .9, narizForma: 'respingona', menton: 'redondo', alto: .96, grueso: .9, piernas: 1.08, semilla: 71 },
+  dani:     { ropa: 'traje', pelo: 'corto', barba: 'corta', nariz: 1, narizForma: 'recta', menton: 'marcado', alto: 1.06, grueso: .95, piernas: 1.1, hombros: 1.05, cintura: .85, semilla: 73 },
+  camarero: { ropa: 'traje', pelo: 'corto', nariz: .95, narizForma: 'recta', menton: 'redondo', alto: 1, grueso: .9, piernas: 1.06, hombros: 1, cintura: .85, semilla: 79 },
+  // ep. 6 (nombres de sátira aprobados el 30-10-2026): el recién llegado, Paolo Iglesias, Irena Montera y Alviso
+  llegado:  { ropa: 'tunica', pelo: 'corto', barba: 'corta', nariz: 1, narizForma: 'recta', menton: 'marcado', alto: 1.02, grueso: .88, piernas: 1.1, hombros: 1.02, cintura: .8, objetoLejos: 'papel', semilla: 83 },
+  paolo:    { ropa: 'traje', pelo: 'coleta', barba: 'corta', nariz: 1.1, narizForma: 'recta', menton: 'redondo', alto: 1.04, grueso: .92, piernas: 1.08, hombros: 1.02, cintura: .86, semilla: 89 },
+  montera:  { ropa: 'vestido', pelo: 'coleta', nariz: .95, narizForma: 'respingona', menton: 'redondo', alto: .98, grueso: .9, piernas: 1.06, semilla: 97 },
+  alviso:   { rostro: 'anguloso', ropa: 'traje', pelo: 'peinado', barba: 'bigote', nariz: 1.05, narizForma: 'aguilena', menton: 'marcado', alto: 1.06, grueso: .95, piernas: 1.1, hombros: 1.08, cintura: .84, semilla: 101 },
 };
 // gente del pueblo: variaciones deterministas (la misma n da siempre la misma persona)
 function ciudadano(n, extra = {}) {

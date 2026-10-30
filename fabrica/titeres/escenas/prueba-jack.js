@@ -7,7 +7,7 @@ const A = PERSONAJES.acascar;
 const jack = { jack: true, quieto: true, figura: '#3b3431', sombra: 9, contraluz: 0, bordes: ['rgb(255,236,214)', 'rgb(255,120,70)'], borde: .8 };
 const rojo = [{ tipo: 'plano', color: '#b11d18', par: .3 }];
 window.ESCENA = {
-  dura: 8, fps: 12, suelo: 600,
+  dura: 8, fps: 30, suelo: 600,
   planos: [
     { desde: 0, ...jack, viento: 1, decorado: [...rojo, { tipo: 'roca', x: 560, y: 640, escala: 1.4, par: 1 }, { tipo: 'pinchos', y: 690, par: 1 }],
       actores: [{ p: Object.assign({}, A, { escala: .7, objeto: 'bandera' }), x: 560, y: -75, mira: 1, acciones: [] }],

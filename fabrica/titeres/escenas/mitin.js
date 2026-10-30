@@ -14,7 +14,7 @@ const gente = [0, 1, 2, 3, 4, 5, 6].map(i => ({ p: ciudadano(i + 1, { escala: .8
   ] }));
 gente[0].x = -60; gente[3].x = -20; gente[6].x = 40;                 // tres que llegan andando desde fuera
 window.ESCENA = {
-  dura: 18, fps: 12, suelo: 600,
+  dura: 18, fps: 30, suelo: 600,
   decorado: [
     { tipo: 'astro', x: 980, y: 190, r: 60, par: .15 },
     { tipo: 'nubes', tono: .75, par: .2, n: 4 },

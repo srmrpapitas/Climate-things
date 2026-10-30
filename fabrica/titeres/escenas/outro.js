@@ -39,7 +39,7 @@ window.ESCENA = {
   titulos: [{ en: 9, hasta: 12, texto: 'ESPAÑISTÁN', sub: 'Dale a me gusta · Suscríbete · Activa la campana', y: 190 }],
   sonidos: [
     ...[1.3, 2.9, 4.5, 7.95].map(en => ({ en, archivo: 'audio/sfx/whoosh.mp3', volumen: .5 })),
-    { en: 2, archivo: 'audio/sfx/impacto.mp3', volumen: .35 }, { en: 3.6, archivo: 'audio/sfx/impacto.mp3', volumen: .8 }, { en: 8.4, archivo: 'audio/sfx/impacto.mp3', volumen: .3 },
+    { en: 2, archivo: 'audio/sfx/impacto.mp3', volumen: .14 }, { en: 3.6, archivo: 'audio/sfx/impacto.mp3', volumen: .32 }, { en: 8.4, archivo: 'audio/sfx/impacto.mp3', volumen: .12 },
     ...CAMP.toca.map(en => ({ en, archivo: 'audio/sfx/campana.mp3', volumen: .8 }))],
   planos: [
     plano(0, [[0, 300, 350, 1.15], [2, 300, 350, 1.15], [2, 230, 340, 1.6]], { franjas: true }),

@@ -9,7 +9,7 @@ const jack = { jack: true, quieto: true, figura: '#3b3431', sombra: 9, contraluz
 const cielo = (color = '#b11d18') => [{ tipo: 'plano', color, par: .3 }, { tipo: 'astro', x: 1010, y: 170, r: 46, par: .3 }];
 const repta = (en, hasta, a, extra = []) => [{ hace: 'coge', que: 'arrastra', mano: 'lejos', en: 0 }, { hace: 'repta', en: 0, hasta, entra: .01 }, { hace: 'camina', en, hasta, a }, ...extra];
 window.ESCENA = {
-  dura: 24, fps: 12, suelo: 600,
+  dura: 24, fps: 30, suelo: 600,
   carteles: [
     { en: 1, hasta: 4.7, x: 40, y: 40, ancho: 470, titulo: '2014 · Elecciones europeas', filas: [['Escaños de Vox', '0']], fuente: 'Ministerio del Interior' },
     { en: 8.7, hasta: 12.8, x: 40, y: 40, ancho: 600, titulo: 'Los que levantaron Vox', paso: 1,

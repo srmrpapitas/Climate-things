@@ -26,10 +26,10 @@ window.ESCENA = {
   sonidos: [
     { en: 0, hasta: MESA, archivo: 'audio/sfx/lluvia.mp3', volumen: .35, bucle: true },
     { en: 0, hasta: MESA, archivo: 'audio/sfx/viento.mp3', volumen: .25, bucle: true },
-    { en: PELEAN, archivo: 'audio/sfx/impacto.mp3', volumen: .35 },
+    { en: PELEAN, archivo: 'audio/sfx/impacto.mp3', volumen: .14 },
     { en: MESA, hasta: G.fin, archivo: 'audio/sfx/lluvia.mp3', volumen: .1, bucle: true },     // dentro: la lluvia, tras el cristal
     { en: MESA, hasta: G.fin, archivo: 'audio/sfx/dron.mp3', volumen: .22, bucle: true },
-    { en: MESA, archivo: 'audio/sfx/impacto.mp3', volumen: .5 }],
+    { en: MESA, archivo: 'audio/sfx/impacto.mp3', volumen: .20 }],
   planos: [
     { desde: 0, ...jack, viento: .4, franjas: true, decorado: feria, actores: gente,
       particulas: [{ tipo: 'lluvia', n: 320, viento: 120, fuerza: [[0, .35], [MESA, .7]] }],

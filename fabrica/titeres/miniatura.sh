@@ -1,11 +1,14 @@
 #!/bin/sh
 # Miniatura del capítulo: fondo de títeres (escenas/miniatura*.js, fotograma 1,5) + letras grandes, dato del momento y el episodio en una esquina.
-# Uso (desde la raíz, con `python3 -m http.server 8765` en marcha): sh fabrica/titeres/miniatura.sh [1|2|3|4]   → out/miniatura-ep0N.jpg (1280×720)
+# Uso (desde la raíz, con `python3 -m http.server 8765` en marcha): sh fabrica/titeres/miniatura.sh [1-6]   → out/miniatura-ep0N.jpg (1280×720)
 set -e
 EP=${1:-3}
 case $EP in
   1) ESC=miniatura-ep01; GRANDE='SANCHÍS'; TAM=330; L1='¿APRUEBA O'; L2='SUSPENDE?'; DATO='SUS CUENTAS · 29-N' ;;
   2) ESC=miniatura-ep02; GRANDE='EL PP'; TAM=400; L1='PROMESAS'; L2='VS DATOS'; DATO='FEIJOLO · 29-N' ;;
+  6) ESC=miniatura-ep06; GRANDE='72.000'; TAM=400; L1='EN DOS'; L2='DÍAS'; DATO='CEUTA TIENE 83.000' ;;
+  5) ESC=miniatura-ep05; GRANDE='31 AÑOS'; TAM=300; L1='¿Y AÚN EN'; L2='LITERA?'; DATO='FALTAN 750.000 CASAS' ;;
+  7) ESC=miniatura-ep07; GRANDE='OBEDECE'; TAM=400; L1='NO TE ENSEÑAN'; L2='A PENSAR'; DATO='DESDE PRUSIA, 1763' ;;
   4) ESC=miniatura-ep04; GRANDE='PP + PSOE'; TAM=250; L1='¿DOS FAMILIAS'; L2='O UNA MESA?'; DATO='DE FRANCO A HOY' ;;
   *) ESC=miniatura; GRANDE='VOX'; TAM=400; L1='¿Y AHORA'; L2='QUÉ?'; DATO='ROZA EL 20 % · 29-N' ;;
 esac

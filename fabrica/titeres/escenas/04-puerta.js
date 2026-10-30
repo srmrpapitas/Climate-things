@@ -20,7 +20,7 @@ window.ESCENA = {
   sonidos: [
     { en: 0, hasta: G.fin, archivo: 'audio/sfx/ciudad.mp3', volumen: .18, bucle: true }, { en: 0, archivo: 'audio/sfx/viento.mp3', volumen: .25 },
     { en: PUERTA, archivo: 'audio/sfx/whoosh.mp3', volumen: .25 }, { en: CRUZA1, archivo: 'audio/sfx/whoosh.mp3', volumen: .35 }, { en: CRUZA2, archivo: 'audio/sfx/whoosh.mp3', volumen: .35 },
-    { en: CONTRATAN, archivo: 'audio/sfx/riser.mp3', volumen: .25 }, { en: DELITO, archivo: 'audio/sfx/impacto.mp3', volumen: .8 }],
+    { en: CONTRATAN, archivo: 'audio/sfx/riser.mp3', volumen: .25 }, { en: DELITO, archivo: 'audio/sfx/impacto.mp3', volumen: .32 }],
   carteles: [
     nota(G.x('b33.2', .5), en.b34 - .2, 'Felipón', [['Presidente del Gobierno', '1982–1996'], ['Consejero de Gas Natural Fenosa', '2010–2015', '#7a1410']], 'Gas Natural Fenosa · prensa'),
     nota(G.x('b34', .5), en['b34.2'] - .2, 'Ansar', [['Presidente del Gobierno', '1996–2004'], ['Asesor externo de Endesa', 'desde 2011', '#7a1410']], 'Endesa · prensa'),

@@ -2,7 +2,7 @@
 <html><head><meta charset="utf-8"><title>Teatro de títeres</title>
 <style>html,body{margin:0;background:#000}canvas{display:block;width:1280px;height:720px}</style></head>
 <body><canvas id="c" width="1280" height="720"></canvas>
-<script src="titeres.js"></script><script src="personajes.js"></script><script src="decorados.js"></script><script src="frente.js"></script>
+<script src="titeres.js"></script><script src="personajes.js"></script><script src="decorados.js"></script><script src="decorados-06.js"></script><script src="decorados-07.js"></script><script src="frente.js"></script>
 <script>
 // Reproductor: escena.html?e=NOMBRE carga escenas/NOMBRE.js (que define window.ESCENA) y la reproduce en bucle.
 // Para grabar: fabrica/titeres/grabar.mjs (llama a window.dibuja(t) fotograma a fotograma).
@@ -66,6 +66,20 @@ const TRANS = {
       const gr = g.createRadialGradient(x, y, r * .2, x, y, r); gr.addColorStop(0, `rgba(18,12,9,${.95 * den})`); gr.addColorStop(1, 'rgba(18,12,9,0)');
       g.fillStyle = gr; g.fillRect(x - r, y - r, 2 * r, 2 * r); }
     g.fillStyle = `rgba(18,12,9,${Math.pow(den, 4)})`; g.fillRect(0, 0, 1280, 720); },
+  // paneo: la cámara barre a la derecha como si fuera el mismo sitio; un poste negro en primer plano pasa rápido y tapa la costura,
+  // y al otro lado ya es otro lugar. Para el efecto cine completo, el plano nuevo empieza cerca (zoom 1,3) y la cámara se aleja.
+  paneo(g, t, k, muestra, aux) { const c = g.canvas, W = c.width, H = c.height;
+    copia.width = 2 * W; copia.height = H; const q = copia.getContext('2d'); q.drawImage(c, 0, 0); q.drawImage(aux, W, 0);   // los dos lugares en una tira
+    const u = k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2, dx = u * W, vel = Math.sin(Math.PI * k);   // arranca y frena como una grúa
+    g.save(); g.setTransform(1, 0, 0, 1, 0, 0);
+    for (let j = 3; j >= 0; j--) { g.globalAlpha = j ? .2 * vel : 1; g.drawImage(copia, -dx + j * 60 * vel, 0); }   // estela del movimiento
+    g.globalAlpha = 1;
+    const s = W - dx, ancho = 300 + 260 * vel;                           // el poste tapa la costura entre los dos lugares
+    const gr = g.createLinearGradient(s - ancho, 0, s + ancho, 0);
+    gr.addColorStop(0, 'rgba(11,7,5,0)'); gr.addColorStop(.28, 'rgba(11,7,5,1)'); gr.addColorStop(.72, 'rgba(11,7,5,1)'); gr.addColorStop(1, 'rgba(11,7,5,0)');
+    g.fillStyle = gr; g.fillRect(s - ancho, 0, 2 * ancho, H);
+    g.fillStyle = 'rgba(255,200,130,.18)'; g.fillRect(s + ancho * .28, 0, 6, H);   // filo de luz en el borde del poste
+    g.restore(); g.setTransform(1.5, 0, 0, 1.5, 0, 0); },
   // tinta: una mancha de tinta china que crece desde el centro, lo tapa todo y al retirarse deja el plano nuevo
   tinta(g, t, k, muestra) { G0 = g; if (k >= .5) muestra(() => G0.rect(-50, -50, 1400, 820));
     const r = 920 * Math.sin(Math.PI * Math.min(k, .999)), cx = 640 + 60 * Math.sin(k * 3), cy = 360;
@@ -74,6 +88,46 @@ const TRANS = {
     g.fill();
     for (let i = 0; i < 30; i++) { const a = 6.283 * AZ(i + 20), d = r * (1.08 + .5 * AZ(i + 21)), q = (4 + 22 * AZ(i + 22)) * Math.sin(Math.PI * k);   // salpicaduras
       g.beginPath(); g.arc(cx + d * Math.cos(a), cy + d * Math.sin(a), q, 0, 6.283); g.fill(); } },
+  // metamorfosis: todo el plano (fondo, personajes, objetos) se deshace en gotas de tinta; el viento las arrastra por el pergamino y
+  // vuelven a dibujar el plano nuevo, cada gota en su sitio: un personaje se convierte en otro, una casa en un monte. Dura 3 s
+  metamorfosis(g, t, k, muestra, aux) {
+    const c = g.canvas, W = c.width, H = c.height, G = META.gotas || [], mw = Math.ceil(W / CEL), mh = Math.ceil(H / CEL);
+    if (copia.width !== W || copia.height !== H) { copia.width = W; copia.height = H; }
+    const q = copia.getContext('2d'); masc.width = mw; masc.height = mh; const m = masc.getContext('2d');
+    // 1) el plano viejo, comido por donde ya se ha ido su tinta; luego se desvanece lo que queda
+    q.globalCompositeOperation = 'copy'; q.drawImage(c, 0, 0); m.fillStyle = '#fff';
+    for (const p of G) if (k > p.sale) m.fillRect(p.s[0] / CEL - .8, p.s[1] / CEL - .8, 1.6, 1.6);
+    q.globalCompositeOperation = 'destination-out'; q.imageSmoothingQuality = 'high'; q.drawImage(masc, 0, 0, W, H);
+    g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1;
+    if (fondo.complete && fondo.naturalWidth) g.drawImage(fondo, 0, 0, W, H); else { g.fillStyle = '#e6cf9f'; g.fillRect(0, 0, W, H); }   // el pergamino limpio
+    g.globalAlpha = 1 - T.suave((k - .3) / .25); g.drawImage(copia, 0, 0);
+    // 2) el plano nuevo aparece donde cae la tinta, y al final todo entero
+    q.globalCompositeOperation = 'copy'; q.drawImage(aux, 0, 0);
+    m.globalCompositeOperation = 'copy'; m.fillStyle = `rgba(255,255,255,${T.suave((k - .74) / .24)})`; m.fillRect(0, 0, mw, mh); m.globalCompositeOperation = 'source-over'; m.fillStyle = '#fff';
+    for (const p of G) if (k > p.llega) m.fillRect(p.e[0] / CEL - .8, p.e[1] / CEL - .8, 1.6, 1.6);
+    q.globalCompositeOperation = 'destination-in'; q.drawImage(masc, 0, 0, W, H); q.globalCompositeOperation = 'source-over';
+    g.globalAlpha = 1; g.drawImage(copia, 0, 0);
+    // 3) las gotas en vuelo: trazos de tinta estirados hacia donde van, en una curva que el viento empuja
+    g.strokeStyle = g.fillStyle = '#0b0705'; g.lineCap = 'round';
+    const pos = (p, u) => { const v = 1 - u, w = Math.sin(Math.PI * u);
+      const x = v * v * p.s[0] + 2 * v * u * p.c[0] + u * u * p.e[0], y = v * v * p.s[1] + 2 * v * u * p.c[1] + u * u * p.e[1], [cx, cy] = T.campo(x, y, t * .8);
+      return [x + 85 * w * cx, y + 60 * w * cy]; };                      // el viento las lleva en corrientes, todas juntas
+    if (META.materia === 'hojas') for (const p of G) { if (k <= p.sale || k >= p.llega) continue;   // materia: 'hojas' → la tinta vuela hecha hojas
+      const [x, y] = pos(p, T.suave((k - p.sale) / (p.llega - p.sale))); g.save(); g.translate(x, y); g.rotate(p.r * 40 + 1.2 * Math.sin(t * 4 + p.r * 9)); g.scale(1, .2 + .8 * Math.abs(Math.cos(t * 5 + p.r * 30)));
+      g.beginPath(); g.ellipse(0, 0, 4 + 2.2 * p.r, 1.8 + p.r * .8, 0, 0, 6.283); g.fill(); g.restore(); }
+    else for (const [b, ancho] of [[0, 4], [1, 7], [2, 11]]) { g.beginPath();
+      for (const p of G) { if (k <= p.sale || k >= p.llega || p.b !== b) continue;
+        const u = T.suave((k - p.sale) / (p.llega - p.sale)), [x0, y0] = pos(p, Math.max(0, u - .07)), [x1, y1] = pos(p, u); g.moveTo(x0, y0); g.lineTo(x1, y1); }
+      g.lineWidth = ancho; g.stroke();
+      g.beginPath(); for (const p of G) { if (k <= p.sale || k >= p.llega || p.b !== b) continue;   // la cola, más fina y larga
+        const u = T.suave((k - p.sale) / (p.llega - p.sale)), [x0, y0] = pos(p, Math.max(0, u - .16)), [x1, y1] = pos(p, Math.max(0, u - .07)); g.moveTo(x0, y0); g.lineTo(x1, y1); }
+      g.lineWidth = ancho * .4; g.stroke(); }
+    for (const p of G) { const d = (k - p.llega) / .05; if (d > 0 && d < 1 && p.b) { g.globalAlpha = 1 - d; g.beginPath(); g.arc(p.e[0], p.e[1], p.r * (1 + 2 * d), 0, 6.283); g.fill(); } }   // salpica al caer
+    const vk = Math.sin(Math.PI * T.clamp((k - .15) / .7));               // un poco de viento que se lleva la tinta
+    if (vk > 0) { g.globalAlpha = .3 * vk; g.lineWidth = 2.5;
+      for (let i = 0; i < 14; i++) { const y = H * AZ(i + 40), x = ((k * 1.6 + AZ(i + 60)) % 1.3 - .15) * W * 1.2, l = 260 + 420 * AZ(i + 80);
+        g.beginPath(); g.moveTo(x, y); g.quadraticCurveTo(x - l / 2, y - 40 * Math.sin(i + k * 4), x - l, y + 12); g.stroke(); } }
+    g.restore(); g.setTransform(1.5, 0, 0, 1.5, 0, 0); },
   // tajo: un corte blanco en diagonal y la imagen se parte en dos mitades que se separan (para las rupturas)
   tajo(g, t, k, muestra) { G0 = g;
     const p0 = [-100, 760], v = [1480, -800], L0 = [p0[0] - .35 * v[0], p0[1] - .35 * v[1]], L1 = [p0[0] + 1.35 * v[0], p0[1] + 1.35 * v[1]], n = [.475, .88];
@@ -89,6 +143,34 @@ const TRANS = {
     const a = Math.max(0, 1 - u * 2.5); if (a > 0) { g.save(); g.strokeStyle = `rgba(255,248,236,${a})`; g.shadowColor = 'rgba(255,255,255,.9)'; g.shadowBlur = 18;
       g.lineWidth = 6 * (1 - u) + 2; g.beginPath(); g.moveTo(...p0); g.lineTo(p0[0] + v[0] * linea, p0[1] + v[1] * linea); g.stroke(); g.restore(); } },
 };
+// duración de cada transición (s); las que no salen aquí duran 0,9 s. Empiezan antes del corte (PRE) y acaban después
+const DURA_TRANS = { metamorfosis: 3 }, DT = pl => DURA_TRANS[pl.def.transicion] || .9, PRE = pl => DT(pl) * .5 / .9;
+// la metamorfosis necesita saber dónde está la tinta del plano viejo y dónde va la del nuevo: se calcula una vez por transición,
+// con el plano viejo al empezar y el nuevo al acabar, en una rejilla de CEL px. Cada gota sale de una celda de tinta y cae en otra;
+// las dos listas van ordenadas de izquierda a derecha para que la tinta de cada cosa vaya a la cosa que tiene más cerca
+const META = { clave: null, gotas: null }, CEL = 8, masc = document.createElement('canvas');
+function tintaDe(c) {
+  const w = Math.ceil(c.width / CEL), h = Math.ceil(c.height / CEL), m = document.createElement('canvas'); m.width = w; m.height = h;
+  const x = m.getContext('2d', { willReadFrequently: true }); x.imageSmoothingQuality = 'high'; x.drawImage(c, 0, 0, w, h);
+  const d = x.getImageData(0, 0, w, h).data, out = [];
+  for (let i = 0; i < w * h; i++) if (.3 * d[4 * i] + .59 * d[4 * i + 1] + .11 * d[4 * i + 2] < 40) out.push([(i % w + .5) * CEL, (Math.floor(i / w) + .5) * CEL]);
+  return out;
+}
+function preparaMetamorfosis(a, b, t0, lienzo, aux) {
+  if (META.clave === t0) return;
+  const pre = PRE(b), D = DT(b);
+  a.pinta(t0 - pre + .1 * D); const A = tintaDe(lienzo);
+  b.pintaAux(t0 - pre + D); const B = tintaDe(aux);
+  const N = Math.min(6000, Math.max(A.length, B.length, 1));
+  const lista = (L, sem) => { if (!L.length) L = [[960, 540]]; const orden = L.map((_, i) => i).sort((i, j) => AZ(i * 1.7 + sem) - AZ(j * 1.7 + sem)), r = [];
+    for (let i = 0; i < N; i++) r.push(L[orden[i % L.length]]); return r.sort((p, q) => (p[0] + .45 * p[1]) - (q[0] + .45 * q[1])); };
+  const S = lista(A, 3), E = lista(B, 7);
+  META.gotas = S.map((s, i) => { const e = E[i], sale = .06 + .3 * (s[0] / lienzo.width) + .08 * AZ(i + 5), llega = Math.min(.93, sale + .32 + .16 * AZ(i + 9));
+    const mx = (s[0] + e[0]) / 2, my = (s[1] + e[1]) / 2, [fx, fy] = T.campo(mx, my, 0);
+    const r = 2.5 + 4.5 * AZ(i + 19) ** 2;
+    return { s, e, sale, llega, r, b: r < 3.5 ? 0 : r < 5 ? 1 : 2, c: [mx + 160 + 110 * fx + 30 * AZ(i + 11), my - 150 + 90 * fy - 30 * AZ(i + 17)] }; });   // el arco lo marca el viento, igual para las vecinas
+  META.clave = t0; META.materia = b.def.materia; window.META_INFO = [A.length, B.length, N];
+}
 // títulos grandes (ESCENA.titulos: {en, hasta, texto, sub}): letras doradas espaciadas que entran despacio
 function titulos(g, t) {
   for (const c of ESCENA.titulos || []) { if (t < c.en || t > c.hasta) continue;
@@ -136,7 +218,8 @@ window.listo = new Promise(r => {
     // una escena puede tener varios planos con su propio decorado y reparto (contraplanos, vistas de frente o de espaldas)
     // cada plano se puede pintar en el lienzo o en uno auxiliar (para las transiciones de viento)
     const aux = document.createElement('canvas'); aux.width = lienzo.width; aux.height = lienzo.height;
-    const planos = (ESCENA.planos || [ESCENA]).map(pl => { const d = Object.assign({ fps: ESCENA.fps, suelo: ESCENA.suelo }, pl);
+    const fpsUrl = +new URLSearchParams(location.search).get('fps'); if (fpsUrl) ESCENA.fps = fpsUrl;   // ?fps=30: borrador rápido de una escena a 60
+    const planos = (ESCENA.planos || [ESCENA]).map(pl => { const d = Object.assign({ fps: ESCENA.fps, suelo: ESCENA.suelo }, pl); if (fpsUrl) d.fps = fpsUrl;
       return { desde: pl.desde ?? 0, def: pl, pinta: T.escena(d, lienzo, fondo), pintaAux: T.escena(d, aux, fondo),
         paneles: (pl.paneles || []).map(p => Object.assign({}, p, { pinta: T.escena(Object.assign({}, d, p), aux, fondo) })) }; });
     const g = lienzo.getContext('2d');
@@ -145,13 +228,14 @@ window.listo = new Promise(r => {
     window.dibuja = t => {
       t = Math.floor(t * (ESCENA.fps || 30) + 1e-6) / (ESCENA.fps || 30);
       let i = 0; planos.forEach((q, k) => { if (t >= q.desde) i = k; });
-      const sig = planos[i + 1], viene = sig && TRANS[sig.def.transicion] && t >= sig.desde - .5;
-      const actual = planos[i], fue = TRANS[actual.def.transicion] && t < actual.desde + .4 && i > 0;
+      const sig = planos[i + 1], viene = sig && TRANS[sig.def.transicion] && t >= sig.desde - PRE(sig);
+      const actual = planos[i], fue = TRANS[actual.def.transicion] && t < actual.desde + DT(actual) - PRE(actual) && i > 0;
       if (viene || fue) {                                              // transición: el plano siguiente aparece a través de la del tipo elegido
         const [a, b, t0] = viene ? [actual, sig, sig.desde] : [planos[i - 1], actual, actual.desde];
+        if (b.def.transicion === 'metamorfosis') preparaMetamorfosis(a, b, t0, lienzo, aux);
         a.pinta(t); tinte(lienzo, a); T.pintaColores(g, a.pinta.colores, t); b.pintaAux(t); tinte(aux, b); T.pintaColores(aux.getContext('2d'), b.pintaAux.colores, t);
-        const k = Math.min(1, Math.max(0, (t - (t0 - .5)) / .9));
-        TRANS[b.def.transicion](g, t, k, camino => { g.save(); g.setTransform(1.5, 0, 0, 1.5, 0, 0); g.beginPath(); camino(); g.clip(); g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(aux, 0, 0); g.restore(); g.setTransform(1.5, 0, 0, 1.5, 0, 0); });
+        const k = Math.min(1, Math.max(0, (t - (t0 - PRE(b))) / DT(b)));
+        TRANS[b.def.transicion](g, t, k, camino => { g.save(); g.setTransform(1.5, 0, 0, 1.5, 0, 0); g.beginPath(); camino(); g.clip(); g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(aux, 0, 0); g.restore(); g.setTransform(1.5, 0, 0, 1.5, 0, 0); }, aux);
       } else { actual.pinta(t); tinte(lienzo, actual); T.pintaColores(g, actual.pinta.colores, t); paneles(actual, t); }
       franjas(actual, planos[i - 1], t);
       g.setTransform(1.5, 0, 0, 1.5, 0, 0); carteles(g, t); titulos(g, t); subtitulos(g, t); };

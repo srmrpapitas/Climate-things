@@ -1,5 +1,7 @@
 # Si se duplica
 
+> **¿Eres una IA que retoma el trabajo?** Lee primero `CLAUDE.md` (sus reglas valen para cualquier IA). Después, `fabrica/manual/RETOMAR.md`: su primera sección «▶ AHORA» dice qué está hecho, qué falta y con qué comandos.
+
 Simulador cinemático low poly para vídeos verticales de Instagram (@siseduplica): un fenómeno que duplica su intensidad en cada fase hasta que no queda nada. Primer escenario: **la ola que se duplica** (20 m → 10.240 m) sobre una ciudad costera.
 
 ## Cómo se usa

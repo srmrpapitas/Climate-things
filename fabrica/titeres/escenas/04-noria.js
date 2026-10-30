@@ -22,7 +22,7 @@ window.ESCENA = {
     { en: 0, hasta: G.fin, archivo: 'audio/sfx/lluvia.mp3', volumen: .3, bucle: true },
     { en: 0, hasta: G.fin, archivo: 'audio/sfx/viento.mp3', volumen: .2, bucle: true },
     { en: ENCIENDE, archivo: 'audio/sfx/whoosh.mp3', volumen: .3 },
-    { en: CAEN + .7, archivo: 'audio/sfx/derrumbe.mp3', volumen: .5 }, { en: CAEN + .75, archivo: 'audio/sfx/impacto.mp3', volumen: .45 }],
+    { en: CAEN + .7, archivo: 'audio/sfx/derrumbe.mp3', volumen: .20 }, { en: CAEN + .75, archivo: 'audio/sfx/impacto.mp3', volumen: .18 }],
   carteles: [
     { en: G.x('b3', .4), hasta: en.b5 - .3, x: 40, y: 40, ancho: 470, titulo: 'PP + PSOE', tiempos: [G.x('b3', 3), G.x('b3.2', 3.4), CAEN + 1],
       filas: [['2008', '83,8 %'], ['2015', '50,7 %'], ['2023', '≈ 65 %', '#7a1410']], fuente: 'Ministerio del Interior' },

@@ -19,7 +19,7 @@ window.ESCENA = {
   dura: G.fin + 1, fps: 30, suelo: 600, voces: G.voces,
   silencios: [[DECIDES - .7, DECIDES]],
   sonidos: [{ en: 0, hasta: G.fin + 1, archivo: 'audio/sfx/viento.mp3', volumen: .12, bucle: true }, { en: 0, archivo: 'audio/sfx/viento.mp3', volumen: .25 },
-    ...[...IZQ, ...DER].map(t => ({ en: t, archivo: 'audio/sfx/impacto.mp3', volumen: .18 })),
+    ...[...IZQ, ...DER].map(t => ({ en: t, archivo: 'audio/sfx/impacto.mp3', volumen: .07 })),
     { en: en.b40 - .2, archivo: 'audio/sfx/viento.mp3', volumen: .3 }, { en: VOTES + .3, archivo: 'audio/sfx/whoosh.mp3', volumen: .2 }, { en: PENSANDO, archivo: 'audio/sfx/campana.mp3', volumen: .3 }],
   carteles: [
     { en: DECIDES - .2, hasta: en.b40 - .2, x: 340, y: 40, ancho: 600, titulo: 'Cuál pesa más', filas: [['lo decides tú', '']], fuente: 'Españistán no te dice a quién votar' },

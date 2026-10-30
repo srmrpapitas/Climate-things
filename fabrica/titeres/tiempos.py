@@ -24,6 +24,17 @@ EPISODIOS = {
     '04': dict(guion='fabrica/herramientas/guion_espanistan-04-8min.tsv', voz='audio/voz/es/espanistan-04-gabo/', salida='tiempos-04.js', frases={
         'f1': ('audio/voz/es/espanistan-04-personajes/f1_sanchis', 'No es no. Hasta que es sí.', 'Sanchís'),
         'f2': ('audio/voz/es/espanistan-04-personajes/f2_feijolo', 'Que gobierne la lista más votada. Sobre todo si es la mía.', 'Feijolo')}),
+    '05': dict(guion='fabrica/herramientas/guion_espanistan-05-8min.tsv', voz='audio/voz/es/espanistan-05-gabo/', salida='tiempos-05.js', frases={
+        'f1': ('audio/voz/es/espanistan-05-personajes/f1_sanchis', 'Hemos anunciado más viviendas que nadie. Construirlas… ya es otro tema.', 'Sanchís'),
+        'f2': ('audio/voz/es/espanistan-05-personajes/f2_feijolo', 'La solución es liberar suelo. Ya lo hicimos en el noventa y ocho. Y mira qué bien salió.', 'Feijolo')}),
+    '06': dict(guion='fabrica/herramientas/guion_espanistan-06-8min.tsv', voz='audio/voz/es/espanistan-06-gabo/', salida='tiempos-06.js', frases={
+        'f1': ('audio/voz/es/espanistan-06-personajes/f1_sanchis', 'Hemos regularizado a más gente que nadie. Lo de la frontera… lo vemos después.', 'Sanchís'),
+        'f2': ('audio/voz/es/espanistan-06-personajes/f2_feijolo', 'Visado por puntos y cuotas cada año. Como ya hicimos en dos mil… bueno, como no hicimos.', 'Feijolo'),
+        'f3': ('audio/voz/es/espanistan-06-personajes/f3_acascar', 'Devolverlos a todos. Cuántos son, cómo y con qué aviones, eso ya es otro tema.', 'Acascar')}),
+    '07': dict(guion='fabrica/herramientas/guion_espanistan-07-8min.tsv', voz='audio/voz/es/espanistan-07-gabo/', salida='tiempos-07.js', frases={
+        'f1': ('audio/voz/es/espanistan-07-personajes/f1_sanchis', 'O estás con la escuela pública, o estás con los que quieren venderla a trozos.', 'Sanchís'),
+        'f2': ('audio/voz/es/espanistan-07-personajes/f2_feijolo', 'Ellos quieren que tus hijos pasen de curso sin estudiar. Aprobado general, como en el sesenta y ocho.', 'Feijolo'),
+        'f3': ('audio/voz/es/espanistan-07-personajes/f3_acascar', 'Eso lo dicen los profesores, que son todos unos rojos. Siguiente pregunta.', 'Acascar')}),
 }
 E = EPISODIOS[EP]; GUION, VOZ, FRASES = E['guion'], E['voz'], E['frases']
 
@@ -53,5 +64,5 @@ estimado = not glob.glob(VOZ + 'b*.mp3')
 salida = os.path.join(os.path.dirname(__file__), 'escenas', E['salida'])
 with open(salida, 'w', encoding='utf-8') as s:
     s.write(f'// Generado por fabrica/titeres/tiempos.py {EP}: duración {"ESTIMADA (aún sin audio)" if estimado else "real"} de cada bloque del narrador y de cada frase de los personajes.\n')
-    s.write('window.TIEMPOS = ' + json.dumps({'voz': VOZ, 'b': b, 's': inicios, 'p': piezas, 'f': f}, ensure_ascii=False) + ';\n')
+    s.write('window.TIEMPOS = ' + json.dumps({'voz': VOZ, 'b': b, 's': inicios, 'p': piezas, 'f': f, 'txt': textos}, ensure_ascii=False) + ';\n')
 print(f'{salida}: {len(b)} bloques ({sum(b.values()):.1f} s de narrador{" ESTIMADOS" if estimado else ""}) y {len(f)} frases de personajes ({sum(v[1] for v in f.values()):.1f} s)')
