@@ -21,6 +21,14 @@ En los ep. 1–3 la mitad del público se va antes del segundo 30; quien pasa de
 
 ## Antes de montar cada capítulo (checklist, 30-10-2026)
 - Golpes (`impacto`, `derrumbe`, `cristales`, `trueno`) con `volumen` ≤ 0,4 (lo normal, 0,15–0,3), siempre por debajo de la voz.
+- **Invariante de sonido: revisar el audio VARIAS veces antes de entregar, con armonía voz / música / efectos.** Nada se sube sin pasar esto:
+  1. Golpes ≤ 0,4 en el código (`grep -E "impacto|derrumbe|cristales|trueno"` en las escenas).
+  2. Medir el vídeo montado (y otra vez el que se entrega):
+     `ffmpeg -nostats -i out/X.mp4 -vn -af ebur128=peak=true -f null - 2>&1 | grep -A12 Summary`.
+     Buscar: I entre −18 y −14 LUFS · LRA ≤ 6 LU (nivel parejo) · pico ≤ −1 dB (`volumedetect` → `max_volume`), nunca 0,0 dB.
+     Referencia buena (ep. 5–7, 31-10): I −17 LUFS · LRA 3,2–3,5 · pico −2,6 dB.
+  3. Comparar con la versión anterior: la voz al mismo nivel (`mean_volume` ±1 dB) y la música (`MUSICA = .12`) siempre debajo.
+  4. El usuario escucha el vídeo entero antes de subir. Solo se sube con su «ok».
 - Primera frase: el dato más fuerte, con cifra o persona, o un acertijo (el bate y la pelota del ep. 7). Pregunta abierta antes del segundo 20.
 - Final: Pregunta del Decano → «Te leo en comentarios» → avance del capítulo siguiente → outro.
 - Transiciones 60/40: contarlas al escribir cada secuencia.
