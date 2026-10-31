@@ -1,7 +1,7 @@
 # Difusión · Españistán ep. 5 «La casa de los dos»
 
 **Vídeo:** `~/Desktop/Espanistan-05/espanistan-05.mp4` · **Miniatura:** `~/Desktop/Espanistan-05/Miniatura-ep05.jpg`
-**Programado:** domingo 1-11-2026, 19:00 — https://youtu.be/MY7-rw8KPUA (hora de España), en el canal de Españistán. «No es para niños».
+**Programado:** domingo 1-11-2026, 19:00 — https://youtu.be/8_YuuZUiVuw (hora de España; re-mezclado con golpes bajos el 31-10; el viejo MY7-rw8KPUA, en privado), en el canal de Españistán. «No es para niños».
 
 ## Título
 31 años y en litera: por qué faltan 750.000 casas | Españistán ep. 5

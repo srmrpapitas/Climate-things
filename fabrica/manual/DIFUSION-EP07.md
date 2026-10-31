@@ -1,7 +1,7 @@
 # Españistán ep. 7 · «La fábrica de respuestas» (la educación)
 
 **Vídeo:** `~/Desktop/Espanistan-07/espanistan-07.mp4` (11:26, 30 fps) · **Miniatura:** `~/Desktop/Espanistan-07/Miniatura-ep07.jpg` (`sh fabrica/titeres/miniatura.sh 7`)
-**Estreno:** jueves 5-11-2026, 19:00 (hora de España), en el canal TeatroAnimadoTv. «No es para niños». **Programado** (30-10) con pantalla final (ep. 6 + suscribirse) y en la lista Españistán: https://youtu.be/IQfOpvF1lPs
+**Estreno:** jueves 5-11-2026, 19:00 (hora de España), en el canal TeatroAnimadoTv. «No es para niños». **Programado** con pantalla final (ep. 6 nuevo + suscribirse) y en la lista Españistán: https://youtu.be/6nNCjOtaa3I (re-mezclado el 31-10; el viejo IQfOpvF1lPs, en privado)
 Miniatura: «OBEDECE · NO TE ENSEÑAN A PENSAR · DESDE PRUSIA, 1763».
 
 ## Título

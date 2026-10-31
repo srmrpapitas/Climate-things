@@ -2,7 +2,7 @@
 
 ## ▶ AHORA (30-10-2026, noche): revisión de los ep. 3–7 y lista de mejoras · para CUALQUIER IA que siga
 Lee antes `CLAUDE.md` (sus reglas valen para cualquier IA): ediciones mínimas, no abrir `out/` ni vídeos, respuestas cortas en español.
-**Calendario**: ep. 4 público el 30-10 a las 19:00 · ep. 5 programado el 1-11 · ep. 6 el 3-11 · ep. 7 el 5-11 · ep. 8 (pensiones) sin empezar.
+**Calendario**: ep. 4 público el 30-10 a las 19:00 · ep. 5 programado el 1-11 · ep. 6 el 3-11 · ep. 7 el 5-11 (los tres resubidos el 31-10 con golpes bajos; enlaces en DIFUSION-EP0N.md) · ep. 8 (pensiones) sin empezar.
 
 **Hecho el 30-10 (noche)**
 - Los golpes (`impacto`, `derrumbe`, `cristales`, `trueno`) sonaban muy fuertes. Están bajados al 40 % en el código de las escenas de los ep. 3–7 y en `intro.js`, `intro2.js`, `intro-07.js` y `outro.js`. **Regla: golpes ≤ 0,4 (lo normal, 0,15–0,3).**
@@ -25,7 +25,7 @@ Lee antes `CLAUDE.md` (sus reglas valen para cualquier IA): ediciones mínimas, 
 2. **Shorts de los ep. 4–7: no hay ninguno.** La cola de `SHORTS-CALENDARIO.md` (ep. 1–3) se acaba el **6-11 a las 21:00**.
    - `fabrica/titeres/shorts.py` está atado al ep. 3: cambiar `CAPITULO`, `GUION`, `SECUENCIAS_0N` y `tiempos-0N.js`, y escribir la lista `SHORTS` (bloque de inicio, bloque de fin y gancho en dos líneas).
    - 2 al día, a las 14:00 y a las 21:00.
-3. **Re-mezclar los ep. 5, 6 y 7 antes de que salgan** (el 5 tenía 15 golpes fuertes).
+3. **Re-mezclar los ep. 5, 6 y 7 antes de que salgan**: hecho el 31-10 (`out/espanistan-0N-limitado.mp4`, copia en `~/Desktop/Espanistan-0N/espanistan-0N-NUEVO.mp4`). Ep. 5 resubido (https://youtu.be/8_YuuZUiVuw, 1-11 19:00, pantalla final ep. 4), ep. 6 (https://youtu.be/_bu1POG2-As, 3-11 19:00, pantalla final ep. 5); los viejos en privado, que los borre el usuario. Ep. 7 (https://youtu.be/6nNCjOtaa3I, 5-11 19:00, pantalla final ep. 6 nuevo). TODO HECHO («Reutilizar detalles» + «Importar pantalla final» del viejo).
 4. **Avance del capítulo siguiente** al final. Solo lo tienen el 3 y el 7.
 5. **En YouTube:**
    - Pantalla final en los ep. 4 y 5: comprobar que la tienen.

@@ -1,7 +1,7 @@
 # Españistán ep. 6 · «Los que llegan» (la inmigración)
 
 **Vídeo:** `~/Desktop/Espanistan-06/espanistan-06.mp4` (10:19) · **Miniatura:** `~/Desktop/Espanistan-06/Miniatura-ep06.jpg` (`sh fabrica/titeres/miniatura.sh 6`)
-**Estreno:** martes 3-11-2026, 19:00 (hora de España), en el canal TeatroAnimadoTv. «No es para niños». **Programado** (30-10) con pantalla final: https://youtu.be/ubVxHmiKRfA
+**Estreno:** martes 3-11-2026, 19:00 (hora de España), en el canal TeatroAnimadoTv. «No es para niños». **Programado** con pantalla final (ep. 5 + suscribirse): https://youtu.be/_bu1POG2-As (re-mezclado el 31-10; el viejo ubVxHmiKRfA, en privado)
 
 ## Título
 72.000 en dos días: los datos de la inmigración que incomodan a todos | Españistán ep. 6
