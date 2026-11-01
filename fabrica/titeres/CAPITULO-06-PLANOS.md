@@ -1,6 +1,6 @@
 # Ep. 6 «Los que llegan» (inmigración) · plan de planos
 
-Guion: `fabrica/herramientas/guion_espanistan-06-8min.tsv` (b1–b50) · fuentes: `fabrica/manual/DIFUSION-EP06.md`.
+Guion: `fabrica/herramientas/guion_espanistan-06-8min.tsv` (b1–b50) · fuentes: `fabrica/manual/difusion/DIFUSION-EP06.md`.
 
 **Temporada 2: «pequeño reboot».**
 - Todas las escenas llevan `cartoon: true`: se encogen antes del gesto, se estiran al lanzarlo, rebotan al andar, hacen el susto `sorprende` y dejan líneas de velocidad al correr.

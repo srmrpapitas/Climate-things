@@ -1,4 +1,4 @@
-// Prueba de 3,5 s del final del paralepípedo, montada como el golpe de One Punch Man (EFECTOS-EPICOS.md §8): pocos dibujos de verdad
+// Prueba de 3,5 s del final del paralepípedo, montada como el golpe de One Punch Man (GUIA.md §6.1): pocos dibujos de verdad
 // (clips de Veo + 3 dibujos de Nano Banana) y todo lo demás por código en cada fotograma: estroboscopio, smear, parada en seco,
 // destello y negativos, onda, viento que alterna dos dibujos y plano general que se aleja (el «…pípedo» final se quitó: no le gustó).
 // El puño NO toca al niño (los generadores lo bloquean y no se esquiva): se para a un dedo de su cara y la onda arrasa lo de detrás.

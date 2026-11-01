@@ -116,7 +116,7 @@ function aberracion(g, dx) {                                        // los color
     ch.globalCompositeOperation = 'multiply'; ch.fillStyle = col; ch.fillRect(0, 0, W, H); g.drawImage(canal, o * s, 0); }
   g.restore();
 }
-// ---------- cortes en la palabra y rampa de velocidad (EFECTOS-EPICOS.md 4.2 y 4.3) ----------
+// ---------- cortes en la palabra y rampa de velocidad (cortes anclados a palabras; rampa: rápido, lento en el pico, rápido) ----------
 const ENCUADRES = [[1, 0, 0], [1.45, -.1, 70], [1.18, .09, -30]];
 function cortes(g, t, desde) {                                     // cambia de encuadre cada dos «paralepípedo»; devuelve los segundos desde el último corte
   bocaN(0); const ps = BN.filter(p => p[1] >= desde && p[1] <= t), c = Math.floor(ps.length / 2), [z, r, dy] = ENCUADRES[c % 3];

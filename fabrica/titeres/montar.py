@@ -3,7 +3,7 @@
 
 Uso (desde la raíz del repo): python3 fabrica/titeres/montar.py out/espanistan-03-animado.mp4
   Antes: cada secuencia grabada con grabar.mjs, la ráfaga con `node fabrica/titeres/rafaga.mjs out/rafaga`
-  y la música con `~/qw/bin/python -I fabrica/manual/herramientas/musica.py out/musica03/AMBIENTE.wav AMBIENTE`.
+  y la música con `~/qw/bin/python -I fabrica/herramientas/musica.py out/musica03/AMBIENTE.wav AMBIENTE`.
 """
 import subprocess, sys
 

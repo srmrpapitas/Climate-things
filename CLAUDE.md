@@ -1,20 +1,19 @@
-# Fábrica de videos
+# Fábrica de vídeos
 
-**Antes de nada, leer `fabrica/manual/CAPITULO-SIGUIENTE.md` (cómo hacer el siguiente capítulo, estilo aprobado), `fabrica/manual/PLAN-10-SEMANA.md` (costes), `fabrica/manual/COMO-HACER-UN-VIDEO.md` (el proceso), `fabrica/manual/PLAN-15.md` (cómo ahorrar), `fabrica/manual/RETOMAR.md` (trabajo en curso) y `fabrica/manual/README.md`**: voz, música, efectos, render y herramientas.
+**Antes de nada, leer dos archivos:**
+1. `fabrica/manual/RETOMAR.md`: qué está hecho y qué falta (corto).
+2. `fabrica/manual/GUIA.md`: cómo se hace cada cosa, con los comandos (capítulo de Españistán, shorts, miniaturas, subir, anime, reel viral).
 
-**Vídeo viral** (reel meme de IG, el chorizo portuano: fórmula y paso a paso): `fabrica/explicado/VIDEO-VIRAL.md`.
+Lo demás se lee solo cuando la guía lo mande (el plan de planos de un capítulo, el motor de títeres, la receta del reel viral).
 
-**Escenas épicas** (primeros planos que hablan, boca sincronizada con la voz, drones, rampas de velocidad, cortes en la palabra): `fabrica/manual/EFECTOS-EPICOS.md`.
+## Proyectos vivos
+- **Españistán** (YouTube): capítulos de títeres de ≈ 8–10 min → `fabrica/titeres/`.
+- **Anime** (golpe a lo One Punch Man) y **reels virales** (Instagram @siseduplica) → `fabrica/explicado/`.
 
-## Reglas de trabajo (ahorro de tokens)
-- Producir un video = escribir/editar SOLO `videos/<slug>.yaml`. No abrir ni reescribir plantillas salvo que se pida.
-- Formato y tipos de escena: `esqueletos/README.md`. Reglas obligatorias: `reglas/retencion.md` (validar R8 antes de renderizar).
-- No leer `assets/`, `out/`, `node_modules/` ni videos/imágenes. No hacer capturas para revisar: el usuario revisa el render y pide cambios por número de escena.
-- Ediciones mínimas (Edit sobre líneas), nunca reescribir archivos completos.
-- Respuestas cortas: qué cambió y el comando de render. Sin resúmenes largos.
-
-## Flujo
-1. Tema + plataforma → guion en el YAML (aplica R1–R7).
-2. Checklist R8.
-3. Render local (comando por definir según el motor elegido).
-4. Ajustes por escena → re-render.
+## Reglas de trabajo
+- Hablar con el usuario en español, corto y sin tecnicismos. No es programador.
+- Pedir el «sí» antes de gastar créditos, de publicar y de borrar cualquier cosa subida.
+- Ediciones mínimas en el código; no reescribir archivos enteros que funcionan.
+- No abrir vídeos ni `out/` para revisar salvo que haga falta: fotogramas sueltos u hojas de contacto.
+- Lo largo (renders, voces) en segundo plano; seguir respondiendo.
+- Lo nuevo que se aprenda va a su sección de `GUIA.md`, y el estado a `RETOMAR.md`. No crear más archivos de instrucciones.

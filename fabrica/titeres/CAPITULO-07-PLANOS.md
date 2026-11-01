@@ -3,7 +3,7 @@
 Guion: `fabrica/herramientas/guion_espanistan-07-8min.tsv` (50 bloques, 74 frases, ≈ 1.420 palabras ≈ 11 min con intro y outro; datos de PISA 2025). Datos: `historias/espanistan/07-educacion.md`.
 **A 60 fps** (aprobado el 30-10-2026 tras la prueba): es el primer capítulo así. Borradores con `FPS=30 node grabar.mjs …` y la versión definitiva, sin FPS. El ep. 6 va a 30 fps y el usuario quiere compararlos.
 
-## Mejoras del motor antes de grabar (notas del ep. 6, en `CAPITULO-SIGUIENTE.md`)
+## Mejoras del motor antes de grabar (notas del ep. 6, ahora en `GUIA.md` §2.4)
 1. **60 fps de punta a punta**:
    - `fps: 60` en cada escena.
    - `grabar.mjs` lee `window.FPS`; revisar el `-framerate` del ffmpeg.
