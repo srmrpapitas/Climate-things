@@ -12,16 +12,20 @@ AMARILLO, ROJO, AZUL, VERDE, BLANCO, NEGRO = '#FFD400', '#E3161B', '#1F5FBF', '#
 MINIS = {
     4: dict(grande=[('ES TEATRO', 745, -5, 120, AMARILLO)],
             banda=('DESDE 1982 MANDAN LOS MISMOS', 15, 622, 64),
-            etiquetas=[('PP', 830, 300, AZUL), ('PSOE', 1060, 300, ROJO)]),
-    5: dict(grande=[('750.000', 735, 0, 150, AMARILLO), ('CASAS', 800, 150, 100, BLANCO)],
-            banda=('¿QUIÉN TE LA QUITÓ?', 560, 590, 105),
-            etiquetas=[('PP', 790, 420, AZUL), ('PSOE', 1150, 420, ROJO)]),
-    6: dict(grande=[('72.000', 740, -10, 165, AMARILLO), ('POR UN BULO', 735, 155, 95, BLANCO)],
-            banda=('DE MARRUECOS A CEUTA · Y NO HACEN NADA', 600, 630, 56),
-            etiquetas=[('PP', 805, 552, AZUL), ('PSOE', 1000, 552, ROJO)]),
+            caras=[('feijoo-brazos', 790, 110, 640), ('sanchez-manosb', 1115, 200, 530)],
+            etiquetas=[('PP', 800, 470, AZUL), ('PSOE', 1150, 640, ROJO)]),
+    5: dict(grande=[('VIVIENDA', 735, 0, 140, AMARILLO), ('IMPOSIBLE', 735, 150, 118, BLANCO)],
+            banda=('31 AÑOS, 2 SUELDOS... Y SIN CASA', 560, 610, 70),
+            caras=[('feijoo-2025', 830, 250, 520), ('sanchez-2024b', 1120, 240, 520)],
+            etiquetas=[('PP', 830, 520, AZUL), ('PSOE', 1120, 520, ROJO)]),
+    6: dict(grande=[('CEUTA', 760, -10, 165, AMARILLO), ('DESBORDADA', 728, 160, 98, BLANCO)],
+            banda=('72.000 EN 2 DÍAS · CEUTA TIENE 83.000', 600, 625, 60),
+            caras=[('feijoo-2018', 800, 300, 440), ('sanchez-hablab', 995, 380, 350), ('abascal-cpac', 1185, 290, 460)],
+            etiquetas=[('PP', 800, 540, AZUL), ('PSOE', 990, 540, ROJO), ('VOX', 1180, 540, VERDE)]),
     7: dict(grande=[('TE ENSEÑAN', 740, 0, 112, AMARILLO), ('A OBEDECER', 740, 110, 112, BLANCO)],
             banda=('¿Y A PENSAR? NO', 600, 622, 76),
-            etiquetas=[('PP', 840, 555, AZUL), ('PSOE', 1110, 555, ROJO)]),
+            caras=[('feijoo-2023', 850, 270, 480), ('sanchez-seriob', 1115, 300, 430)],
+            etiquetas=[('PP', 850, 530, AZUL), ('PSOE', 1110, 530, ROJO)]),
 }
 
 def texto(d, xy, t, tam, color, borde=10):
@@ -56,9 +60,20 @@ def rayos():
     dorado = Image.new('RGBA', (1280, 720), (255, 196, 40, 0)); dorado.putalpha(halo.filter(ImageFilter.GaussianBlur(90)))
     r.alpha_composite(dorado); return r
 
+def cara(nombre, cx, y, alto):
+    """Foto real recortada (out/fotos-reales/NOMBRE-recorte.png, Commons libre) con sombra y borde blanco, encima del dibujo."""
+    fig = Image.open(f'out/fotos-reales/{nombre}-recorte.png').convert('RGBA'); fig = fig.crop(fig.getchannel('A').getbbox())
+    fig = fig.resize((round(fig.width * alto / fig.height), alto), Image.LANCZOS); a = fig.getchannel('A')
+    capa = Image.new('RGBA', (1280, 720)); x = cx - fig.width // 2
+    sombra = Image.new('RGBA', fig.size, (0, 0, 0, 0)); sombra.putalpha(a.point(lambda v: v * .5).filter(ImageFilter.GaussianBlur(12)))
+    borde = Image.new('RGBA', fig.size, (255, 255, 255, 0)); borde.putalpha(a.filter(ImageFilter.MaxFilter(9)))
+    capa.alpha_composite(sombra, (x + 12, y + 10)); capa.alpha_composite(borde, (x, y)); capa.alpha_composite(fig, (x, y)); return capa
+
 def hacer(ep):
     m = MINIS[ep]; im = Image.open(f'out/miniaturas-gemini/ep{ep:02d}-blanco.png').convert('RGBA').resize((1280, 720), Image.LANCZOS)
-    im = Image.alpha_composite(im, rayos()); im = Image.alpha_composite(im, elegido())
+    im = Image.alpha_composite(im, rayos())
+    for c in m.get('caras', []): im = Image.alpha_composite(im, cara(*c))
+    im = Image.alpha_composite(im, elegido())
     capa = Image.new('RGBA', im.size); d = ImageDraw.Draw(capa)
     for t, x, y, tam, color in m['grande']: texto(d, (x, y), t, tam, color)
     t, x, y, tam = m['banda']; f = ImageFont.truetype(IMPACT, tam); b = d.textbbox((0, 0), t, font=f)

@@ -280,3 +280,5 @@ Trampas:
 
 ## 6. Whisper (tiempos)
 `python3 -m venv /home/user/qw && /home/user/qw/bin/pip install -q faster-whisper soundfile`, y después `/home/user/qw/bin/python -I fabrica/manual/herramientas/tiempos.py VOZ.mp3 > tiempos.json`.
+
+**01-11-2026: miniaturas nuevas subidas a YouTube** — ep. 3 (`6KmuoSjSYCQ`, Vox/Orbán: `fabrica/titeres/miniatura_vox.py`), ep. 4–7 (Elegido sobre blanco: `fabrica/titeres/miniatura_gemini.py`). Sin Chrome: base64 en gist secreto temporal (borrado al acabar) + `fetch` desde Studio + `DataTransfer` en el `input[type=file]`; esperar ~10 s a la vista previa y guardar con un CLIC REAL en «Guardar» (el clic por JS a veces no guarda la miniatura). Pendiente: shorts del ep. 5 sin subir (calendario en SHORTS-CALENDARIO.md).
