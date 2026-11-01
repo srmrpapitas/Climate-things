@@ -1,5 +1,34 @@
 # Retomar Españistán (leer al abrir una sesión nueva)
 
+## ▶ Meme «paralepípedo» (1-11-2026): audio APROBADO · animado entero a 60 fps
+- **EN CURSO (1-11, 03:30): 60 imágenes distintas por segundo con Veo + RIFE.** Clips de Veo (Google Flow, fotograma inicial/final = dibujos clave) en `referencias/paralepipedo/veo/` (puno, padre-habla, nino, padre-estres). `RIFE=… python3 -I fabrica/explicado/secuencias.py [cadenas|planos [nombre…]|nino]` hace `referencias/paralepipedo/sec/` (intermedios de dibujos + clips retimados a cada plano); la escena los pinta con `clip()` y `cad()`. Final: carga 17,8 · lanza 18,7 · «parale…» 19,5 · puño 20,12 · impacto 20,4 (sin la explosión de Veo). Falta: render entero → loudnorm −16 (golpes ≤ ,4) → enviar; el usuario quiere poder reordenar planos/fotogramas («así no me convence»): preguntarle qué cambiar. Flow: quedan ~10 puntos hoy (se renuevan a las 2:43); con niños el filtro bloquea enfado. RIFE se bajó al scratchpad: si falta, volver a bajar rife-ncnn-vulkan 20221029 macOS.
+- Escena: `fabrica/explicado/escenas/paralepipedo.js` (+ `tiempos_paralepipedo.js`). Render: `node fabrica/explicado/grabar.mjs paralepipedo out/paralepipedo-bruto.mp4` → loudnorm a −16 → `out/paralepipedo.mp4`.
+- Golpe final = **puñetazo a lo Saitama** (aprobado): plano `puno` 20,15–20,6, fondo en espiral, de espaldas, impacto a 20,4 + `sfx/eleven/punetazo.mp3` (.35).
+- **Método nuevo (aprobado por el usuario): dibujos clave con Gemini** (navegador integrado, cuenta del usuario, conversación «Creación de Hoja de Personaje Anime»). Estilo: manga coloreado saturado tipo Baki; el susto y la furia en blanco y negro. 17 dibujos en `referencias/paralepipedo/clave/` (pasillo, sonrisa/-mm/-habla, lado/-grita, susto/-mm/-que, nino/-grita, furia-aprieta/-grito, ojos, sombra, carga, puno).
+  - Variantes de boca: pedir «EXACTAMENTE la misma imagen cambiando SOLO la boca» → salen alineadas al píxel. Boca de anime: 3 posiciones (cerrada, milímetros, abierta), y los labios se despegan antes de hablar.
+  - Sacarlas: no hay subida ni descarga; en JS se pone el blob a pantalla completa y se captura con `zoom` + `save_to_disk` (790×1414).
+  - Sin cortina (el usuario la quitó): el final es el puñetazo a cámara a lo One Punch Man (carga → puño → impacto a 20,4).
+  - La versión dibujada por código está en el scratchpad (`paralepipedo-dibujado.js`), descartada.
+- Audio de 24 s: `out/paralepipedo-voz.mp3` (−16 LUFS). Frases en `audio/voz/es/paralepipedo/` (n = niño, adulto agudo diseñado `Rih37FRcdSm9g22A4JdT`; dice «paralepípedo», así lo quiere el usuario: NO corregir, p = padre Mario). Efectos nuevos en `efectos.py` (cortina, golpe-seco, tension, manga, grillos).
+- Tiempos (v3, 22,6 s): 0 «¡Papá!» · 2,0 «Dime, hijo» · 3,9 «¡Paralepípedo!» · 5,4 golpe manga suave · 6,3 «¿Qué?» · 7,5 ráfaga · 10,4 golpe manga suave · 11,0 «Cállate» · 17,8 cortina · 20,4 golpe (el niño se corta ahí) · 22,6 fin.
+- Planos que pide el usuario:
+  1. POV del niño detrás del padre.
+  2. Primeros planos en arte pintado: cara sonriente.
+  3. Lateral en 3.ª persona, los dos.
+  4. Padre en manga/anime en blanco y negro: «¿Qué?».
+  5. POV del padre: el niño en bucle.
+  6. Cara macabra exagerada, «casi Baki, pero no tanto»: «Cállate».
+  7. El padre baja la cortina agarrándola por arriba, todo a negro, y suena el golpe.
+- Clave: **bandas negras que se cierran arriba y abajo** en los planos del padre en modo arte; expresiones ultramarcadas.
+
+## ▶ Vídeo viral de Instagram (31-10-2026, noche): «chorizo portuano» SUBIDO
+- Reel de 95 s en @siseduplica, subido por el usuario. Vídeo: `out/chorizo-portuano.mp4`.
+- **Es el modelo para los siguientes vídeos virales.** Cómo se hizo y cómo repetirlo: `fabrica/explicado/VIDEO-VIRAL.md`
+  (la fórmula del meme, el guion, la voz primero, «cada cosa que dice aparece en pantalla», transición de zoom, sonido a −16 LUFS).
+- El tsunami **no** fue viral: no usarlo de modelo.
+- Sin commitear: guion, escenas, efectos nuevos, `video.html` (transición de zoom), `voz.py` (`--velocidad`) y la guía.
+- Siguiente: el usuario dirá el próximo meme. Aplicar VIDEO-VIRAL.md y dar primero el audio para que lo apruebe.
+
 ## ▶ AHORA (30-10-2026, noche): revisión de los ep. 3–7 y lista de mejoras · para CUALQUIER IA que siga
 Lee antes `CLAUDE.md` (sus reglas valen para cualquier IA): ediciones mínimas, no abrir `out/` ni vídeos, respuestas cortas en español.
 **Calendario**: ep. 4 público el 30-10 a las 19:00 · ep. 5 programado el 1-11 · ep. 6 el 3-11 · ep. 7 el 5-11 (los tres resubidos el 31-10 con golpes bajos; enlaces en DIFUSION-EP0N.md) · ep. 8 (pensiones) sin empezar.

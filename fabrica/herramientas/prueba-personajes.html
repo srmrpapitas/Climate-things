@@ -1,0 +1,54 @@
+<!doctype html>
+<!-- Prueba del paquete nuevo: personajes GLB + clips UAL adaptados + postprocessing (N8AO, SMAA, viñeta) + GSAP.
+     python3 -m http.server 8765 → http://localhost:8765/fabrica/herramientas/prueba-personajes.html?t=1.2 -->
+<meta charset="utf-8">
+<style>html,body{margin:0;background:#000}canvas{display:block}</style>
+<script type="importmap">
+{ "imports": {
+  "three": "../../vendor/three.module.min.js",
+  "three/examples/jsm/postprocessing/Pass.js": "../../vendor/postprocessing/Pass.js",
+  "postprocessing": "../../vendor/pmndrs/postprocessing.js",
+  "n8ao": "../../vendor/pmndrs/N8AO.js",
+  "gsap": "../../vendor/gsap/index.js"
+} }
+</script>
+<canvas id="c"></canvas>
+<script type="module">
+import * as THREE from 'three';
+import { EffectComposer, RenderPass, EffectPass, SMAAEffect, VignetteEffect, BloomEffect, ToneMappingEffect, ToneMappingMode } from 'postprocessing';
+import { N8AOPostPass } from 'n8ao';
+import { gsap } from 'gsap';
+import { cargaPersonaje, clipMixamo } from './personajes.js';
+
+const W = 540, H = 960, c = document.getElementById('c');
+const ren = new THREE.WebGLRenderer({ canvas: c, powerPreference: 'high-performance', antialias: false, stencil: false, depth: false, preserveDrawingBuffer: true });
+ren.setSize(W, H); ren.shadowMap.enabled = true; ren.shadowMap.type = THREE.PCFSoftShadowMap;
+const esc = new THREE.Scene(); esc.background = new THREE.Color(0x1b2233);
+const cam = new THREE.PerspectiveCamera(35, W / H, .1, 200);
+esc.add(new THREE.HemisphereLight(0xbcd4ff, 0x40302a, 1.1));
+const sol = new THREE.DirectionalLight(0xffffff, 2.2); sol.position.set(4, 8, 5); sol.castShadow = true; sol.shadow.mapSize.set(2048, 2048);
+Object.assign(sol.shadow.camera, { left: -6, right: 6, top: 6, bottom: -6 }); esc.add(sol);
+const parque = new THREE.Mesh(new THREE.PlaneGeometry(30, 30), new THREE.MeshStandardMaterial({ color: 0xc8864a, roughness: .55 }));
+parque.rotation.x = -Math.PI / 2; parque.receiveShadow = true; esc.add(parque);
+
+const comp = new EffectComposer(ren, { frameBufferType: THREE.HalfFloatType });
+comp.addPass(new RenderPass(esc, cam));
+const ao = new N8AOPostPass(esc, cam, W, H); ao.configuration.aoRadius = 1.2; ao.configuration.intensity = 2.5; comp.addPass(ao);
+comp.addPass(new EffectPass(cam, new BloomEffect({ intensity: .6, luminanceThreshold: .85 }), new VignetteEffect({ darkness: .45 }),
+  new ToneMappingEffect({ mode: ToneMappingMode.ACES_FILMIC }), new SMAAEffect()));
+
+const nombres = new URLSearchParams(location.search).get('quien')?.split(',') ?? ['Character_Male_33', 'Character_42_Female', 'Character_Male_37'], clips = ['Jog_Fwd_Loop', 'Dance_Loop', 'Jump_Loop'];
+const gente = await Promise.all(nombres.map(cargaPersonaje));
+// ?mixamo=Mma_Kick,Hook,Victory → prueba los clips FBX de Mixamo en lugar de los de la UAL
+const mix = new URLSearchParams(location.search).get('mixamo')?.split(',');
+const usar = mix ? await Promise.all(mix.map(n => clipMixamo(n))) : clips;
+gente.forEach((p, i) => { p.obj.position.x = (i - 1) * 1.4; esc.add(p.obj); p.accion(usar[i]); });
+
+// la cámara la mueve una línea de tiempo de GSAP en pausa: se fija con seek(t) en cada fotograma (determinista)
+const camino = { x: -3, y: 1.6, z: 7 };
+const tl = gsap.timeline({ paused: true }).to(camino, { x: 3, y: 1.2, z: 5.5, duration: 4, ease: 'power2.inOut' });
+window.dibuja = t => { tl.seek(t); cam.position.set(camino.x, camino.y, camino.z); cam.lookAt(0, 1, 0);
+  gente.forEach(p => p.mixer.setTime(t)); comp.render(); };
+window.dibuja(+new URLSearchParams(location.search).get('t') || 1.2);
+window.listo = true;
+</script>

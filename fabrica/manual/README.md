@@ -47,6 +47,18 @@ Red necesaria: `pypi.org`, `huggingface.co`, `*.hf.co` (si da 403, el usuario lo
   Medido: **10 s de video ≈ 57 s de render** (≈6× tiempo real). Un video de 9,5 min ≈ 55 min → lanzarlo en segundo plano.
 - `npx hyperframes@0.8.204 check` revisa errores antes de renderizar.
 
+## 4b. Paquete premium para escenas 3D (instalado el 31-10-2026)
+- **Personajes**: 34 GLB con esqueleto Mixamo y textura en `modelos/personajes-extras/glb/` (13 hombres, 13 mujeres, killers, monstruos, sheriff; 1,5–2,7 m). Vienen del zip del usuario `characters--extras.zip`; para reconvertir: `node fabrica/herramientas/fbx-a-glb.mjs <carpeta Extras_Rig> <carpeta textures> <salida>`.
+- **Animaciones**: Universal Animation Library de Quaternius (CC0), 43 clips en `modelos/anim-ual/UAL1_Standard.glb`: Idle, Jog, Sprint, Walk, Jump (Start/Loop/Land), Dance, Interact, Roll, Sitting, Death… No trae botar, tirar ni mate: esos se bajan de Mixamo (cuenta del usuario) o se animan a mano.
+- **Cómo se usan**: `fabrica/herramientas/personajes.js` → `const p = await cargaPersonaje('Character_Male_33'); p.accion('Jog_Fwd_Loop'); p.mixer.setTime(t)`. Adapta cada clip al personaje (rotaciones del mundo desde la pose en T y cadera escalada). No usar `SkeletonUtils.retargetClip`: hunde al personaje por la escala ×0,01.
+- **Postprocesado** (`vendor/pmndrs`): `postprocessing` 6.36 (la última compatible con three r160) y `n8ao` (oclusión ambiental). Combinación probada: N8AO + Bloom + viñeta + tono ACES + SMAA.
+- **GSAP** 3.15 (`vendor/gsap`, licencia estándar gratuita): líneas de tiempo en pausa y `tl.seek(t)` en cada fotograma, así la grabación es determinista.
+- Mapa de módulos (`importmap`): `three`, `postprocessing`, `n8ao`, `gsap` y `three/examples/jsm/postprocessing/Pass.js` (lo pide N8AO). Ya está en `index.html`.
+- Escena de prueba con todo junto: `fabrica/herramientas/prueba-personajes.html?t=1.2` (`&mixamo=Mma_Kick,Hook,Victory` prueba clips de Mixamo).
+- **Clips de Mixamo** (FBX «Without Skin»): `modelos/scd/anim/` (34 de pelea: golpes, bloqueos, derribo, KO, entrada, victoria). `p.accion(await clipMixamo('Hook'))`; ya quita el `mixamorig5:` y pasa la cadera de cm a m.
+- **SCD (octógono)**: `modelos/scd/octagono.glb` (84 MB, sin texturas, 268 m), `trump.glb` (sin esqueleto: se rigea en Mixamo), `lula.glb` (busto). Mirar un GLB: `fabrica/herramientas/ver-glb.html?m=<ruta>`.
+- **Pruebas sin cargar la GPU**: Chromium con `--use-angle=swiftshader` (CPU), un fotograma y cerrar el navegador después.
+
 ## 5. Entorno (nube)
 - Sin GPU, 4 núcleos, 15 GB de RAM: **no cargar dos modelos de voz a la vez**.
 - Rama de trabajo indicada en cada sesión; subir siempre lo generado (`git add`, `commit`, `push`).

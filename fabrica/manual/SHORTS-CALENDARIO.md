@@ -32,3 +32,17 @@ Marcar ✅ al programar.
 - Detalles: título y descripción; «No, no está creado para niños» (`[name=VIDEO_MADE_FOR_KIDS_NOT_MFK]`); 3 × «Siguiente»; desplegar «Programar», fecha en el calendario y hora en la lista (opción «21:00»/«14:00»); «Programar»; aviso «Entendido».
 - El vídeo relacionado **no sale al subir**: después, en `/video/ID/edit` → botón «Vídeo relacionado (Ninguno)» → elegir el capítulo → Guardar.
 - 28-10: vídeo relacionado puesto en los 14 programados (ep. 2 y ep. 3). Ep. 1 hecho el 28-10. Ojo: no renderizar dos shorts a la vez con versiones viejas de shorts.py (se mezclaban los textos); xewMel6WO4g es un ep1-mochila roto, en privado.
+
+## Ep. 5 (vivienda), propuesta 01-11: hueco extra a las 18:00, del 2-11 al 5-11 (más los de 14:00/21:00 desde el 7-11)
+Archivos: `python3 fabrica/titeres/shorts05.py` → `out/shorts/ep5-*.mp4`. Vídeo relacionado: ep. 5 `8_YuuZUiVuw`. Hashtags: #Españistán #vivienda #alquiler.
+
+| # | Fecha | Archivo | Título |
+|---|---|---|---|
+| 20 | 02-11 18:00 | ep5-resta | Faltan 750.000 casas en España: la cuenta 🏠 #Shorts |
+| 21 | 03-11 18:00 | ep5-tenerife | Contrato fijo, 1.300 €… y vive en una caravana 🚐 #Shorts |
+| 22 | 04-11 18:00 | ep5-madrid | 2.000 € al mes por 90 metros en Madrid 😳 #Shorts |
+| 23 | 05-11 18:00 | ep5-orsola | Un fondo compró su edificio con ellos dentro 🏢 #Shorts |
+| 24 | 07-11 14:00 | ep5-okupacion | Okupación: las leyes que se contradicen ⚖️ #Shorts |
+| 25 | 07-11 21:00 | ep5-1998 | 1998: la ley que empezó la burbuja 🏗️ #Shorts |
+| 26 | 08-11 14:00 | ep5-promesas | 270.000 viviendas prometidas, 49.000 hechas 🤔 #Shorts |
+| 27 | 08-11 21:00 | ep5-solucion | Cómo se arregla la vivienda: 4 cosas a la vez ✅ #Shorts |

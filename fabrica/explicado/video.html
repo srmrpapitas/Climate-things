@@ -9,15 +9,24 @@ const slug = new URLSearchParams(location.search).get('v') || 'ia-ciudades';
 const carga = src => new Promise(r => { const s = document.createElement('script'); s.src = src; s.onload = r; document.body.appendChild(s); });
 window.listo = (async () => {
   await carga('motor.js'); await carga(`escenas/tiempos_${slug}.js`); await carga(`escenas/${slug}.js`);
+  if (window.VIDEO?.prepara) await VIDEO.prepara;   // escenas con imágenes: esperar a que carguen
   window.DURA = VIDEO.dura ?? TIEMPOS.fin + 1; window.FPS = M.FPS;
 })();
 const g = document.getElementById('c').getContext('2d');
+const capa = Object.assign(document.createElement('canvas'), { width: 1080, height: 1920 }).getContext('2d');   // escena suelta para la transición de zoom
 window.dibuja = t => {
   g.setTransform(1, 0, 0, 1, 0, 0); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
   // entre escenas no hay corte: la cámara viaja a la derecha (como el ejemplo, ver EJEMPLO.md) en 0,6 s; la escena vieja sale y la nueva entra
   const ini = e => e.en ?? M.F(e.desde).en - .15, lista = VIDEO.escenas;
   const sig = lista.findIndex((e, k) => k > 0 && t >= ini(e) - .25 && t < ini(e) + .35);
-  if (sig > 0) {
+  if (sig > 0 && VIDEO.transicion === 'zoom') {
+    // zoom (como el ejemplo): la cámara se mete en `foco` de la escena que sale y aterriza desenfocada en la nueva
+    const u = M.cl((t - ini(lista[sig]) + .25) / .6), sale = u < .5, esc = lista[sale ? sig - 1 : sig];
+    const v = sale ? Math.pow(M.e(u * 2), 2) : 1 - M.eo((u - .5) * 2), [fx, fy] = (sale ? esc.foco : esc.entra) || [M.W / 2, M.H / 2];
+    capa.setTransform(1, 0, 0, 1, 0, 0); capa.globalAlpha = 1; capa.filter = 'none'; capa.clearRect(0, 0, M.W, M.H); capa.save(); esc.dibuja(capa, t); capa.restore();
+    g.fillStyle = '#000'; g.fillRect(0, 0, M.W, M.H); g.filter = `blur(${(22 * Math.sin(Math.PI * u)).toFixed(1)}px)`;
+    g.save(); g.translate(fx, fy); g.scale(1 + (sale ? 3 : 1.4) * v, 1 + (sale ? 3 : 1.4) * v); g.translate(-fx, -fy); g.drawImage(capa.canvas, 0, 0); g.restore(); g.filter = 'none';
+  } else if (sig > 0) {
     const u = M.e(M.cl((t - ini(lista[sig]) + .25) / .6));
     for (const [esc, dx] of [[lista[sig - 1], -M.W * u], [lista[sig], M.W * (1 - u)]]) {
       g.save(); g.beginPath(); g.rect(dx, 0, M.W, M.H); g.clip(); g.translate(dx, 0); esc.dibuja(g, t); g.restore(); }

@@ -2,6 +2,10 @@
 
 **Antes de nada, leer `fabrica/manual/CAPITULO-SIGUIENTE.md` (cómo hacer el siguiente capítulo, estilo aprobado), `fabrica/manual/PLAN-10-SEMANA.md` (costes), `fabrica/manual/COMO-HACER-UN-VIDEO.md` (el proceso), `fabrica/manual/PLAN-15.md` (cómo ahorrar), `fabrica/manual/RETOMAR.md` (trabajo en curso) y `fabrica/manual/README.md`**: voz, música, efectos, render y herramientas.
 
+**Vídeo viral** (reel meme de IG, el chorizo portuano: fórmula y paso a paso): `fabrica/explicado/VIDEO-VIRAL.md`.
+
+**Escenas épicas** (primeros planos que hablan, boca sincronizada con la voz, drones, rampas de velocidad, cortes en la palabra): `fabrica/manual/EFECTOS-EPICOS.md`.
+
 ## Reglas de trabajo (ahorro de tokens)
 - Producir un video = escribir/editar SOLO `videos/<slug>.yaml`. No abrir ni reescribir plantillas salvo que se pida.
 - Formato y tipos de escena: `esqueletos/README.md`. Reglas obligatorias: `reglas/retencion.md` (validar R8 antes de renderizar).

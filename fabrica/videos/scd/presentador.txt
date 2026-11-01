@@ -1,0 +1,17 @@
+# Presentador SCD, frase a frase (una llamada de voz por frase y luego se pegan).
+# Orden copiado de la referencia (Downloads/Arena Background. Bruce Buffer Championship Introduction.mp4):
+#   «And now… it's time» → «introducing the champion» → «fighting out of the red corner» → estilo («he is a gamer and a striker»)
+#   → altura → peso → «fighting out of [ciudad, estado, país]» → título («presenting the … champion of the world») → NOMBRE.
+# Ritmo medido: arranque estirado (4 palabras en ≈ 5 s); datos rápidos (≈ 3 palabras/s) con la última palabra estirada;
+# pausas de 0,35–0,45 s; el nombre es lo más fuerte.
+# En inglés solo «And introducing first» y «The one and only». Mezcla: eco MUY suave + público y ambiente de fondo.
+# Formato: NN | archivo | velocidad | entonación | texto
+01 | 01 | 1,0  | susurro grave → explota                 | Señoras y señores… ¡ES… LA… HOOOORA!     (01 + 02 actuales)
+02 | 03 | 1,0  | grito de arena                         | ¡Bienvenidos… al COMBATE DEL AÑOOOO!
+03 | 04 | 1,25 | inglés, «AAAND» eterno                 | AAAAAAAAAND INTRODUCING FIRST!
+04 | 05 | 1,1  | seco y rápido, estira «empates»        | Peleando desde la esquina roja… con un récord profesional de: dos guerras. Deportaciones. Una elección perdida… y CERO empates.
+05 | 06 | 1,0  | rápido, guiño en «naranja»             | Mide un metro noventa… pesa ciento dos kilos… y es de color… naranja.
+06 | 12 | 1,1  | rápido, estira el final                | Peleando desde Washington D. C.… Estados Unidos de Américaaa…
+07 | 13 | 1,0  | sube, épico                            | Presentando… al presidente… de los Estados Unidooos…
+08 | 14 | 1,0  | inglés, cada palabra suelta y enorme   | THE ONE… AND ONLY…
+09 | 15 | 1,25 | explosión rápida y concisa             | DO… DOO… ¡DOOONALD TRUUUMP!

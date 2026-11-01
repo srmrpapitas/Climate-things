@@ -11,6 +11,7 @@ VOZ = "851ejYcv2BoNPjrkw93G"   # Tony «Your Casual Voice»: cercano, elegido po
 MODELO = "eleven_v4"
 PAUSA = 0.18                   # entre frases: corto, ritmo de vídeo vertical
 LPS = 14.0
+VELOCIDAD = float(sys.argv[sys.argv.index('--velocidad') + 1]) if '--velocidad' in sys.argv else None   # 0,7–1,2 (ElevenLabs); el viral de referencia va a 209 palabras/min
 
 def fichas(frase):
     """[(voz, pantalla, clave)] por palabra de pantalla; voz puede ser varias palabras."""
@@ -80,7 +81,7 @@ def dura_total(a):
 def generar_id(texto, destino, previas, voz):
     """Como generar, pero encadena la entonación con los bloques anteriores (previous_request_ids) y devuelve el id."""
     clave = open(os.path.expanduser("~/.elevenlabs_key")).read().strip()
-    cuerpo = {"text": texto, "model_id": MODELO, "language_code": "es", "previous_request_ids": previas[-3:]}
+    cuerpo = {"text": texto, "model_id": MODELO, "language_code": "es", "previous_request_ids": previas[-3:], **({"voice_settings": {"speed": VELOCIDAD}} if VELOCIDAD else {})}
     r = subprocess.run(["curl", "-sS", "--fail-with-body", "-K", "-", "-D", destino + ".cab", "-H", "Content-Type: application/json", "--data-binary", json.dumps(cuerpo),
                         f"https://api.elevenlabs.io/v1/text-to-speech/{voz}/with-timestamps?output_format=mp3_44100_128"],
                        input=f'header = "xi-api-key: {clave}"\n', text=True, capture_output=True)

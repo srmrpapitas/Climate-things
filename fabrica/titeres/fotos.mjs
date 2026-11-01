@@ -6,7 +6,7 @@ const [nombre, ...tiempos] = process.argv.slice(2), dir = `out/fotos_${nombre}`;
 const nav = await chromium.launch({ args: ['--use-angle=metal', '--enable-gpu-rasterization', '--ignore-gpu-blocklist'] });
 const pag = await nav.newPage({ viewport: { width: 1280, height: 720 }, deviceScaleFactor: 1 });
 pag.on('pageerror', e => { console.error('ERROR en la escena:', e.message); process.exit(1); });
-await pag.goto(`http://localhost:8765/fabrica/titeres/escena.html?e=${nombre}`);
+await pag.goto(`http://localhost:8765/fabrica/titeres/escena.html?e=${nombre}${process.env.Q ? `&${process.env.Q}` : ""}`);
 await pag.evaluate(async () => { window.grabando = true; await window.listo; });
 for (const t of tiempos) {
   const png = await pag.evaluate(t => { window.dibuja(t); return document.getElementById('c').toDataURL('image/png').split(',')[1]; }, +t);
